@@ -2,6 +2,7 @@ package com.kousen.cert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kousen.cert.model.CertificateRequest;
+import com.kousen.cert.service.CertificateStorageService;
 import com.kousen.cert.service.PdfService;
 import org.apache.pdfbox.pdmodel.PDDocument; // Import PDFBox
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -14,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +38,9 @@ class CertificateControllerTest {
 
     @MockitoBean
     private PdfService pdfService;
+    
+    @MockitoBean
+    private CertificateStorageService storageService;
 
     @Test
     void shouldCreateCertificateAndReturnPdf() throws Exception {
@@ -53,6 +59,7 @@ class CertificateControllerTest {
         }
 
         when(pdfService.createPdf(any(), any())).thenReturn(tempPdf);
+        when(storageService.storeCertificate(any(), any())).thenReturn(tempPdf);
 
         // When/Then
         mockMvc.perform(post("/api/certificates")
@@ -94,5 +101,44 @@ class CertificateControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.availableBooks").isArray())
                 .andExpect(jsonPath("$.availableBooks.length()").value(6));
+    }
+    
+    @Test
+    void shouldListStoredCertificates() throws Exception {
+        // Given
+        List<Path> mockCertificates = List.of(
+            Paths.get("/test/cert1.pdf"),
+            Paths.get("/test/cert2.pdf")
+        );
+        when(storageService.listAllCertificates()).thenReturn(mockCertificates);
+        when(storageService.getStoragePath()).thenReturn(Paths.get("/test"));
+        
+        // When/Then
+        mockMvc.perform(get("/api/certificates/stored"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.certificates").isArray())
+                .andExpect(jsonPath("$.count").value(2));
+    }
+    
+    @Test
+    void shouldGetStoredCertificate() throws Exception {
+        // Given - create a temporary real file for testing
+        Path tempPdf = Files.createTempFile("test-cert-", ".pdf");
+        try {
+            // Create a simple PDF file
+            Files.writeString(tempPdf, "Test PDF content");
+            
+            // Set up the mock to return the real file
+            String filename = tempPdf.getFileName().toString();
+            when(storageService.getCertificate(filename)).thenReturn(tempPdf);
+            
+            // When/Then - should work with a real file
+            mockMvc.perform(get("/api/certificates/stored/" + filename))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_PDF));
+        } finally {
+            // Clean up
+            Files.deleteIfExists(tempPdf);
+        }
     }
 }

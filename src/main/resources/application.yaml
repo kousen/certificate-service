@@ -4,3 +4,5 @@ spring:
       enabled: true
 certificate:
   keystore: ${user.home}/.cert_keystore.p12
+  storage:
+    path: ${user.home}/certificate-service/certificates
