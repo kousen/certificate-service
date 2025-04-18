@@ -24,9 +24,22 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Configure font directory
-            ClassPathResource fontResource = new ClassPathResource("/fonts");
-            renderer.getFontResolver().addFontDirectory(fontResource.getFile().getAbsolutePath(), true);
+            // Register fonts directly by file path rather than by directory
+            try {
+                // Load fonts directly one by one
+                ClassPathResource cinzelFont = new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf");
+                ClassPathResource greatVibesFont = new ClassPathResource("/fonts/GreatVibes-Regular.ttf");
+                
+                // Add each font individually
+                renderer.getFontResolver().addFont(
+                    cinzelFont.getFile().getAbsolutePath(), 
+                    true);
+                renderer.getFontResolver().addFont(
+                    greatVibesFont.getFile().getAbsolutePath(), 
+                    true);
+            } catch (Exception e) {
+                throw new IOException("Failed to load fonts: " + e.getMessage(), e);
+            }
             
             // Render the PDF - the classpath: prefix in the HTML/CSS will be resolved relative to the baseUrl
             renderer.setDocumentFromString(html, baseUrl);
