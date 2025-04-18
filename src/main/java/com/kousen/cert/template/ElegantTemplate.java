@@ -13,9 +13,9 @@ public record ElegantTemplate() implements PdfTemplate {
     @Override
     public String html(CertificateRequest r) {
         try {
-            // Read template file
+            // Read template file using InputStream to work with JAR resources
             var resource = new ClassPathResource("templates/elegant-certificate.html");
-            String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
+            String template = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             
             // Generate QR code with certificate-specific verification URL
             String qrCode = QrCodeUtil.dataUri(r.purchaserName(), r.bookTitle(), 220);

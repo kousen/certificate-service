@@ -52,7 +52,8 @@ public class VerificationController {
         model.addAttribute("issueDate", issueDate != null ? issueDate : "Not specified");
         model.addAttribute("certificateFingerprint", certificateFingerprint);
         
-        return "verify-certificate";
+        // Use "verification-page" as the view name to avoid circular view path error
+        return "verification-page";
     }
     
     /**
@@ -61,6 +62,26 @@ public class VerificationController {
      */
     protected String generateCertificateFingerprint(String keystorePath) {
         try {
+            // Handle potential environment variable in the path
+            if (keystorePath.startsWith("${") && keystorePath.endsWith("}")) {
+                String envVarName = keystorePath.substring(2, keystorePath.length() - 1);
+                String envValue = System.getenv(envVarName);
+                if (envValue == null) {
+                    // Extract default value if present (format: ${ENV_VAR:default})
+                    if (envVarName.contains(":")) {
+                        String[] parts = envVarName.split(":", 2);
+                        String defaultValue = parts[1];
+                        keystorePath = defaultValue;
+                    } else {
+                        logger.warn("Environment variable {} not found", envVarName);
+                        return "Certificate fingerprint not available - keystore path not configured";
+                    }
+                } else {
+                    keystorePath = envValue;
+                }
+            }
+            
+            logger.info("Loading keystore from: {}", keystorePath);
             KeyStoreProvider provider = new KeyStoreProvider(Paths.get(keystorePath));
             Certificate cert = provider.keyStore().getCertificate("authorKey");
             
@@ -83,7 +104,7 @@ public class VerificationController {
             
             return "Certificate fingerprint not available";
         } catch (Exception e) {
-            logger.error("Failed to generate certificate fingerprint", e);
+            logger.error("Failed to generate certificate fingerprint: {}", e.getMessage(), e);
             return "Error generating certificate fingerprint";
         }
     }

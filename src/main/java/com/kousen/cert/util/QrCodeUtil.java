@@ -14,6 +14,7 @@ import java.util.Base64;
 public final class QrCodeUtil {
     private QrCodeUtil() {}
 
+    // Keep the URL path the same as the endpoint in VerificationController
     private static final String DEFAULT_VERIFICATION_URL = "/verify-certificate";
     
     /**

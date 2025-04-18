@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Service - Ken Kousen</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Certificate Service</h1>
+        <p>Generate and verify digitally signed PDF certificates</p>
+    </div>
+
+    <div class="card">
+        <h2>About This Service</h2>
+        <p>This application generates beautiful, digitally signed certificates of ownership for books or other digital content. Each certificate includes:</p>
+        <ul>
+            <li>Elegantly designed PDF with custom typography</li>
+            <li>Secure 4096-bit RSA digital signature</li>
+            <li>QR code for certificate verification</li>
+            <li>Unique certificate fingerprint</li>
+        </ul>
+        <p>The digital signature ensures that certificates cannot be tampered with and provides mathematical proof of authenticity.</p>
+    </div>
+
+    <h2>API Endpoints</h2>
+    
+    <div class="api-endpoint">
+        <div>
+            <span class="endpoint-method">POST</span>
+            <span class="endpoint-url">/api/certificates</span>
+        </div>
+        <div class="endpoint-desc">Generate a new certificate</div>
+        <details>
+            <summary>Request format</summary>
+            <pre>
+{
+  "purchaserName": "Jane Smith",
+  "bookTitle": "Tales from the Jar Side"
+}
+            </pre>
+        </details>
+    </div>
+
+    <div class="api-endpoint">
+        <div>
+            <span class="endpoint-method">GET</span>
+            <span class="endpoint-url">/verify-certificate?name=Jane%20Smith&book=Tales%20from%20the%20Jar%20Side&date=2025-04-18</span>
+        </div>
+        <div class="endpoint-desc">Verify a certificate and view its details</div>
+    </div>
+
+    <h2>How to Use</h2>
+    
+    <div class="steps">
+        <div class="step">
+            <span class="step-number">1.</span>
+            <div>Generate a certificate by sending a POST request to <code>/api/certificates</code> with the required JSON data</div>
+        </div>
+        <div class="step">
+            <span class="step-number">2.</span>
+            <div>Download the resulting PDF certificate</div>
+        </div>
+        <div class="step">
+            <span class="step-number">3.</span>
+            <div>To verify, scan the QR code on the certificate or visit the verification URL directly</div>
+        </div>
+        <div class="step">
+            <span class="step-number">4.</span>
+            <div>Check the certificate's digital signature in Adobe Reader to confirm it hasn't been tampered with</div>
+        </div>
+    </div>
+
+    <h2>Try It Out</h2>
+    <p>Generate a sample certificate for yourself to see how it works:</p>
+    
+    <div class="card">
+        <form id="demo-form">
+            <div style="margin-bottom: 15px;">
+                <label for="name" style="display: block; margin-bottom: 5px;">Your Name:</label>
+                <input type="text" id="name" name="name" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Enter your name">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="book" style="display: block; margin-bottom: 5px;">Book Title:</label>
+                <input type="text" id="book" name="book" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="Tales from the Jar Side" placeholder="Enter book title">
+            </div>
+            <button type="submit" class="demo-button">Generate Certificate</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('demo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const book = document.getElementById('book').value;
+            
+            if (!name || !book) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            fetch('/api/certificates', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    purchaserName: name,
+                    bookTitle: book
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Certificate generation failed');
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'certificate.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+            .catch(error => {
+                alert('Error: ' + error.message);
+            });
+        });
+    </script>
+
+    <div class="footer">
+        <p>© 2025 Ken Kousen | Tales from the Jar Side</p>
+        <p>Powered by Spring Boot, Flying Saucer, PDFBox, and BouncyCastle</p>
+    </div>
+</body>
+</html>

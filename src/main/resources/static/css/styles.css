@@ -1,0 +1,168 @@
+/* Base styles for certificate service */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+h2 {
+    color: #3498db;
+    margin-top: 30px;
+}
+
+.card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    border-left: 4px solid #3498db;
+    margin-bottom: 20px;
+}
+
+.steps {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.step {
+    margin-bottom: 15px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.step-number {
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    color: #3498db;
+}
+
+code {
+    background-color: #f1f1f1;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.api-endpoint {
+    background-color: #e8f4f8;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.endpoint-method {
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.endpoint-url {
+    font-family: monospace;
+    margin-left: 10px;
+}
+
+.endpoint-desc {
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.demo-button {
+    display: inline-block;
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.demo-button:hover {
+    background-color: #2980b9;
+}
+
+.footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.9em;
+    color: #7f8c8d;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+}
+
+/* Form styles */
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Certificate-specific styles */
+.certificate-details {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 5px;
+    border-left: 4px solid #3498db;
+    margin-bottom: 30px;
+}
+
+.details-item {
+    margin-bottom: 10px;
+}
+
+.details-label {
+    font-weight: bold;
+    display: inline-block;
+    width: 120px;
+}
+
+.valid-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #2ecc71;
+    color: white;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* QR code styles */
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.qr {
+    width: 150px;
+    height: 150px;
+    margin-bottom: 10px;
+}
+
+.qr-text {
+    font-size: 0.9em;
+    color: #555;
+    text-align: center;
+}

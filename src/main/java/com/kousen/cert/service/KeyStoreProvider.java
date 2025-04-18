@@ -33,7 +33,24 @@ public class KeyStoreProvider {
 
     public KeyStoreProvider(Path storePath) {
         this.storePath = storePath;
-        this.pwd = System.getProperty("CERT_PWD", "changeit").toCharArray();
+        // Check environment variable first, then system property, then default
+        String password = System.getenv("CERT_PWD");
+        if (password == null) {
+            password = System.getProperty("CERT_PWD", "changeit");
+        }
+        this.pwd = password.toCharArray();
+        
+        // Create parent directories if they don't exist
+        try {
+            Path parent = storePath.getParent();
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+        } catch (Exception e) {
+            // Log but continue, as the actual file operation will fail with a more specific error
+            System.err.println("Failed to create parent directories: " + e.getMessage());
+        }
+        
         this.keyStore = Files.exists(storePath) ? load() : create();
     }
 

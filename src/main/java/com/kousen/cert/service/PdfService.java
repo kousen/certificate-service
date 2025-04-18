@@ -24,18 +24,22 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Register fonts directly by file path rather than by directory
+            // Register fonts using bytes from input streams to work with JAR resources
             try {
-                // Load fonts directly one by one
+                // Load fonts directly from resources
                 ClassPathResource cinzelFont = new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf");
                 ClassPathResource greatVibesFont = new ClassPathResource("/fonts/GreatVibes-Regular.ttf");
                 
-                // Add each font individually
+                // Add each font using byte arrays instead of file paths
                 renderer.getFontResolver().addFont(
-                    cinzelFont.getFile().getAbsolutePath(), 
+                    cinzelFont.getInputStream().readAllBytes(), 
+                    "CinzelDecorative", 
+                    0, 
                     true);
                 renderer.getFontResolver().addFont(
-                    greatVibesFont.getFile().getAbsolutePath(), 
+                    greatVibesFont.getInputStream().readAllBytes(), 
+                    "GreatVibes", 
+                    0, 
                     true);
             } catch (Exception e) {
                 throw new IOException("Failed to load fonts: " + e.getMessage(), e);

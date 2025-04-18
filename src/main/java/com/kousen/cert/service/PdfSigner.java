@@ -45,14 +45,21 @@ public class PdfSigner implements SignatureInterface {
     private void initializeKeyMaterial() {
         try {
             KeyStore ks = provider.keyStore();
-            char[] pwd = System.getProperty("CERT_PWD", "changeit").toCharArray();
+            
+            // Check environment variable first, then system property, then default
+            String password = System.getenv("CERT_PWD");
+            if (password == null) {
+                password = System.getProperty("CERT_PWD", "changeit");
+            }
+            char[] pwd = password.toCharArray();
+            
             privateKey = (PrivateKey) ks.getKey("authorKey", pwd);
             certificateChain = ks.getCertificateChain("authorKey");
             if (privateKey == null || certificateChain == null) {
                 throw new IllegalStateException("Key or certificate chain not found");
             }
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to initialize key material", e);
+            throw new IllegalStateException("Failed to initialize key material: " + e.getMessage(), e);
         }
     }
 
