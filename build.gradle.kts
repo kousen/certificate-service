@@ -12,6 +12,7 @@ repositories { mavenCentral() }
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.xhtmlrenderer:flying-saucer-pdf:9.12.0")
     implementation("com.github.librepdf:openpdf:2.0.3")
     implementation("org.apache.pdfbox:pdfbox:3.0.4")

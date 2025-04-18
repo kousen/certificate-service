@@ -18,8 +18,10 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CertificateController.class)
@@ -61,5 +63,36 @@ class CertificateControllerTest {
 
         // Clean up
         Files.deleteIfExists(tempPdf);
+    }
+    
+    @Test
+    void shouldRejectInvalidBookTitle() throws Exception {
+        // Given
+        String requestJson = """
+                {
+                    "purchaserName": "Test User",
+                    "bookTitle": "Invalid Book Title",
+                    "purchaserEmail": "test@example.com"
+                }
+                """;
+
+        // When/Then
+        mockMvc.perform(post("/api/certificates")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Validation Error"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").exists())
+                .andExpect(jsonPath("$.timestamp").exists())
+                .andExpect(jsonPath("$.errors.bookTitle").exists());
+    }
+    
+    @Test
+    void shouldReturnAvailableBooks() throws Exception {
+        mockMvc.perform(get("/api/certificates/books"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableBooks").isArray())
+                .andExpect(jsonPath("$.availableBooks.length()").value(6));
     }
 }

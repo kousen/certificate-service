@@ -3,13 +3,17 @@ package com.kousen.cert.controller;
 import com.kousen.cert.model.CertificateRequest;
 import com.kousen.cert.service.*;
 import com.kousen.cert.template.ElegantTemplate;
+import jakarta.validation.Valid;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/certificates")
@@ -25,12 +29,20 @@ public class CertificateController {
     }
 
     @PostMapping(produces = "application/pdf")
-    public ResponseEntity<FileSystemResource> create(@RequestBody CertificateRequest req) throws Exception {
+    public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req) throws Exception {
         Path unsigned = pdfService.createPdf(new ElegantTemplate(), req);
         Path signed   = pdfSigner.sign(unsigned);
         FileSystemResource res = new FileSystemResource(signed);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"certificate.pdf\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
                 .body(res);
     }
+    
+    @GetMapping("/books")
+    public ResponseEntity<Map<String, Object>> getAvailableBooks() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("availableBooks", CertificateRequest.ALLOWED_BOOK_TITLES);
+        return ResponseEntity.ok(response);
+    }
+    
 }

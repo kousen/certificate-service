@@ -34,7 +34,7 @@ class ElegantTemplateTest {
         ElegantTemplate template = new ElegantTemplate();
         CertificateRequest request = new CertificateRequest(
                 "John & Jane Doe", 
-                "Java & Spring <Guide>", 
+                "Modern Java Recipes", // Using an allowed book title
                 Optional.empty()
         );
         
@@ -44,6 +44,6 @@ class ElegantTemplateTest {
         // Then
         assertThat(html).isNotNull();
         assertThat(html).contains("John &amp; Jane Doe");  // Encoded ampersand
-        assertThat(html).contains("Java &amp; Spring &lt;Guide&gt;"); // Encoded special chars
+        assertThat(html).contains("Modern Java Recipes"); // Valid book title
     }
 }
