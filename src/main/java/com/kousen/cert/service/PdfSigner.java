@@ -4,6 +4,17 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
+import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
+import org.bouncycastle.cms.CMSSignedDataGenerator;
+import org.bouncycastle.cms.CMSSignedData;
+import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.cert.jcajce.JcaCertStore;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.IOException;
@@ -12,29 +23,41 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.*;
 import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Calendar;
 
-public class PdfSigner {
+public class PdfSigner implements SignatureInterface {
 
     private final KeyStoreProvider provider;
+    private PrivateKey privateKey;
+    private Certificate[] certificateChain;
 
     public PdfSigner(KeyStoreProvider provider) {
         this.provider = provider;
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new BouncyCastleProvider());
         }
+        // Initialize keys and certificates
+        initializeKeyMaterial();
+    }
+
+    private void initializeKeyMaterial() {
+        try {
+            KeyStore ks = provider.keyStore();
+            char[] pwd = System.getProperty("CERT_PWD", "changeit").toCharArray();
+            privateKey = (PrivateKey) ks.getKey("authorKey", pwd);
+            certificateChain = ks.getCertificateChain("authorKey");
+            if (privateKey == null || certificateChain == null) {
+                throw new IllegalStateException("Key or certificate chain not found");
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to initialize key material", e);
+        }
     }
 
     public Path sign(Path in) throws Exception {
         Path signed = Files.createTempFile("cert-signed-", ".pdf");
-
-        KeyStore ks = provider.keyStore();
-        char[] pwd = System.getProperty("CERT_PWD", "changeit").toCharArray();
-        PrivateKey pk = (PrivateKey) ks.getKey("authorKey", pwd);
-        Certificate[] chain = ks.getCertificateChain("authorKey");
-        if (pk == null || chain == null) {
-            throw new IllegalStateException("Key or certificate chain not found");
-        }
 
         try (PDDocument doc = Loader.loadPDF(in.toFile());
              SignatureOptions options = new SignatureOptions()) {
@@ -43,27 +66,72 @@ public class PdfSigner {
             sig.setFilter(PDSignature.FILTER_ADOBE_PPKLITE);
             sig.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_DETACHED);
             sig.setName("Ken Kousen");
+            sig.setLocation("Connecticut, USA");
+            sig.setReason("Certificate of Ownership");
             sig.setSignDate(Calendar.getInstance());
             
-            // Set certificate chain in the signature options
+            // Set signature size
             options.setPreferredSignatureSize(SignatureOptions.DEFAULT_SIGNATURE_SIZE * 2);
             
-            // Add the signature
-            doc.addSignature(sig, (InputStream content) -> {
-                try {
-                    Signature signature = Signature.getInstance("SHA512withRSA");
-                    signature.initSign(pk);
+            // Add signature using the provided SignatureInterface implementation
+            doc.addSignature(sig, this, options);
 
-                    byte[] buffer = content.readAllBytes();
-                    signature.update(buffer);
-                    return signature.sign();
-                } catch (GeneralSecurityException | IOException e) {
-                    throw new IOException(e);
-                }
-            }, options);
-
+            // Save incrementally
             doc.saveIncremental(Files.newOutputStream(signed));
         }
         return signed;
+    }
+
+    // SignatureInterface implementation for creating the actual signature with proper CMS data
+    @Override
+    public byte[] sign(InputStream content) throws IOException {
+        try {
+            // Read content to be signed
+            byte[] buffer = content.readAllBytes();
+            
+            // Create a CMS Signed Data Generator
+            CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
+            
+            // Get the signing certificate
+            X509Certificate signingCert = (X509Certificate) certificateChain[0];
+            X509CertificateHolder certHolder = new JcaX509CertificateHolder(signingCert);
+            
+            // Add the certificate to the generator
+            gen.addCertificate(certHolder);
+            
+            // Create a store of chain certificates
+            JcaCertStore certStore = new JcaCertStore(Arrays.asList(certificateChain));
+            gen.addCertificates(certStore);
+            
+            // Create the signature
+            JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA512withRSA");
+            contentSignerBuilder.setProvider(BouncyCastleProvider.PROVIDER_NAME);
+            
+            // Add the signer information
+            JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
+                    new JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build());
+            
+            // Important: This makes it clear this is for non-repudiation (legal signatures)
+            signerInfoBuilder.setDirectSignature(true);
+            
+            gen.addSignerInfoGenerator(signerInfoBuilder.build(
+                    contentSignerBuilder.build(privateKey), certHolder));
+            
+            // Create the signed data
+            CMSProcessableByteArray processableData = new CMSProcessableByteArray(buffer);
+            CMSSignedData signedData = gen.generate(processableData, false);
+            
+            // Return encoded signature
+            return signedData.getEncoded();
+            
+        } catch (Exception e) {
+            throw new IOException("Failed to create signature", e);
+        }
+    }
+    
+    // Helper method to add a visual explanation for users
+    public void addVisualSignatureExplanation(PDDocument document) throws IOException {
+        // Implementation could be added to create a visual explanation
+        // of the self-signed certificate status on the PDF
     }
 }

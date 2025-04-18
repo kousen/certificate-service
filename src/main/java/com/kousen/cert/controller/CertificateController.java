@@ -58,6 +58,7 @@ public class CertificateController {
             FileSystemResource res = new FileSystemResource(signed);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
+                    .header("X-Certificate-Status", "Self-signed - May show warnings in PDF readers")
                     .body(res);
         } finally {
             // Clean up the temporary unsigned PDF if it still exists
@@ -128,11 +129,25 @@ public class CertificateController {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_PDF)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .header("X-Certificate-Status", "Self-signed - May show warnings in PDF readers")
                     .body(resource);
         } catch (IOException e) {
             logger.error("Certificate not found: {}", filename, e);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Certificate not found", e);
         }
+    }
+    
+    @GetMapping("/signature-info")
+    public ResponseEntity<Map<String, String>> getSignatureInfo() {
+        return ResponseEntity.ok(Map.of(
+            "certificateType", "Self-signed X.509",
+            "signatureAlgorithm", "SHA512withRSA",
+            "keySize", "4096 bits",
+            "validationStatus", "This certificate is self-signed. Adobe and other PDF readers will display " +
+                               "warnings because it's not from a trusted certificate authority (CA).",
+            "userExperience", "Recipients will need to manually trust the certificate or simply " +
+                              "accept the warning to view the certificate."
+        ));
     }
     
 }
