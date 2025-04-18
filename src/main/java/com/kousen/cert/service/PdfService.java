@@ -20,15 +20,15 @@ public class PdfService {
             // Create a new ITextRenderer
             var renderer = new ITextRenderer();
             
-            // Set base URL for resource loading
-            ClassPathResource resource = new ClassPathResource("/");
-            String baseUrl = resource.getURL().toExternalForm();
+            // Configure resources and fonts
+            ClassPathResource rootResource = new ClassPathResource("/");
+            String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Configure the font resolver
-            renderer.getFontResolver().addFontDirectory(
-                    new ClassPathResource("/fonts").getFile().getAbsolutePath(), true);
+            // Configure font directory
+            ClassPathResource fontResource = new ClassPathResource("/fonts");
+            renderer.getFontResolver().addFontDirectory(fontResource.getFile().getAbsolutePath(), true);
             
-            // Render the PDF
+            // Render the PDF - the classpath: prefix in the HTML/CSS will be resolved relative to the baseUrl
             renderer.setDocumentFromString(html, baseUrl);
             renderer.layout();
             renderer.createPDF(os);

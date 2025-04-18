@@ -40,7 +40,7 @@ class PdfServiceTest {
             
             // Verify content
             assertThat(text).contains("Certificate of Ownership");
-            assertThat(text).contains("James Goslin");
+            assertThat(text).contains("James Gosling");
             assertThat(text).contains("Modern Java Recipes");
         }
         
