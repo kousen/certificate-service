@@ -28,11 +28,9 @@ public class CustomFontResolver {
     public static void registerFonts(ITextRenderer renderer) throws IOException {
         ITextFontResolver fontResolver = renderer.getFontResolver();
         
-        // Register "CinzelDecorative" font
-        registerFont(fontResolver, "/fonts/CinzelDecorative-Regular.ttf", "CinzelDecorative", false, false);
-        
-        // Register "GreatVibes" font
-        registerFont(fontResolver, "/fonts/GreatVibes-Regular.ttf", "GreatVibes", false, false);
+        // Register custom fonts
+        registerFont(fontResolver, "/fonts/CinzelDecorative-Regular.ttf");
+        registerFont(fontResolver, "/fonts/GreatVibes-Regular.ttf");
         
         // Add cleanup hook for temporary files on JVM shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -49,43 +47,30 @@ public class CustomFontResolver {
     /**
      * Register a single font with the renderer
      */
-    private static void registerFont(ITextFontResolver fontResolver, 
-                                    String resourcePath, 
-                                    String fontFamily, 
-                                    boolean italic, 
-                                    boolean bold) throws IOException {
+    private static void registerFont(ITextFontResolver fontResolver, String resourcePath) throws IOException {
         // Check if we already have this font as a temp file
         if (fontTempFiles.containsKey(resourcePath)) {
             // Use cached temp file
-            fontResolver.addFont(
-                fontTempFiles.get(resourcePath).toString(),
-                fontFamily,
-                italic,
-                bold,
-                true  // embedded
-            );
+            fontResolver.addFont(fontTempFiles.get(resourcePath).toString(), true);
             return;
         }
         
+        // Create a readable font name for the temp file
+        String fontName = resourcePath.substring(resourcePath.lastIndexOf('/') + 1, resourcePath.lastIndexOf('.'));
+        
         // Create temporary file for the font
         ClassPathResource fontResource = new ClassPathResource(resourcePath);
-        Path tempFontFile = Files.createTempFile(fontFamily, ".ttf");
+        Path tempFontFile = Files.createTempFile(fontName, ".ttf");
         
         // Copy font data to temporary file
         Files.copy(fontResource.getInputStream(), tempFontFile, StandardCopyOption.REPLACE_EXISTING);
         
-        // Register the font
-        fontResolver.addFont(
-            tempFontFile.toString(),
-            fontFamily,
-            italic,
-            bold,
-            true  // embedded
-        );
+        // Register the font with the renderer
+        fontResolver.addFont(tempFontFile.toString(), true);
         
         // Cache the temporary file
         fontTempFiles.put(resourcePath, tempFontFile);
         
-        System.out.println("Registered font: " + fontFamily + " (" + resourcePath + ")");
+        System.out.println("Registered font: " + fontName + " (" + tempFontFile + ")");
     }
 }
