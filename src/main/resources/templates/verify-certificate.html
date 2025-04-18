@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Verification</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 20px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .certificate-details {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 30px;
+        }
+        .certificate-details h2 {
+            margin-top: 0;
+            color: #3498db;
+        }
+        .details-item {
+            margin-bottom: 10px;
+        }
+        .details-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        .verification-steps {
+            background-color: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .verification-steps h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .step {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .step-number {
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .signature-info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f4f8;
+            border-radius: 5px;
+        }
+        .signature-info h3 {
+            margin-top: 0;
+            color: #2980b9;
+        }
+        .public-key {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        .valid-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Certificate Verification</h1>
+        <p>Verify the authenticity of your certificate from Ken Kousen</p>
+    </div>
+
+    <div class="certificate-details">
+        <h2>Certificate Details</h2>
+        <div class="details-item">
+            <span class="details-label">Name:</span>
+            <span class="details-value" id="purchaser-name">${name}</span>
+        </div>
+        <div class="details-item">
+            <span class="details-label">Book Title:</span>
+            <span class="details-value" id="book-title">${bookTitle}</span>
+        </div>
+        <div class="details-item">
+            <span class="details-label">Issue Date:</span>
+            <span class="details-value" id="issue-date">${issueDate}</span>
+        </div>
+        <div class="details-item">
+            <span class="details-label">Status:</span>
+            <span class="valid-badge">Valid</span>
+        </div>
+    </div>
+
+    <div class="verification-steps">
+        <h2>How to Verify This Certificate</h2>
+        <div class="step">
+            <span class="step-number">1.</span>
+            <div>Open Adobe Reader and load the PDF certificate</div>
+        </div>
+        <div class="step">
+            <span class="step-number">2.</span>
+            <div>Click on the Signature Panel (usually found in the left sidebar)</div>
+        </div>
+        <div class="step">
+            <span class="step-number">3.</span>
+            <div>Right-click on the signature and select "Show Signature Properties"</div>
+        </div>
+        <div class="step">
+            <span class="step-number">4.</span>
+            <div>Click "Show Signer's Certificate" to view certificate details</div>
+        </div>
+        <div class="step">
+            <span class="step-number">5.</span>
+            <div>Compare the certificate details with the information provided here</div>
+        </div>
+    </div>
+
+    <div class="signature-info">
+        <h3>About the Digital Signature</h3>
+        <p>Each certificate is digitally signed with a 4096-bit RSA key using SHA-512 algorithm. While the certificate is self-signed (not issued by a central Certificate Authority), the signature mathematically guarantees that the PDF has not been altered since it was signed.</p>
+        
+        <h3>Signer's Public Key Fingerprint</h3>
+        <div class="public-key">Ken Kousen
+Tales from the Jar Side
+Certificate Fingerprint (SHA-256):
+${certificateFingerprint}</div>
+    </div>
+</body>
+</html>

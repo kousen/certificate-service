@@ -14,7 +14,7 @@ import java.util.Base64;
 public final class QrCodeUtil {
     private QrCodeUtil() {}
 
-    private static final String DEFAULT_VERIFICATION_URL = "https://talesofthejarside.com/verify-certificate";
+    private static final String DEFAULT_VERIFICATION_URL = "/verify-certificate";
     
     /**
      * Gets the verification URL for a specific certificate
