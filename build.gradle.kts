@@ -34,7 +34,8 @@ tasks.bootJar {
 tasks.test {
     useJUnitPlatform()
 
-    jvmArgs?.addAll(listOf("-Xshare:off"))
+    // Disable class data sharing
+    jvmArgs("-Xshare:off")
     
     // Increase heap size for tests
     minHeapSize = "256m"
