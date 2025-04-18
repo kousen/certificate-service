@@ -26,33 +26,18 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Simplified font loading approach
+            // Very simple font handling approach
             try {
-                // Use a direct URL-based approach that works well with classpath resources in JAR
+                // Set the base URL so the XML renderer can find resources
                 renderer.getSharedContext().setBaseURL(baseUrl);
                 
-                // Log font loading
-                System.out.println("=== FONT DEBUG INFORMATION ===");
-                System.out.println("Base URL: " + baseUrl);
+                // Instead of using custom fonts, just use SYSTEM fonts in the HTML
+                // This is more reliable for deployment environments
+                System.out.println("Using system fonts instead of custom fonts for reliability");
                 
-                // Register fonts directly and tell Flying Saucer to load them from classpath
-                String fontCss = 
-                      "@font-face { font-family: 'Times New Roman'; src: local('Times New Roman'); }\n"
-                    + "@font-face { font-family: 'CinzelDecorative'; src: url('" + baseUrl + "fonts/CinzelDecorative-Regular.ttf'); }\n"
-                    + "@font-face { font-family: 'GreatVibes'; src: url('" + baseUrl + "fonts/GreatVibes-Regular.ttf'); }\n";
-                
-                // Add a direct stylesheet with font declarations
-                renderer.getSharedContext().getCss().parseAndApplyStylesheet(
-                    null, // No existing stylesheet reference needed
-                    fontCss, 
-                    baseUrl);
-                
-                System.out.println("Registered fonts via CSS @font-face");
-                System.out.println("=== END FONT DEBUG INFO ===");
             } catch (Exception e) {
-                System.err.println("Font registration error: " + e.getMessage());
+                System.err.println("Font setup error: " + e.getMessage());
                 e.printStackTrace();
-                throw new IOException("Failed to load fonts: " + e.getMessage(), e);
             }
             
             // Render the PDF - the classpath: prefix in the HTML/CSS will be resolved relative to the baseUrl
