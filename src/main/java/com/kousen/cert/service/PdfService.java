@@ -43,7 +43,7 @@ public class PdfService {
                 
                 // Add a direct stylesheet with font declarations
                 renderer.getSharedContext().getCss().parseAndApplyStylesheet(
-                    renderer.getSharedContext().getCss().getStylesheet(), 
+                    null, // No existing stylesheet reference needed
                     fontCss, 
                     baseUrl);
                 
