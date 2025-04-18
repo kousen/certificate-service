@@ -77,8 +77,8 @@ public class PdfService {
                     
                     // Fallback to directly setting CSS resolver base URL
                     renderer.getSharedContext().setBaseURL(baseUrl);
-                    renderer.getSharedContext().getCss().setDocumentURI(baseUrl);
-                    System.out.println("Set document URI to: " + baseUrl);
+                    // Don't try to set document URI directly (not in this version of the API)
+                    System.out.println("Set base URL to: " + baseUrl);
                 }
                 
                 // Log success
