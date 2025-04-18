@@ -24,32 +24,36 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Register fonts using temp files to work with JAR resources
+            // Register fonts using iText's built-in font resolver for embedded applications
             try {
-                // Load fonts from resources and create temporary files
-                ClassPathResource cinzelFont = new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf");
-                ClassPathResource greatVibesFont = new ClassPathResource("/fonts/GreatVibes-Regular.ttf");
+                // Use a more direct approach without relying on file access
+                com.lowagie.text.pdf.BaseFont cinzelBaseFont = com.lowagie.text.pdf.BaseFont.createFont(
+                    "fonts/CinzelDecorative-Regular.ttf", 
+                    com.lowagie.text.pdf.BaseFont.IDENTITY_H, 
+                    com.lowagie.text.pdf.BaseFont.EMBEDDED,
+                    true,
+                    new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf").getInputStream().readAllBytes(),
+                    null
+                );
                 
-                // Create temporary files for the fonts
-                Path tempCinzelFont = Files.createTempFile("cinzel", ".ttf");
-                Path tempGreatVibesFont = Files.createTempFile("greatvibes", ".ttf");
+                com.lowagie.text.pdf.BaseFont greatVibesBaseFont = com.lowagie.text.pdf.BaseFont.createFont(
+                    "fonts/GreatVibes-Regular.ttf", 
+                    com.lowagie.text.pdf.BaseFont.IDENTITY_H, 
+                    com.lowagie.text.pdf.BaseFont.EMBEDDED,
+                    true,
+                    new ClassPathResource("/fonts/GreatVibes-Regular.ttf").getInputStream().readAllBytes(),
+                    null
+                );
                 
-                // Copy font data to temp files
-                Files.write(tempCinzelFont, cinzelFont.getInputStream().readAllBytes());
-                Files.write(tempGreatVibesFont, greatVibesFont.getInputStream().readAllBytes());
+                // Register the fonts with explicit family names
+                renderer.getFontResolver().addFont(cinzelBaseFont, "CinzelDecorative");
+                renderer.getFontResolver().addFont(greatVibesBaseFont, "GreatVibes");
                 
-                // Add fonts using file paths
-                renderer.getFontResolver().addFont(
-                    tempCinzelFont.toFile().getAbsolutePath(), 
-                    true);
-                renderer.getFontResolver().addFont(
-                    tempGreatVibesFont.toFile().getAbsolutePath(), 
-                    true);
-                
-                // Register cleanup to delete temp files when JVM exits
-                tempCinzelFont.toFile().deleteOnExit();
-                tempGreatVibesFont.toFile().deleteOnExit();
+                // Log successful font registration
+                System.out.println("Successfully registered fonts: CinzelDecorative and GreatVibes");
             } catch (Exception e) {
+                System.err.println("Font registration error: " + e.getMessage());
+                e.printStackTrace();
                 throw new IOException("Failed to load fonts: " + e.getMessage(), e);
             }
             
