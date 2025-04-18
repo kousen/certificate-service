@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 
 public class PdfService {
 
@@ -24,21 +26,63 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Directly use the CSS @font-face approach and let Flying Saucer handle it
+            // Use a different approach to embed fonts directly in the PDF
             try {
-                // Set the source root URI for CSS to find resources relatively
-                renderer.getSharedContext().setBaseURL(baseUrl);
+                // First try using font resolver
+                ClassPathResource cinzelFont = new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf");
+                ClassPathResource greatVibesFont = new ClassPathResource("/fonts/GreatVibes-Regular.ttf");
                 
-                // Log font loading attempt
-                System.out.println("Loading fonts from base URL: " + baseUrl);
-                System.out.println("Font directories available: " + new ClassPathResource("/fonts").getURL());
+                // Log available resources
+                System.out.println("=== FONT DEBUG INFORMATION ===");
+                System.out.println("Base URL: " + baseUrl);
+                System.out.println("Cinzel font exists: " + cinzelFont.exists());
+                System.out.println("GreatVibes font exists: " + greatVibesFont.exists());
                 
-                // Register basic font directory
-                String fontPath = new ClassPathResource("/fonts").getURL().toString();
-                renderer.getFontResolver().addFontDirectory(fontPath, true);
+                // Use a hybrid approach - first try a direct technique
+                try {
+                    Path tempDir = Files.createTempDirectory("fonts");
+                    Path cinzelPath = tempDir.resolve("CinzelDecorative-Regular.ttf");
+                    Path greatVibesPath = tempDir.resolve("GreatVibes-Regular.ttf");
+                    
+                    // Copy fonts to temporary directory
+                    Files.copy(cinzelFont.getInputStream(), cinzelPath, StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(greatVibesFont.getInputStream(), greatVibesPath, StandardCopyOption.REPLACE_EXISTING);
+                    
+                    System.out.println("Created temp files at: " + tempDir);
+                    System.out.println("Temp Cinzel exists: " + Files.exists(cinzelPath));
+                    System.out.println("Temp GreatVibes exists: " + Files.exists(greatVibesPath));
+                    
+                    // Register font directory
+                    renderer.getFontResolver().addFontDirectory(tempDir.toString(), true);
+                    
+                    // Add each font individually as well
+                    renderer.getFontResolver().addFont(cinzelPath.toString(), true);
+                    renderer.getFontResolver().addFont(greatVibesPath.toString(), true);
+                    
+                    // Set cleanup
+                    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                        try {
+                            Files.walk(tempDir)
+                                 .sorted(Comparator.reverseOrder())
+                                 .map(Path::toFile)
+                                 .forEach(java.io.File::delete);
+                        } catch (IOException e) {
+                            System.err.println("Failed to delete temp directory: " + e.getMessage());
+                        }
+                    }));
+                    
+                    System.out.println("Successfully registered fonts via temp directory");
+                } catch (Exception e) {
+                    System.err.println("Failed with temp directory approach: " + e.getMessage());
+                    
+                    // Fallback to directly setting CSS resolver base URL
+                    renderer.getSharedContext().setBaseURL(baseUrl);
+                    renderer.getSharedContext().getCss().setDocumentURI(baseUrl);
+                    System.out.println("Set document URI to: " + baseUrl);
+                }
                 
-                // Log successful font registration
-                System.out.println("Successfully registered font directory: " + fontPath);
+                // Log success
+                System.out.println("=== END FONT DEBUG INFO ===");
             } catch (Exception e) {
                 System.err.println("Font registration error: " + e.getMessage());
                 e.printStackTrace();
