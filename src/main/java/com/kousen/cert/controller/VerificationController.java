@@ -52,8 +52,8 @@ public class VerificationController {
         model.addAttribute("issueDate", issueDate != null ? issueDate : "Not specified");
         model.addAttribute("certificateFingerprint", certificateFingerprint);
         
-        // Use "verification-page" as the view name to avoid circular view path error
-        return "verification-page";
+        // Using the verification template
+        return "verify-certificate";
     }
     
     /**

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -104,15 +104,15 @@
         <h2>Certificate Details</h2>
         <div class="details-item">
             <span class="details-label">Name:</span>
-            <span class="details-value" id="purchaser-name">${name}</span>
+            <span class="details-value" id="purchaser-name" th:text="${name}">John Doe</span>
         </div>
         <div class="details-item">
             <span class="details-label">Book Title:</span>
-            <span class="details-value" id="book-title">${bookTitle}</span>
+            <span class="details-value" id="book-title" th:text="${bookTitle}">Sample Book</span>
         </div>
         <div class="details-item">
             <span class="details-label">Issue Date:</span>
-            <span class="details-value" id="issue-date">${issueDate}</span>
+            <span class="details-value" id="issue-date" th:text="${issueDate}">2025-04-18</span>
         </div>
         <div class="details-item">
             <span class="details-label">Status:</span>
@@ -152,7 +152,7 @@
         <div class="public-key">Ken Kousen
 Tales from the Jar Side
 Certificate Fingerprint (SHA-256):
-${certificateFingerprint}</div>
+<span th:text="${certificateFingerprint}">EXAMPLE:FINGERPRINT:HASH:VALUE</span></div>
     </div>
 </body>
 </html>
