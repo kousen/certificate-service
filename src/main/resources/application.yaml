@@ -3,6 +3,6 @@ spring:
     virtual:
       enabled: true
 certificate:
-  keystore: ${user.home}/.cert_keystore.p12
+  keystore: ${CERTIFICATE_KEYSTORE:${user.home}/.cert_keystore.p12}
   storage:
-    path: ${user.home}/certificate-service/certificates
+    path: ${CERTIFICATE_STORAGE_PATH:${user.home}/certificate-service/certificates}
