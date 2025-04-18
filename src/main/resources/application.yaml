@@ -2,6 +2,8 @@ spring:
   threads:
     virtual:
       enabled: true
+server:
+  url: ${SERVER_URL:https://certificate-service-997e5d9f565a.herokuapp.com}
 certificate:
   keystore: ${CERTIFICATE_KEYSTORE:${user.home}/.cert_keystore.p12}
   storage:

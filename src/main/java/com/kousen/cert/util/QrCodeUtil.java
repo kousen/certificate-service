@@ -14,8 +14,26 @@ import java.util.Base64;
 public final class QrCodeUtil {
     private QrCodeUtil() {}
 
-    // Keep the URL path the same as the endpoint in VerificationController
-    private static final String DEFAULT_VERIFICATION_URL = "/verify-certificate";
+    // Define default base URL and verification path
+    private static final String DEFAULT_VERIFICATION_PATH = "/verify-certificate";
+    
+    // URLs will be dynamically constructed using server URL
+    private static String serverBaseUrl = "https://certificate-service-997e5d9f565a.herokuapp.com";
+    
+    /**
+     * Sets the server base URL for QR code generation
+     * @param baseUrl the base URL of the server
+     */
+    public static void setServerBaseUrl(String baseUrl) {
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            // Remove trailing slash if present
+            if (baseUrl.endsWith("/")) {
+                baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+            }
+            serverBaseUrl = baseUrl;
+            System.out.println("QR Code base URL set to: " + serverBaseUrl);
+        }
+    }
     
     /**
      * Gets the verification URL for a specific certificate
@@ -31,7 +49,9 @@ public final class QrCodeUtil {
         
         // Build verification URL with parameters
         String formattedDate = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE);
-        return DEFAULT_VERIFICATION_URL + 
+        
+        // Construct absolute URL using server base URL
+        return serverBaseUrl + DEFAULT_VERIFICATION_PATH + 
                 "?name=" + encodedName + 
                 "&book=" + encodedTitle +
                 "&date=" + formattedDate;
@@ -44,7 +64,7 @@ public final class QrCodeUtil {
      * @return a data URI containing the QR code image
      */
     public static String dataUri(int sizePx) {
-        return dataUri(DEFAULT_VERIFICATION_URL, sizePx);
+        return dataUri(serverBaseUrl + DEFAULT_VERIFICATION_PATH, sizePx);
     }
     
     /**
