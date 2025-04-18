@@ -1,0 +1,11 @@
+# Option 1: Save response with manual download
+### Generate Certificate (Manual Download)
+POST http://localhost:8080/api/certificates
+Content-Type: application/json
+Accept: application/pdf
+
+{
+  "purchaserName": "Ada Lovelace",
+  "bookTitle": "Modern Java Recipes",
+  "purchaserEmail": "ada@lovelace.org"
+}
