@@ -21,9 +21,13 @@ public class PdfService {
             var renderer = new ITextRenderer();
             
             // Set base URL for resource loading
-            String baseUrl = new ClassPathResource("/").getFile().toURI().toString();
-
-
+            ClassPathResource resource = new ClassPathResource("/");
+            String baseUrl = resource.getURL().toExternalForm();
+            
+            // Configure the font resolver
+            renderer.getFontResolver().addFontDirectory(
+                    new ClassPathResource("/fonts").getFile().getAbsolutePath(), true);
+            
             // Render the PDF
             renderer.setDocumentFromString(html, baseUrl);
             renderer.layout();
