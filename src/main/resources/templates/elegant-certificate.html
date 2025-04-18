@@ -89,12 +89,26 @@
     }
     
     /* ==== QR Code ==== */
-    .qr {
+    .qr-container {
       position: absolute;
       bottom: 2cm;
-      left: 2cm; /* changed from right to left */
+      left: 2cm;
+      width: 3cm;
+      text-align: center;
+    }
+    
+    .qr {
       width: 2.2cm;
       height: auto;
+      margin-bottom: 0.2cm;
+    }
+    
+    .qr-text {
+      font-family: 'Times New Roman', serif;
+      font-size: 8pt;
+      color: #ffd65c;
+      margin: 0;
+      line-height: 1;
     }
   </style>
   <title>Certificate Service</title>
@@ -110,7 +124,10 @@
       <p>and has earned the author's eternal gratitude.</p>
     </div>
     
-    <img class="qr" src="${qrCode}" alt="Tales from the Jar Side QR"/>
+    <div class="qr-container">
+      <img class="qr" src="${qrCode}" alt="Certificate Verification QR Code"/>
+      <p class="qr-text">Scan to verify certificate authenticity</p>
+    </div>
   </div>
 </body>
 </html>
