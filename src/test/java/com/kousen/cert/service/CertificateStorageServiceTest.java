@@ -33,7 +33,7 @@ class CertificateStorageServiceTest {
                 Optional.of("john@example.com")
         );
         
-        // Create a dummy PDF file
+        // Create a fake PDF file
         Path tempPdf = Files.createTempFile(tempDir, "temp-cert-", ".pdf");
         Files.writeString(tempPdf, "Test PDF content");
         
@@ -68,7 +68,7 @@ class CertificateStorageServiceTest {
                 Optional.empty()
         );
         
-        // Create a dummy PDF file
+        // Create a fake PDF file
         Path tempPdf = Files.createTempFile(tempDir, "temp-cert-", ".pdf");
         Files.writeString(tempPdf, "Test PDF content");
         
@@ -92,7 +92,7 @@ class CertificateStorageServiceTest {
                 Optional.empty()
         );
         
-        // Create a dummy PDF file
+        // Create a fake PDF file
         Path tempPdf = Files.createTempFile(tempDir, "temp-cert-", ".pdf");
         Files.writeString(tempPdf, "Test PDF content");
         
