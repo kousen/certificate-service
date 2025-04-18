@@ -26,18 +26,20 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Very simple font handling approach
+            // Custom font handling with improved reliability
             try {
                 // Set the base URL so the XML renderer can find resources
                 renderer.getSharedContext().setBaseURL(baseUrl);
                 
-                // Instead of using custom fonts, just use SYSTEM fonts in the HTML
-                // This is more reliable for deployment environments
-                System.out.println("Using system fonts instead of custom fonts for reliability");
+                // Register custom fonts with our font resolver helper
+                CustomFontResolver.registerFonts(renderer);
+                
+                System.out.println("Custom fonts registered successfully");
                 
             } catch (Exception e) {
                 System.err.println("Font setup error: " + e.getMessage());
                 e.printStackTrace();
+                throw new IOException("Failed to set up fonts", e);
             }
             
             // Render the PDF - the classpath: prefix in the HTML/CSS will be resolved relative to the baseUrl

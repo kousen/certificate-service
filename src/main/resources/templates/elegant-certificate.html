@@ -6,7 +6,15 @@
   <style type="text/css">
     /* @noInspection CssUnresolvedResourceReference */
     /* ==== Fonts ==== */
-    /* Font declarations are now handled programmatically in PdfService */
+    @font-face {
+      font-family: 'CinzelDecorative';
+      src: url('classpath:/fonts/CinzelDecorative-Regular.ttf');
+    }
+    
+    @font-face {
+      font-family: 'GreatVibes';
+      src: url('classpath:/fonts/GreatVibes-Regular.ttf');
+    }
     
     /* ==== Page Settings ==== */
     @page {
@@ -53,27 +61,24 @@
     
     /* ==== Typography ==== */
     h1 {
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'CinzelDecorative', serif;
       font-size: 48pt;
       color: #ffd65c;
       margin: 0 0 0.5cm 0;
-      font-weight: bold;
     }
     
     .recipient {
-      font-family: 'Brush Script MT', 'Comic Sans MS', cursive;
-      font-size: 42pt;
+      font-family: 'GreatVibes', cursive;
+      font-size: 40pt;
       color: #ffd65c;
       margin: 0.3cm 0 0.5cm 0;
-      font-style: italic;
     }
     
     h2 {
-      font-family: 'Georgia', 'Times New Roman', serif;
+      font-family: 'CinzelDecorative', serif;
       font-size: 24pt;
       color: #ffd65c;
       margin: 0.3cm 0;
-      font-weight: bold;
     }
     
     p {
