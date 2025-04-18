@@ -24,23 +24,31 @@ public class PdfService {
             ClassPathResource rootResource = new ClassPathResource("/");
             String baseUrl = rootResource.getURL().toExternalForm();
             
-            // Register fonts using bytes from input streams to work with JAR resources
+            // Register fonts using temp files to work with JAR resources
             try {
-                // Load fonts directly from resources
+                // Load fonts from resources and create temporary files
                 ClassPathResource cinzelFont = new ClassPathResource("/fonts/CinzelDecorative-Regular.ttf");
                 ClassPathResource greatVibesFont = new ClassPathResource("/fonts/GreatVibes-Regular.ttf");
                 
-                // Add each font using byte arrays instead of file paths
+                // Create temporary files for the fonts
+                Path tempCinzelFont = Files.createTempFile("cinzel", ".ttf");
+                Path tempGreatVibesFont = Files.createTempFile("greatvibes", ".ttf");
+                
+                // Copy font data to temp files
+                Files.write(tempCinzelFont, cinzelFont.getInputStream().readAllBytes());
+                Files.write(tempGreatVibesFont, greatVibesFont.getInputStream().readAllBytes());
+                
+                // Add fonts using file paths
                 renderer.getFontResolver().addFont(
-                    cinzelFont.getInputStream().readAllBytes(), 
-                    "CinzelDecorative", 
-                    0, 
+                    tempCinzelFont.toFile().getAbsolutePath(), 
                     true);
                 renderer.getFontResolver().addFont(
-                    greatVibesFont.getInputStream().readAllBytes(), 
-                    "GreatVibes", 
-                    0, 
+                    tempGreatVibesFont.toFile().getAbsolutePath(), 
                     true);
+                
+                // Register cleanup to delete temp files when JVM exits
+                tempCinzelFont.toFile().deleteOnExit();
+                tempGreatVibesFont.toFile().deleteOnExit();
             } catch (Exception e) {
                 throw new IOException("Failed to load fonts: " + e.getMessage(), e);
             }
