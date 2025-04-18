@@ -17,8 +17,8 @@ public record ElegantTemplate() implements PdfTemplate {
             var resource = new ClassPathResource("templates/elegant-certificate.html");
             String template = Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
             
-            // Generate QR code
-            String qrCode = QrCodeUtil.dataUri(220);
+            // Generate QR code with certificate-specific verification URL
+            String qrCode = QrCodeUtil.dataUri(r.purchaserName(), r.bookTitle(), 220);
             
             // XML encode the values to avoid parsing issues
             String purchaserName = encodeXml(r.purchaserName());
