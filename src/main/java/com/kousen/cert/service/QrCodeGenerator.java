@@ -69,7 +69,7 @@ public class QrCodeGenerator {
         
         // Create the verification URL with parameters
         return String.format(Locale.US, 
-                "%s/verify?name=%s&book=%s&date=%s",
+                "%s/verify-certificate?name=%s&book=%s&date=%s",
                 baseUrl,
                 encodeUrlParam(name),
                 encodeUrlParam(bookTitle),
