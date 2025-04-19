@@ -4,39 +4,36 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <style type="text/css">
-    /* @noInspection CssUnresolvedResourceReference */
-    /* ==== Fonts ==== */
-    /* Declare fonts by name - they will be loaded by the PDF renderer */
     @font-face {
       font-family: 'CinzelDecorative';
       src: url('classpath:/fonts/CinzelDecorative-Regular.ttf') format('truetype');
     }
-    
+
     @font-face {
       font-family: 'GreatVibes';
       src: url('classpath:/fonts/GreatVibes-Regular.ttf') format('truetype');
     }
-    
+
     /* ==== Page Settings ==== */
     @page {
       size: 29.7cm 21cm; /* A4 Landscape */
       margin: 0;
     }
-    
+
     html, body {
       margin: 0;
       padding: 0;
       width: 29.7cm;
       height: 21cm;
     }
-    
+
     body {
       background-image: url('classpath:/images/certificate-bg.png');
       background-repeat: no-repeat;
       background-size: 29.7cm 21cm;
       background-position: top left;
     }
-    
+
     /* ==== Certificate Container ==== */
     .certificate {
       width: 29.7cm;
@@ -44,7 +41,7 @@
       position: relative;
       text-align: center;
     }
-    
+
     /* ==== Content Area ==== */
     .content {
       position: absolute;
@@ -59,7 +56,7 @@
       justify-content: center;
       align-items: center;
     }
-    
+
     /* ==== Typography ==== */
     h1 {
       font-family: 'CinzelDecorative', serif;
@@ -67,28 +64,28 @@
       color: #ffd65c;
       margin: 0 0 0.5cm 0;
     }
-    
+
     .recipient {
       font-family: 'GreatVibes', cursive;
       font-size: 40pt;
       color: #ffd65c;
       margin: 0.3cm 0 0.5cm 0;
     }
-    
+
     h2 {
       font-family: 'CinzelDecorative', serif;
       font-size: 24pt;
       color: #ffd65c;
       margin: 0.3cm 0;
     }
-    
+
     p {
       font-family: 'Times New Roman', serif;
       font-size: 14pt;
       color: #ffd65c;
       margin: 0.2cm 0;
     }
-    
+
     /* ==== QR Code ==== */
     .qr-container {
       position: absolute;
@@ -97,13 +94,13 @@
       width: 3cm;
       text-align: center;
     }
-    
+
     .qr {
       width: 2.2cm;
       height: auto;
       margin-bottom: 0.2cm;
     }
-    
+
     .qr-text {
       font-family: 'Times New Roman', serif;
       font-size: 8pt;
@@ -124,7 +121,7 @@
       <h2>${bookTitle}</h2>
       <p>and has earned the author's eternal gratitude.</p>
     </div>
-    
+
     <div class="qr-container">
       <img class="qr" src="${qrCode}" alt="Certificate Verification QR Code"/>
       <p class="qr-text">Scan to verify certificate authenticity</p>

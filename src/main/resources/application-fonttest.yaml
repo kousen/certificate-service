@@ -1,0 +1,4 @@
+spring:
+  main:
+    # Exit after running the font test
+    web-application-type: none
