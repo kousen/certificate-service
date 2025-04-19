@@ -2,7 +2,6 @@ package com.kousen.cert.controller;
 
 import com.kousen.cert.model.CertificateRequest;
 import com.kousen.cert.service.*;
-import com.kousen.cert.template.ElegantTemplate;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class CertificateController {
     @PostMapping(produces = "application/pdf")
     public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req) throws Exception {
         // Generate the certificate
-        Path unsigned = pdfService.createPdf(new ElegantTemplate(), req);
+        Path unsigned = pdfService.createPdf(req);
         Path signed = pdfSigner.sign(unsigned);
         
         try {

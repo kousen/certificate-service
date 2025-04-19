@@ -8,6 +8,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * @deprecated This template is no longer used with the PDFBox implementation
+ */
+@Deprecated
 public record ElegantTemplate() implements PdfTemplate {
 
     // Cache for resource data URIs

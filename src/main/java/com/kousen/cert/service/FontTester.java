@@ -1,7 +1,6 @@
 package com.kousen.cert.service;
 
 import com.kousen.cert.model.CertificateRequest;
-import com.kousen.cert.template.ElegantTemplate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -37,7 +36,7 @@ public class FontTester implements CommandLineRunner {
         );
         
         // Generate the PDF
-        Path pdfPath = pdfService.createPdf(new ElegantTemplate(), request);
+        Path pdfPath = pdfService.createPdf(request);
         
         // Output the result
         System.out.println("Test PDF created at: " + pdfPath.toAbsolutePath());

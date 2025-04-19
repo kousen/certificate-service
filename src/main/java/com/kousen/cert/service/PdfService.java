@@ -1,7 +1,6 @@
 package com.kousen.cert.service;
 
 import com.kousen.cert.model.CertificateRequest;
-import com.kousen.cert.template.PdfTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,12 +26,11 @@ public class PdfService {
     /**
      * Creates a PDF certificate from a certificate request
      * 
-     * @param template The PDF template to use
      * @param request The certificate request with recipient and book info
      * @return Path to the generated PDF file
      * @throws IOException If there's an error during PDF creation
      */
-    public Path createPdf(PdfTemplate template, CertificateRequest request) throws IOException {
+    public Path createPdf(CertificateRequest request) throws IOException {
         try {
             // Generate QR code with verification URL
             Path qrCodePath = qrCodeGenerator.generateQrCode(
