@@ -30,8 +30,9 @@ public class ServerUrlConfig {
             return;
         }
         
-        // Default to custom domain URL if no value is configured
-        String customDomain = "https://certificate-service.kousenit.com";
+        // Default to custom domain URL using HTTP for now
+        // TODO: Set up SSL certificate for the custom domain and switch to HTTPS
+        String customDomain = "http://certificate-service.kousenit.com";
         QrCodeUtil.setServerBaseUrl(customDomain);
     }
     
@@ -44,6 +45,6 @@ public class ServerUrlConfig {
             return configuredServerUrl;
         }
         
-        return "https://certificate-service.kousenit.com";
+        return "http://certificate-service.kousenit.com";
     }
 }
