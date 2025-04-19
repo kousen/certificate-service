@@ -35,12 +35,21 @@ class PdfFontTest {
                 Optional.empty()
         );
         
+        // Let's print the HTML that will be rendered to PDF for debugging
+        ElegantTemplate template = new ElegantTemplate();
+        String html = template.html(request);
+        System.out.println("\n----- HTML TO RENDER -----\n");
+        System.out.println(html.substring(0, Math.min(html.length(), 500)) + "...");
+        System.out.println("\n----- END HTML -----\n");
+        
         // When
-        Path pdfPath = service.createPdf(new ElegantTemplate(), request);
+        Path pdfPath = service.createPdf(template, request);
         
         // Then
         assertThat(pdfPath).isNotNull();
         assertThat(Files.exists(pdfPath)).isTrue();
+        
+        System.out.println("[DEBUG_LOG] Created PDF at: " + pdfPath.toAbsolutePath());
         
         try (PDDocument document = Loader.loadPDF(pdfPath.toFile())) {
             // Analyze fonts
@@ -84,7 +93,7 @@ class PdfFontTest {
             assertThat(imageCount).isGreaterThanOrEqualTo(1);
         }
         
-        // Clean up
-        Files.deleteIfExists(pdfPath);
+        // Debug only - don't delete the PDF to allow manual inspection
+        System.out.println("[DEBUG_LOG] PDF available for inspection at: " + pdfPath.toAbsolutePath());
     }
 }

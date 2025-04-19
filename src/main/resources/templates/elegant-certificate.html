@@ -4,13 +4,17 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <style type="text/css">
+    /* 
+     * Font definitions for PDF generation
+     * These will be loaded from temporary files by CustomFontResolver
+     */
     @font-face {
-      font-family: 'CinzelDecorative';
+      font-family: 'CinzelDecorative-Regular';
       src: url('classpath:/fonts/CinzelDecorative-Regular.ttf') format('truetype');
     }
 
     @font-face {
-      font-family: 'GreatVibes';
+      font-family: 'GreatVibes-Regular';
       src: url('classpath:/fonts/GreatVibes-Regular.ttf') format('truetype');
     }
 
@@ -59,21 +63,21 @@
 
     /* ==== Typography ==== */
     h1 {
-      font-family: 'CinzelDecorative', serif;
+      font-family: 'CinzelDecorative-Regular', serif;
       font-size: 48pt;
       color: #ffd65c;
       margin: 0 0 0.5cm 0;
     }
 
     .recipient {
-      font-family: 'GreatVibes', cursive;
+      font-family: 'GreatVibes-Regular', cursive;
       font-size: 40pt;
       color: #ffd65c;
       margin: 0.3cm 0 0.5cm 0;
     }
 
     h2 {
-      font-family: 'CinzelDecorative', serif;
+      font-family: 'CinzelDecorative-Regular', serif;
       font-size: 24pt;
       color: #ffd65c;
       margin: 0.3cm 0;
