@@ -34,4 +34,16 @@ public class ServerUrlConfig {
         String herokuUrl = "https://certificate-service-997e5d9f565a.herokuapp.com";
         QrCodeUtil.setServerBaseUrl(herokuUrl);
     }
+    
+    /**
+     * Returns the base URL for the server
+     * @return the server's base URL
+     */
+    public String getUrl() {
+        if (configuredServerUrl != null && !configuredServerUrl.isEmpty()) {
+            return configuredServerUrl;
+        }
+        
+        return "https://certificate-service-997e5d9f565a.herokuapp.com";
+    }
 }

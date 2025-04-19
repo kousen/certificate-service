@@ -3,6 +3,7 @@ package com.kousen.cert.config;
 import com.kousen.cert.service.KeyStoreProvider;
 import com.kousen.cert.service.PdfService;
 import com.kousen.cert.service.PdfSigner;
+import com.kousen.cert.service.QrCodeGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -15,7 +16,9 @@ import java.nio.file.Paths;
 public class CertificateConfig implements WebMvcConfigurer {
 
     @Bean
-    PdfService pdfService() { return new PdfService(); }
+    PdfService pdfService(QrCodeGenerator qrCodeGenerator) { 
+        return new PdfService(qrCodeGenerator); 
+    }
 
     @Bean
     KeyStoreProvider keyStoreProvider() {

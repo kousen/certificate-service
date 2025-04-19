@@ -2,57 +2,57 @@ package com.kousen.cert.service;
 
 import com.kousen.cert.model.CertificateRequest;
 import com.kousen.cert.template.PdfTemplate;
-import org.springframework.core.io.ClassPathResource;
-import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Service for creating PDF certificates
+ */
+@Service
 public class PdfService {
 
-
+    private final QrCodeGenerator qrCodeGenerator;
+    private final PdfBoxGenerator pdfGenerator;
+    
+    @Autowired
+    public PdfService(QrCodeGenerator qrCodeGenerator) {
+        this.qrCodeGenerator = qrCodeGenerator;
+        this.pdfGenerator = new PdfBoxGenerator();
+    }
+    
+    /**
+     * Creates a PDF certificate from a certificate request
+     * 
+     * @param template The PDF template to use
+     * @param request The certificate request with recipient and book info
+     * @return Path to the generated PDF file
+     * @throws IOException If there's an error during PDF creation
+     */
     public Path createPdf(PdfTemplate template, CertificateRequest request) throws IOException {
-        // Get the HTML content
-        String html = template.html(request);
-        
-        // Create a temporary file for the PDF output
-        Path out = Files.createTempFile("cert-", ".pdf");
-
-        try (OutputStream os = Files.newOutputStream(out)) {
-            // Create the PDF renderer
-            ITextRenderer renderer = new ITextRenderer();
+        try {
+            // Generate QR code with verification URL
+            Path qrCodePath = qrCodeGenerator.generateQrCode(
+                    request.purchaserName(), 
+                    request.bookTitle(),
+                    220);  // QR code size in pixels
             
-            // 1. Configure the base URL for resource loading
-            ClassPathResource rootResource = new ClassPathResource("/");
-            String baseUrl = rootResource.getURL().toExternalForm();
-            renderer.getSharedContext().setBaseURL(baseUrl);
+            // Create PDF with PDFBox
+            Path pdfPath = pdfGenerator.createCertificatePdf(
+                    "Certificate of Ownership",
+                    request.purchaserName(),
+                    request.bookTitle(),
+                    qrCodePath);
             
-            // 2. Register fonts - must be done before processing the document
-            try {
-                CustomFontResolver.registerFonts(renderer);
-                System.out.println("Registered fonts using CustomFontResolver");
-            } catch (Exception fontEx) {
-                System.err.println("Error registering fonts: " + fontEx.getMessage());
-                fontEx.printStackTrace();
-            }
+            // Clean up temporary QR code file
+            Files.deleteIfExists(qrCodePath);
             
-            // 3. Set the document content and generate the PDF
-            renderer.setDocumentFromString(html, baseUrl);
-            renderer.layout();
-            renderer.createPDF(os);
-            os.flush();
-            
-            // Log success
-            System.out.println("PDF created at: " + out.toAbsolutePath());
+            return pdfPath;
         } catch (Exception e) {
-            // Clean up on error
-            Files.deleteIfExists(out);
             throw new IOException("Failed to generate PDF: " + e.getMessage(), e);
         }
-
-        return out;
     }
-
 }

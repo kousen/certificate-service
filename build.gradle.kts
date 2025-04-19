@@ -14,8 +14,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-    implementation("org.xhtmlrenderer:flying-saucer-pdf:9.12.0")
-    implementation("com.github.librepdf:openpdf:2.0.3")
     implementation("org.apache.pdfbox:pdfbox:3.0.4")
     implementation("org.bouncycastle:bcprov-jdk18on:1.80")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.80")
@@ -24,7 +22,6 @@ dependencies {
     implementation("com.google.zxing:javase:3.5.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.apache.pdfbox:pdfbox:3.0.4")
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
