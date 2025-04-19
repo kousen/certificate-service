@@ -46,7 +46,7 @@ public class QrCodeGenerator {
         
         try {
             // Generate QR code
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            var qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(verificationUrl, BarcodeFormat.QR_CODE, size, size);
             
             // Write to file

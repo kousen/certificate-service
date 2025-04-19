@@ -1,7 +1,6 @@
 package com.kousen.cert.service;
 
 import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureOptions;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface;
@@ -11,7 +10,6 @@ import org.bouncycastle.cms.CMSProcessableByteArray;
 import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
 import org.bouncycastle.cert.X509CertificateHolder;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
@@ -45,14 +43,14 @@ public class PdfSigner implements SignatureInterface {
     private void initializeKeyMaterial() {
         try {
             KeyStore ks = provider.keyStore();
-            
+
             // Check environment variable first, then system property, then default
             String password = System.getenv("CERT_PWD");
             if (password == null) {
                 password = System.getProperty("CERT_PWD", "changeit");
             }
             char[] pwd = password.toCharArray();
-            
+
             privateKey = (PrivateKey) ks.getKey("authorKey", pwd);
             certificateChain = ks.getCertificateChain("authorKey");
             if (privateKey == null || certificateChain == null) {
@@ -66,20 +64,20 @@ public class PdfSigner implements SignatureInterface {
     public Path sign(Path in) throws Exception {
         Path signed = Files.createTempFile("cert-signed-", ".pdf");
 
-        try (PDDocument doc = Loader.loadPDF(in.toFile());
-             SignatureOptions options = new SignatureOptions()) {
+        try (var doc = Loader.loadPDF(in.toFile());
+             var options = new SignatureOptions()) {
             // Create signature dictionary
-            PDSignature sig = new PDSignature();
+            var sig = new PDSignature();
             sig.setFilter(PDSignature.FILTER_ADOBE_PPKLITE);
             sig.setSubFilter(PDSignature.SUBFILTER_ADBE_PKCS7_DETACHED);
             sig.setName("Ken Kousen");
             sig.setLocation("Connecticut, USA");
             sig.setReason("Certificate of Ownership");
             sig.setSignDate(Calendar.getInstance());
-            
+
             // Set signature size
             options.setPreferredSignatureSize(SignatureOptions.DEFAULT_SIGNATURE_SIZE * 2);
-            
+
             // Add signature using the provided SignatureInterface implementation
             doc.addSignature(sig, this, options);
 
@@ -95,50 +93,44 @@ public class PdfSigner implements SignatureInterface {
         try {
             // Read content to be signed
             byte[] buffer = content.readAllBytes();
-            
+
             // Create a CMS Signed Data Generator
-            CMSSignedDataGenerator gen = new CMSSignedDataGenerator();
-            
+            var gen = new CMSSignedDataGenerator();
+
             // Get the signing certificate
-            X509Certificate signingCert = (X509Certificate) certificateChain[0];
+            var signingCert = (X509Certificate) certificateChain[0];
             X509CertificateHolder certHolder = new JcaX509CertificateHolder(signingCert);
-            
+
             // Add the certificate to the generator
             gen.addCertificate(certHolder);
-            
+
             // Create a store of chain certificates
-            JcaCertStore certStore = new JcaCertStore(Arrays.asList(certificateChain));
+            var certStore = new JcaCertStore(Arrays.asList(certificateChain));
             gen.addCertificates(certStore);
-            
+
             // Create the signature
-            JcaContentSignerBuilder contentSignerBuilder = new JcaContentSignerBuilder("SHA512withRSA");
+            var contentSignerBuilder = new JcaContentSignerBuilder("SHA512withRSA");
             contentSignerBuilder.setProvider(BouncyCastleProvider.PROVIDER_NAME);
-            
+
             // Add the signer information
-            JcaSignerInfoGeneratorBuilder signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
+            var signerInfoBuilder = new JcaSignerInfoGeneratorBuilder(
                     new JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build());
-            
+
             // Important: This makes it clear this is for non-repudiation (legal signatures)
             signerInfoBuilder.setDirectSignature(true);
-            
+
             gen.addSignerInfoGenerator(signerInfoBuilder.build(
                     contentSignerBuilder.build(privateKey), certHolder));
-            
+
             // Create the signed data
-            CMSProcessableByteArray processableData = new CMSProcessableByteArray(buffer);
+            var processableData = new CMSProcessableByteArray(buffer);
             CMSSignedData signedData = gen.generate(processableData, false);
-            
+
             // Return encoded signature
             return signedData.getEncoded();
-            
+
         } catch (Exception e) {
             throw new IOException("Failed to create signature", e);
         }
-    }
-    
-    // Helper method to add a visual explanation for users
-    public void addVisualSignatureExplanation(PDDocument document) throws IOException {
-        // Implementation could be added to create a visual explanation
-        // of the self-signed certificate status on the PDF
     }
 }

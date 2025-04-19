@@ -58,7 +58,7 @@ class CertificateControllerTest {
             doc.save(tempPdf.toFile());
         }
 
-        when(pdfService.createPdf(any(), any())).thenReturn(tempPdf);
+        when(pdfService.createPdf(any())).thenReturn(tempPdf);
         when(storageService.storeCertificate(any(), any())).thenReturn(tempPdf);
 
         // When/Then

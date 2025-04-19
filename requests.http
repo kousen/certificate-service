@@ -19,3 +19,7 @@ GET http://localhost:8080/api/certificates/stored
 ### Get a specific stored certificate
 # Replace filename with an actual certificate filename from the list endpoint
 GET http://localhost:8080/api/certificates/stored/ada_lovelace_modern_java_recipes_20250418123045.pdf
+
+###
+GET http://certificate-service.kousenit.com/api/certificates/stored
+

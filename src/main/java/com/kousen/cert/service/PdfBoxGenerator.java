@@ -1,6 +1,5 @@
 package com.kousen.cert.service;
 
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -12,7 +11,7 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.core.io.ClassPathResource;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -49,7 +48,7 @@ public class PdfBoxGenerator {
         float pageWidth = PDRectangle.A4.getHeight();
         float pageHeight = PDRectangle.A4.getWidth();
 
-        try (PDDocument document = new PDDocument()) {
+        try (var document = new PDDocument()) {
             // Create a landscape page
             PDPage page = new PDPage(new PDRectangle(pageWidth, pageHeight));
             document.addPage(page);
@@ -66,7 +65,8 @@ public class PdfBoxGenerator {
             addBackgroundImage(document, page);
             
             // Start adding content
-            try (PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true)) {
+            try (PDPageContentStream contentStream = new PDPageContentStream(
+                    document, page, PDPageContentStream.AppendMode.APPEND, true)) {
                 // Set text color for all content
                 contentStream.setNonStrokingColor(GOLD_COLOR);
                 
@@ -98,7 +98,8 @@ public class PdfBoxGenerator {
                 
                 // "and has earned the author's eternal gratitude" text
                 y -= 50;
-                drawCenteredText(contentStream, textFont, 14, "and has earned the author's eternal gratitude.", centerX, y);
+                drawCenteredText(contentStream, textFont, 14,
+                        "and has earned the author's eternal gratitude.", centerX, y);
                 
                 // Add QR code
                 if (qrCodePath != null && Files.exists(qrCodePath)) {
@@ -131,7 +132,8 @@ public class PdfBoxGenerator {
                     document.setAllSecurityToBeRemoved(true);
                     
                     // Manually disable font subsetting by setting a custom property
-                    document.getDocumentInformation().setCustomMetadataValue("DisableFontSubstitution", "true");
+                    document.getDocumentInformation()
+                            .setCustomMetadataValue("DisableFontSubstitution", "true");
                     
                     // Save document with simplified settings
                     document.save(pdfPath.toFile());
@@ -157,8 +159,8 @@ public class PdfBoxGenerator {
         
         try {
             // Load the font from classpath resources
-            ClassPathResource fontResource = new ClassPathResource("fonts/" + fontFileName);
-            try (InputStream fontStream = fontResource.getInputStream()) {
+            var fontResource = new ClassPathResource("fonts/" + fontFileName);
+            try (var fontStream = fontResource.getInputStream()) {
                 PDFont font = PDType0Font.load(document, fontStream, true);
                 fontCache.put(fontFileName, font);
                 System.out.println("Loaded and cached font: " + fontFileName);
@@ -176,10 +178,10 @@ public class PdfBoxGenerator {
     /**
      * Add background image to the PDF page
      */
-    private void addBackgroundImage(PDDocument document, PDPage page) throws IOException {
+    private void addBackgroundImage(PDDocument document, PDPage page) {
         try {
-            ClassPathResource imageResource = new ClassPathResource("images/certificate-bg.png");
-            try (InputStream imageStream = imageResource.getInputStream()) {
+            var imageResource = new ClassPathResource("images/certificate-bg.png");
+            try (var imageStream = imageResource.getInputStream()) {
                 PDImageXObject backgroundImage = PDImageXObject.createFromByteArray(document, 
                         imageStream.readAllBytes(), "background");
                 
@@ -200,11 +202,12 @@ public class PdfBoxGenerator {
     /**
      * Add QR code to the page
      */
-    private void addQRCode(PDDocument document, PDPageContentStream contentStream, 
-                          Path qrCodePath, float x, float y) throws IOException {
+    @SuppressWarnings("SameParameterValue")
+    private void addQRCode(PDDocument document, PDPageContentStream contentStream,
+                           Path qrCodePath, float x, float y) throws IOException {
         try {
             // If QR code path is null or file doesn't exist, use a default QR placeholder
-            if (qrCodePath == null || !java.nio.file.Files.exists(qrCodePath)) {
+            if (qrCodePath == null || !Files.exists(qrCodePath)) {
                 // Try to load the test QR code from resources as a fallback for tests
                 try (InputStream testQrStream = getClass().getResourceAsStream("/images/test-qr.png")) {
                     if (testQrStream != null) {
@@ -221,7 +224,7 @@ public class PdfBoxGenerator {
             }
             
             // Use the provided QR code path
-            if (qrCodePath != null && java.nio.file.Files.exists(qrCodePath)) {
+            if (qrCodePath != null && Files.exists(qrCodePath)) {
                 PDImageXObject qrCode = PDImageXObject.createFromFile(qrCodePath.toString(), document);
                 float qrSize = 100;  // Size in points
                 contentStream.drawImage(qrCode, x, y, qrSize, qrSize);

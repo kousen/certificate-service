@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Build: `./gradlew build`
 - Run application: `./gradlew bootRun`
 - Run all tests: `./gradlew test`
-- Run single test: `./gradlew test --tests "com.kousen.cert.service.PdfServiceTest"`
+- Run single test: `./gradlew test --tests "com.kousen.cert.service.KeyStoreProviderTest"`
 - Clean build: `./gradlew clean build`
 
 ## Code Style Guidelines

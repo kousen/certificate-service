@@ -8,11 +8,12 @@ import java.util.Optional;
 
 /**
  * Request object for certificate generation.
- * 
+ * <p>
  * Note: The validation annotations include explicit message attributes which
  * improve the clarity of error messages for API users. While some IDE inspections
  * may flag these as redundant (since they match the default messages), they
  * provide value by making the validation requirements more explicit.
+ * </p>
  */
 public record CertificateRequest(
         @NotBlank(message = "Purchaser name is required") 
@@ -26,12 +27,12 @@ public record CertificateRequest(
 ) {
     // List of allowed book titles
     public static final List<String> ALLOWED_BOOK_TITLES = List.of(
-            "Making Java Groovy",
             "Gradle Recipes for Android",
-            "Modern Java Recipes",
-            "Mockito Made Clear", 
             "Help Your Boss Help You",
-            "Kotlin Cookbook"
+            "Kotlin Cookbook",
+            "Making Java Groovy",
+            "Mockito Made Clear",
+            "Modern Java Recipes"
     );
     
     // Custom validation exception that tracks the field name

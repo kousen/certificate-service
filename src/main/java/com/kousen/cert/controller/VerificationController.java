@@ -13,8 +13,6 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
-import java.util.Optional;
 
 @Controller
 public class VerificationController {
@@ -70,8 +68,7 @@ public class VerificationController {
                     // Extract default value if present (format: ${ENV_VAR:default})
                     if (envVarName.contains(":")) {
                         String[] parts = envVarName.split(":", 2);
-                        String defaultValue = parts[1];
-                        keystorePath = defaultValue;
+                        keystorePath = parts[1];
                     } else {
                         logger.warn("Environment variable {} not found", envVarName);
                         return "Certificate fingerprint not available - keystore path not configured";

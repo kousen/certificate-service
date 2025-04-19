@@ -1,14 +1,7 @@
 package com.kousen.cert.service;
 
-import org.bouncycastle.asn1.ASN1EncodableVector;
-import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x500.X500Name;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyPurposeId;
-import org.bouncycastle.asn1.x509.KeyUsage;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
@@ -16,8 +9,11 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import java.math.BigInteger;
-import java.nio.file.*;
-import java.security.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -64,7 +60,8 @@ public class KeyStoreProvider {
             KeyPair kp = kpGen.generateKeyPair();
 
             // Create certificate subject with more details
-            var subject = new X500Name("CN=Ken Kousen, O=Tales from the Jar Side, OU=PDF Signing, L=Connecticut, ST=CT, C=US");
+            var subject = new X500Name(
+                    "CN=Ken Kousen, O=Tales from the Jar Side, OU=PDF Signing, L=Connecticut, ST=CT, C=US");
             var serial = BigInteger.valueOf(System.currentTimeMillis());
             var notBefore = new Date();
             var notAfter  = Date.from(Instant.now().plus(3650, ChronoUnit.DAYS)); // 10 years
@@ -100,7 +97,7 @@ public class KeyStoreProvider {
                     new ExtendedKeyUsage(new KeyPurposeId[] {
                             KeyPurposeId.id_kp_emailProtection,
                             KeyPurposeId.id_kp_codeSigning
-                            // Adobe's PDF signing OID is 1.2.840.113583.1.1.5
+                            // Adobe's PDF signing OID is 1.2.840.113583.1.1.5,
                             // but we can't use it directly due to access restrictions
                     }));
 

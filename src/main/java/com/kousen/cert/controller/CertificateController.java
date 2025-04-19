@@ -57,11 +57,12 @@ public class CertificateController {
             FileSystemResource res = new FileSystemResource(signed);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
-                    .header("X-Certificate-Status", "Self-signed - May show warnings in PDF readers")
+                    .header("X-Certificate-Status",
+                            "Self-signed - May show warnings in PDF readers")
                     .body(res);
         } finally {
             // Clean up the temporary unsigned PDF if it still exists
-            if (unsigned != null && Files.exists(unsigned)) {
+            if (Files.exists(unsigned)) {
                 try {
                     Files.deleteIfExists(unsigned);
                 } catch (Exception e) {
@@ -128,7 +129,8 @@ public class CertificateController {
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_PDF)
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
-                    .header("X-Certificate-Status", "Self-signed - May show warnings in PDF readers")
+                    .header("X-Certificate-Status",
+                            "Self-signed - May show warnings in PDF readers")
                     .body(resource);
         } catch (IOException e) {
             logger.error("Certificate not found: {}", filename, e);

@@ -10,6 +10,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+
 /**
  * Configuration class responsible for initializing server-specific URL values
  */
@@ -35,10 +39,10 @@ public class ServerUrlConfig {
         String customDomain = "certificate-service.kousenit.com";
         
         // First try to check if HTTPS is available by making a test connection
-        boolean useHttps = true;
+        boolean useHttps = false;
         try {
-            java.net.HttpURLConnection connection = (java.net.HttpURLConnection) 
-                    new java.net.URL("https://" + customDomain).openConnection();
+            HttpURLConnection connection = (java.net.HttpURLConnection)
+                    new URI("https://" + customDomain).toURL().openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(3000);
             connection.connect();
@@ -46,7 +50,6 @@ public class ServerUrlConfig {
             useHttps = (responseCode < 400); // If we get a successful response, use HTTPS
         } catch (Exception e) {
             System.out.println("HTTPS not available for " + customDomain + ": " + e.getMessage());
-            useHttps = false;
         }
         
         String protocol = useHttps ? "https" : "http";
@@ -70,7 +73,7 @@ public class ServerUrlConfig {
         
         try {
             java.net.HttpURLConnection connection = (java.net.HttpURLConnection) 
-                    new java.net.URL("https://" + customDomain).openConnection();
+                    new URI("https://" + customDomain).toURL().openConnection();
             connection.setRequestMethod("HEAD");
             connection.setConnectTimeout(1000);  // Short timeout
             connection.connect();
@@ -78,7 +81,6 @@ public class ServerUrlConfig {
             useHttps = (responseCode < 400);
         } catch (Exception e) {
             // HTTPS not available, use HTTP
-            useHttps = false;
         }
         
         String protocol = useHttps ? "https" : "http";
