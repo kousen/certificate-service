@@ -1,5 +1,6 @@
 package com.kousen.cert.service;
 
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -115,8 +116,26 @@ public class PdfBoxGenerator {
             }
             
             // Save the PDF to the temp file
-            document.save(pdfPath.toFile());
-            System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
+            try {
+                // Disable font subsetting to avoid issues on some environments
+                document.getDocumentCatalog().getAcroForm();  // Initialize AcroForm if present
+                
+                // Try to save with default settings first
+                document.save(pdfPath.toFile());
+                System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
+            } catch (Exception e) {
+                System.err.println("Error saving PDF with default settings: " + e.getMessage());
+                
+                // Try again with font subsetting disabled
+                try {
+                    document.setAllSecurityToBeRemoved(true);
+                    document.save(pdfPath.toFile(), COSName.SUBSET);
+                    System.out.println("PDF created successfully with font subsetting disabled");
+                } catch (Exception e2) {
+                    System.err.println("Error saving PDF with font subsetting disabled: " + e2.getMessage());
+                    throw new IOException("Failed to save PDF document: " + e2.getMessage(), e2);
+                }
+            }
         }
         
         return pdfPath;

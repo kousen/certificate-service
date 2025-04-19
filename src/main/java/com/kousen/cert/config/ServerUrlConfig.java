@@ -30,9 +30,9 @@ public class ServerUrlConfig {
             return;
         }
         
-        // Default to Heroku URL if no value is configured
-        String herokuUrl = "https://certificate-service-997e5d9f565a.herokuapp.com";
-        QrCodeUtil.setServerBaseUrl(herokuUrl);
+        // Default to custom domain URL if no value is configured
+        String customDomain = "https://certificate-service.kousenit.com";
+        QrCodeUtil.setServerBaseUrl(customDomain);
     }
     
     /**
@@ -44,6 +44,6 @@ public class ServerUrlConfig {
             return configuredServerUrl;
         }
         
-        return "https://certificate-service-997e5d9f565a.herokuapp.com";
+        return "https://certificate-service.kousenit.com";
     }
 }
