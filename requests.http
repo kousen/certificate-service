@@ -5,9 +5,9 @@ Content-Type: application/json
 Accept: application/pdf
 
 {
-  "purchaserName": "Ada Lovelace",
-  "bookTitle": "Modern Java Recipes",
-  "purchaserEmail": "ada@lovelace.org"
+  "purchaserName": "Margaret Eldridge",
+  "bookTitle": "Mockito Made Clear",
+  "purchaserEmail": "margaret.eldridge@pragprog.org"
 }
 
 ### List available book titles
