@@ -126,13 +126,18 @@ public class PdfBoxGenerator {
             } catch (Exception e) {
                 System.err.println("Error saving PDF with default settings: " + e.getMessage());
                 
-                // Try again with font subsetting disabled
+                // Try again without font subsetting
                 try {
                     document.setAllSecurityToBeRemoved(true);
-                    document.save(pdfPath.toFile(), COSName.SUBSET);
-                    System.out.println("PDF created successfully with font subsetting disabled");
+                    
+                    // Manually disable font subsetting by setting a custom property
+                    document.getDocumentInformation().setCustomMetadataValue("DisableFontSubstitution", "true");
+                    
+                    // Save document with simplified settings
+                    document.save(pdfPath.toFile());
+                    System.out.println("PDF created successfully with simplified settings");
                 } catch (Exception e2) {
-                    System.err.println("Error saving PDF with font subsetting disabled: " + e2.getMessage());
+                    System.err.println("Error saving PDF with simplified settings: " + e2.getMessage());
                     throw new IOException("Failed to save PDF document: " + e2.getMessage(), e2);
                 }
             }
