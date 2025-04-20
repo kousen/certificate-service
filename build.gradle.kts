@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
+    id("jacoco")
 }
 
 java {
@@ -32,6 +33,7 @@ tasks.bootJar {
 // Configure test task
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(tasks.jacocoTestReport)
 
     // Disable class data sharing
     jvmArgs("-Xshare:off")
@@ -47,5 +49,48 @@ tasks.test {
         showExceptions = true
         showCauses = true
         showStackTraces = true
+    }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
+    
+    // Exclude certain classes from analysis
+    classDirectories.setFrom(
+        files(classDirectories.files.map {
+            fileTree(it) {
+                exclude("**/Application.class")
+                exclude("**/config/**") 
+                exclude("**/model/**")
+            }
+        })
+    )
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.60".toBigDecimal()
+            }
+        }
+
+        rule {
+            enabled = true
+            element = "CLASS"
+            includes = listOf("com.kousen.cert.service.*")
+
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = "0.70".toBigDecimal()
+            }
+        }
     }
 }
