@@ -24,7 +24,6 @@ This service generates professionally designed certificates of ownership for boo
 
 - Java 21 (with virtual threads)
 - Spring Boot 3.4
-- Flying Saucer for HTML-to-PDF conversion
 - PDFBox 3.0 for PDF manipulation and signing
 - BouncyCastle for cryptography
 - ZXing for QR code generation
@@ -118,33 +117,11 @@ Displays certificate verification information and instructions for validating th
    open ada.pdf
    ```
 
-## Deployment
-
-The application is configured for deployment to Heroku:
-
-```bash
-# Set up Heroku
-heroku create certificate-service
-
-# Configure storage paths
-heroku config:set CERTIFICATE_KEYSTORE=/app/.cert_keystore.p12
-heroku config:set CERTIFICATE_STORAGE_PATH=/app/certificates
-
-# Deploy
-git push heroku main
-```
-
 ## Notes on Digital Signatures
 
 The certificates are signed with a self-signed certificate, which means that Adobe Reader and other PDF readers may display warnings about the signature's validity. This is normal and doesn't affect the integrity of the signature itself. The verification page accessible via the QR code explains how to interpret these warnings.
 
-## Customization
-
-### Template Customization
-
-The certificate template is located at `src/main/resources/templates/elegant-certificate.html`. You can modify this file to change the appearance of the certificates.
-
-### Font and Image Assets
+## Font and Image Assets
 
 Place your custom assets under `src/main/resources`:
 
@@ -152,7 +129,6 @@ Place your custom assets under `src/main/resources`:
 fonts/CinzelDecorative-Regular.ttf
 fonts/GreatVibes-Regular.ttf
 images/certificate-bg.png
-images/signature.jpg
 ```
 
 ## License
