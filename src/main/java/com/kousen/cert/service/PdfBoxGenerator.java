@@ -27,8 +27,7 @@ public class PdfBoxGenerator {
     // Font and color constants
     private static final Color GOLD_COLOR = new Color(255, 214, 92);
     
-    // Font cache to avoid reloading fonts for every PDF
-    private static final Map<String, PDFont> fontCache = new HashMap<>();
+    // Font cache removed - PDType0Font must be loaded per document in PDFBox 3.0.4
     
     /**
      * Creates a certificate PDF for the specified text content
@@ -118,28 +117,74 @@ public class PdfBoxGenerator {
             
             // Save the PDF to the temp file
             try {
-                // Disable font subsetting to avoid issues on some environments
+                // In PDFBox 3.0.4, we need to be more careful with font embedding
+                // Explicitly disable subsetting which is causing issues on Heroku
                 document.getDocumentCatalog().getAcroForm();  // Initialize AcroForm if present
                 
-                // Try to save with default settings first
+                // Disable all security features which might interfere with font handling
+                document.setAllSecurityToBeRemoved(true);
+                
+                // Set properties to prevent font subsetting
+                System.setProperty("org.apache.pdfbox.font.subset", "false");
+                document.getDocumentInformation().setCustomMetadataValue("DisableFontSubsetting", "true");
+                
+                // Save with modified settings
                 document.save(pdfPath.toFile());
                 System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
             } catch (Exception e) {
-                System.err.println("Error saving PDF with default settings: " + e.getMessage());
+                System.err.println("Error saving PDF: " + e.getMessage());
                 
-                // Try again without font subsetting
+                // Try alternative approach with standard fonts only
                 try {
-                    document.setAllSecurityToBeRemoved(true);
-                    
-                    // Manually disable font subsetting by setting a custom property
-                    document.getDocumentInformation()
-                            .setCustomMetadataValue("DisableFontSubstitution", "true");
-                    
-                    // Save document with simplified settings
-                    document.save(pdfPath.toFile());
-                    System.out.println("PDF created successfully with simplified settings");
+                    System.err.println("Attempting to save with standard fonts only");
+                    // Create a new document with only standard fonts
+                    try (PDDocument simpleDoc = new PDDocument()) {
+                        PDPage simplePage = new PDPage(new PDRectangle(pageWidth, pageHeight));
+                        simpleDoc.addPage(simplePage);
+                        
+                        try (PDPageContentStream contentStream = new PDPageContentStream(
+                                simpleDoc, simplePage, PDPageContentStream.AppendMode.APPEND, true)) {
+                            
+                            // Use only standard fonts
+                            PDFont stdFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+                            PDFont stdBoldFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+                            PDFont stdItalicFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE);
+                            
+                            contentStream.setNonStrokingColor(GOLD_COLOR);
+                            
+                            // Basic certificate with standard fonts
+                            float y = pageHeight - 200;
+                            drawCenteredText(contentStream, stdBoldFont, 36, title, pageWidth/2, y);
+                            
+                            y -= 50;
+                            drawCenteredText(contentStream, stdFont, 14, "This certifies that", pageWidth/2, y);
+                            
+                            y -= 60;
+                            drawCenteredText(contentStream, stdItalicFont, 32, name, pageWidth/2, y);
+                            
+                            y -= 50;
+                            drawCenteredText(contentStream, stdFont, 14, "is the proud owner of", pageWidth/2, y);
+                            
+                            y -= 40;
+                            drawCenteredText(contentStream, stdBoldFont, 22, subtitle, pageWidth/2, y);
+                            
+                            y -= 50;
+                            drawCenteredText(contentStream, stdFont, 14,
+                                    "and has earned the author's eternal gratitude.", pageWidth/2, y);
+                            
+                            // Add QR code if available
+                            if (qrCodePath != null && Files.exists(qrCodePath)) {
+                                addQRCode(simpleDoc, contentStream, qrCodePath, 80, 80);
+                                drawCenteredText(contentStream, stdFont, 8, 
+                                        "Scan to verify", 80, 60);
+                            }
+                        }
+                        
+                        simpleDoc.save(pdfPath.toFile());
+                    }
+                    System.out.println("Successfully created simplified PDF with standard fonts only");
                 } catch (Exception e2) {
-                    System.err.println("Error saving PDF with simplified settings: " + e2.getMessage());
+                    System.err.println("Error saving even with simplified approach: " + e2.getMessage());
                     throw new IOException("Failed to save PDF document: " + e2.getMessage(), e2);
                 }
             }
@@ -149,28 +194,33 @@ public class PdfBoxGenerator {
     }
     
     /**
-     * Gets a font, loading from cache if possible
+     * Gets a font, loading from classpath resources
      */
     private PDFont getFont(PDDocument document, String fontFileName, PDFont fallbackFont) {
-        // Check if font is in cache
-        if (fontCache.containsKey(fontFileName)) {
-            return fontCache.get(fontFileName);
-        }
-        
+        // Note: In PDFBox 3.0.4, each font must be loaded directly into the document
+        // Do not use the cache for PDType0Font as it causes issues on Heroku
         try {
             // Load the font from classpath resources
             var fontResource = new ClassPathResource("fonts/" + fontFileName);
+            if (!fontResource.exists()) {
+                System.err.println("Font file not found: " + fontFileName);
+                return fallbackFont;
+            }
+            
             try (var fontStream = fontResource.getInputStream()) {
-                PDFont font = PDType0Font.load(document, fontStream, true);
-                fontCache.put(fontFileName, font);
-                System.out.println("Loaded and cached font: " + fontFileName);
+                if (fontStream == null) {
+                    System.err.println("Could not open font stream for: " + fontFileName);
+                    return fallbackFont;
+                }
+                
+                // Set to false to disable subsetting which is causing issues on Heroku
+                PDFont font = PDType0Font.load(document, fontStream, false);
+                System.out.println("Successfully loaded font: " + fontFileName);
                 return font;
             }
         } catch (IOException e) {
             System.err.println("Error loading font " + fontFileName + ": " + e.getMessage());
             System.err.println("Using fallback font: " + fallbackFont.getName());
-            // Cache the fallback font to avoid repeated load attempts
-            fontCache.put(fontFileName, fallbackFont);
             return fallbackFont;
         }
     }
