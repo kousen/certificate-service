@@ -7,7 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run application: `./gradlew bootRun`
 - Run all tests: `./gradlew test`
 - Run single test: `./gradlew test --tests "com.kousen.cert.service.KeyStoreProviderTest"`
+- Run property tests: `./gradlew test --tests "com.kousen.cert.service.QrCodeGeneratorPropertyTest"`
 - Clean build: `./gradlew clean build`
+
+## Test Resources
+- When creating tests, ensure that necessary resources (fonts, images, etc.) are also available in src/test/resources
+- Property-based tests should use controlled parameter generation for cryptographic tests to avoid ASN.1 parsing issues
 
 ## Code Style Guidelines
 - Java 21 with Spring Boot 3.3.1

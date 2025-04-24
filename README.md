@@ -27,6 +27,7 @@ This service generates professionally designed certificates of ownership for boo
 - PDFBox 3.0 for PDF manipulation and signing
 - BouncyCastle for cryptography
 - ZXing for QR code generation
+- jqwik for property-based testing
 
 ## API Endpoints
 
@@ -103,6 +104,22 @@ Displays certificate verification information and instructions for validating th
    ```bash
    ./gradlew bootRun
    ```
+
+### Testing
+
+This project uses both traditional unit tests and property-based testing:
+
+1. Run all tests
+   ```bash
+   ./gradlew test
+   ```
+
+2. Run specific property-based tests
+   ```bash
+   ./gradlew test --tests "com.kousen.cert.service.QrCodeGeneratorPropertyTest"
+   ```
+
+Property-based testing systematically tests properties of the application with many random inputs, helping to discover edge cases that traditional unit tests might miss.
 
 4. Generate a certificate (example using curl)
    ```bash
