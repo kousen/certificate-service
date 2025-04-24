@@ -20,3 +20,5 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Use static imports for JUnit and Mockito methods
 - Maintain separation of concerns (controller/service/model)
 - Use final for immutable fields
+- Use records for simple data classes wherever possible
+- Remove unused imports
