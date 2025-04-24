@@ -2,7 +2,6 @@ package com.kousen.cert.service;
 
 import net.jqwik.api.*;
 import net.jqwik.api.constraints.NotBlank;
-import net.jqwik.api.constraints.NotEmpty;
 import net.jqwik.api.constraints.StringLength;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;

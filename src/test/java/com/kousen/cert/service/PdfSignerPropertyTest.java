@@ -75,7 +75,7 @@ class PdfSignerPropertyTest {
                     List<PDSignature> signatures = document.getSignatureDictionaries();
                     assertThat(signatures).isNotEmpty();
                     
-                    PDSignature signature = signatures.get(0);
+                    PDSignature signature = signatures.getFirst();
                     assertThat(signature.getFilter()).isEqualTo("Adobe.PPKLite");
                     assertThat(signature.getSubFilter()).isEqualTo("adbe.pkcs7.detached");
                     assertThat(signature.getName()).isEqualTo("Ken Kousen");
@@ -128,7 +128,7 @@ class PdfSignerPropertyTest {
                     assertThat(signatures).isNotEmpty();
                     
                     // Basic signature validation
-                    PDSignature signature = signatures.get(0);
+                    PDSignature signature = signatures.getFirst();
                     assertThat(signature.getFilter()).isEqualTo("Adobe.PPKLite");
                     
                     // Each signature should have a creation date
