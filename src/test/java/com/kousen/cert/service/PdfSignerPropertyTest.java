@@ -1,13 +1,10 @@
 package com.kousen.cert.service;
 
 import net.jqwik.api.*;
-import net.jqwik.api.constraints.NotBlank;
-import net.jqwik.api.constraints.StringLength;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.junit.jupiter.api.Disabled;
 
 import java.io.IOException;
 import java.nio.file.Files;
