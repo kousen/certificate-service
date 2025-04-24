@@ -22,7 +22,8 @@ class PdfSignerPropertyTest {
 
     // Initialize for each test
     private KeyStoreProvider initKeyStoreProvider() {
-        Path keystorePath = Paths.get("test-keystore.p12");
+        // Use the keystore from test resources
+        Path keystorePath = Paths.get("src/test/resources/keystores/test-keystore.p12");
         return new KeyStoreProvider(keystorePath);
     }
 

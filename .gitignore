@@ -42,3 +42,9 @@ out/
 */.DS_Store
 **/.DS_Store
 /.jqwik-database
+
+### Security Files ###
+*.p12
+*.jks
+*.keystore
+*.pfx
