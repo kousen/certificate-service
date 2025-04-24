@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * PDF generation utility using Apache PDFBox
@@ -121,7 +119,7 @@ public class PdfBoxGenerator {
                 // Explicitly disable subsetting which is causing issues on Heroku
                 document.getDocumentCatalog().getAcroForm();  // Initialize AcroForm if present
                 
-                // Disable all security features which might interfere with font handling
+                // Disable all security features that might interfere with font handling
                 document.setAllSecurityToBeRemoved(true);
                 
                 // Set properties to prevent font subsetting
@@ -208,11 +206,6 @@ public class PdfBoxGenerator {
             }
             
             try (var fontStream = fontResource.getInputStream()) {
-                if (fontStream == null) {
-                    System.err.println("Could not open font stream for: " + fontFileName);
-                    return fallbackFont;
-                }
-                
                 // Set to false to disable subsetting which is causing issues on Heroku
                 PDFont font = PDType0Font.load(document, fontStream, false);
                 System.out.println("Successfully loaded font: " + fontFileName);

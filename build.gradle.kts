@@ -12,18 +12,27 @@ java {
 repositories { mavenCentral() }
 
 dependencies {
+    // Spring Boot dependencies
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    // PDF generation and manipulation
     implementation("org.apache.pdfbox:pdfbox:3.0.4")
+
+    // Security and cryptography
     implementation("org.bouncycastle:bcprov-jdk18on:1.80")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.80")
     implementation("org.bouncycastle:bcutil-jdk18on:1.80")
+
+    // QR code generation
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.google.zxing:javase:3.5.3")
 
+    // Testing dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("net.jqwik:jqwik:1.8.4")
 }
 
 tasks.bootJar { 
