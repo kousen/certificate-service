@@ -48,13 +48,12 @@ public class PdfService {
                     220);
 
             // Create PDF with PDFBox using in-memory QR code
-            Path pdfPath = pdfGenerator.createCertificatePdfWithQrData(
+
+            return pdfGenerator.createCertificatePdfWithQrData(
                     "Certificate of Ownership",
                     request.purchaserName(),
                     request.bookTitle(),
                     qrCodeData);
-
-            return pdfPath;
         } catch (Exception e) {
             throw new IOException("Failed to generate PDF: " + e.getMessage(), e);
         }
