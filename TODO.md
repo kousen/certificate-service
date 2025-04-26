@@ -14,9 +14,8 @@ This document lists recommended cleanup tasks and improvements for the certifica
 - [ ] Consider adding structured logging for important operations
 
 ### 2. Externalize Hardcoded Values to Configuration
-- [ ] Move hardcoded URLs to application.yaml config:
-  - `QrCodeUtil.java`: "https://certificate-service-997e5d9f565a.herokuapp.com"
-  - `ServerUrlConfig.java`: "certificate-service.kousenit.com"
+- [x] Move hardcoded base-URL logic from ServerUrlConfig.java into `certificate.verification.base-url` property
+- [ ] Move hardcoded default base URL in QrCodeUtil.java into configuration
 - [ ] Create proper configuration properties class with validation
 - [ ] Add environment-specific configurations (dev, test, prod)
 
@@ -29,7 +28,7 @@ This document lists recommended cleanup tasks and improvements for the certifica
 ## Medium Priority
 
 ### 4. Reduce Code Duplication
-- [ ] Consolidate duplicated protocol detection logic in `ServerUrlConfig.java`
+- [x] Consolidate duplicated protocol detection logic in `ServerUrlConfig.java`
 - [ ] Extract common certificate rendering code in `PdfBoxGenerator.java` into helper methods
 - [ ] Create utility methods for repeated operations
 
@@ -46,7 +45,7 @@ This document lists recommended cleanup tasks and improvements for the certifica
 - [ ] Implement proper resource disposal in all service classes
 
 ### 7. Strengthen Dependency Injection
-- [ ] Replace direct instantiation with proper Spring dependency injection
+- [x] Replace direct instantiation with proper Spring dependency injection (PdfBoxGenerator, PdfService)
 - [ ] Use constructor injection consistently throughout the application
 - [ ] Configure appropriate bean scopes for components
 

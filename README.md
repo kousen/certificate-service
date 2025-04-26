@@ -105,6 +105,20 @@ Displays certificate verification information and instructions for validating th
    ./gradlew bootRun
    ```
 
+### Configuration
+
+The service relies on the `certificate.verification.base-url` property to generate absolute QR code links. By default it inherits the `server.url` setting, but you can override it in one of two ways:
+1. Set the environment variable (dots become underscores):
+   ```bash
+   export CERTIFICATE_VERIFICATION_BASE_URL=https://yourdomain.com
+   ```
+2. Override in `src/main/resources/application.yaml`:
+   ```yaml
+   certificate:
+     verification:
+       base-url: https://yourdomain.com
+   ```
+
 ### Testing
 
 This project uses both traditional unit tests and property-based testing:
@@ -117,6 +131,10 @@ This project uses both traditional unit tests and property-based testing:
 2. Run specific property-based tests
    ```bash
    ./gradlew test --tests "com.kousen.cert.service.QrCodeGeneratorPropertyTest"
+   ```
+3. Run integration (end-to-end) tests
+   ```bash
+   ./gradlew test --tests "*IntegrationTest"
    ```
 
 Property-based testing systematically tests properties of the application with many random inputs, helping to discover edge cases that traditional unit tests might miss.
