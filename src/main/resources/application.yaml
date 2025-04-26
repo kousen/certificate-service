@@ -8,3 +8,6 @@ certificate:
   keystore: ${CERTIFICATE_KEYSTORE:${user.home}/.cert_keystore.p12}
   storage:
     path: ${CERTIFICATE_STORAGE_PATH:${user.home}/certificate-service/certificates}
+  verification:
+    # Base URL used in generated QR code links; defaults to server.url
+    base-url: ${CERTIFICATE_VERIFICATION_BASE_URL:${server.url}}
