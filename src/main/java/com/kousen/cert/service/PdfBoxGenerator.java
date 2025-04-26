@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 /**
  * PDF generation utility using Apache PDFBox
  */
+@Component
 public class PdfBoxGenerator {
 
     // Font and color constants
@@ -189,6 +191,139 @@ public class PdfBoxGenerator {
         }
         
         return pdfPath;
+    }
+    /**
+     * Creates a certificate PDF using in-memory QR code data (avoids temporary image files).
+     *
+     * @param title        The main title text
+     * @param name         The recipient's name
+     * @param subtitle     The subtitle or book title
+     * @param qrCodeData   QR code image bytes in PNG format
+     * @return Path to the generated PDF file
+     * @throws IOException If there's an error during PDF creation
+     */
+    /**
+     * Creates a certificate PDF using in-memory QR code data (avoids temporary image files).
+     *
+     * @param title        The main title text
+     * @param name         The recipient's name
+     * @param subtitle     The subtitle or book title
+     * @param qrCodeData   QR code image bytes in PNG format
+     * @return Path to the generated PDF file
+     * @throws IOException If there's an error during PDF creation
+     */
+    public Path createCertificatePdfWithQrData(String title, String name, String subtitle, byte[] qrCodeData) throws IOException {
+        Path pdfPath = Files.createTempFile("cert-", ".pdf");
+        float pageWidth = PDRectangle.A4.getHeight();
+        float pageHeight = PDRectangle.A4.getWidth();
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(new PDRectangle(pageWidth, pageHeight));
+            document.addPage(page);
+
+            PDFont titleFont = getFont(document, "CinzelDecorative-Regular.ttf",
+                    new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD));
+            PDFont nameFont = getFont(document, "GreatVibes-Regular.ttf",
+                    new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE));
+            PDFont textFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+
+            addBackgroundImage(document, page);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(
+                    document, page, PDPageContentStream.AppendMode.APPEND, true)) {
+                contentStream.setNonStrokingColor(GOLD_COLOR);
+
+                float centerX = pageWidth / 2;
+                float y = pageHeight - 200;
+                drawCenteredText(contentStream, titleFont, 48, title, centerX, y);
+
+                y -= 50;
+                drawCenteredText(contentStream, textFont, 14, "This certifies that", centerX, y);
+
+                y -= 60;
+                drawCenteredText(contentStream, nameFont, 40, name, centerX, y);
+
+                y -= 50;
+                drawCenteredText(contentStream, textFont, 14, "is the proud owner of", centerX, y);
+
+                y -= 40;
+                drawCenteredText(contentStream, titleFont, 24, subtitle, centerX, y);
+
+                y -= 50;
+                drawCenteredText(contentStream, textFont, 14,
+                        "and has earned the author's eternal gratitude.", centerX, y);
+
+                if (qrCodeData != null && qrCodeData.length > 0) {
+                    addQRCode(document, contentStream, qrCodeData, 80, 80);
+                    float qrTextX = 80;
+                    float qrTextY = 60;
+                    contentStream.beginText();
+                    contentStream.setFont(textFont, 8);
+                    contentStream.newLineAtOffset(qrTextX - 20, qrTextY);
+                    contentStream.showText("Scan to verify certificate authenticity");
+                    contentStream.endText();
+                }
+            }
+
+            try {
+                document.getDocumentCatalog().getAcroForm();
+                document.setAllSecurityToBeRemoved(true);
+                System.setProperty("org.apache.pdfbox.font.subset", "false");
+                document.getDocumentInformation().setCustomMetadataValue("DisableFontSubsetting", "true");
+                document.save(pdfPath.toFile());
+                System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
+            } catch (Exception e) {
+                System.err.println("Error saving PDF: " + e.getMessage());
+                // Fallback to standard fonts
+                try {
+                    System.err.println("Attempting to save with standard fonts only");
+                    try (PDDocument simpleDoc = new PDDocument()) {
+                        PDPage simplePage = new PDPage(new PDRectangle(pageWidth, pageHeight));
+                        simpleDoc.addPage(simplePage);
+                        try (PDPageContentStream contentStream = new PDPageContentStream(
+                                simpleDoc, simplePage, PDPageContentStream.AppendMode.APPEND, true)) {
+                            PDFont stdFont = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+                            PDFont stdBold = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
+                            PDFont stdItalic = new PDType1Font(Standard14Fonts.FontName.HELVETICA_OBLIQUE);
+                            contentStream.setNonStrokingColor(GOLD_COLOR);
+                            float y2 = pageHeight - 200;
+                            drawCenteredText(contentStream, stdBold, 36, title, pageWidth / 2, y2);
+                            y2 -= 50;
+                            drawCenteredText(contentStream, stdFont, 14, "This certifies that", pageWidth / 2, y2);
+                            y2 -= 60;
+                            drawCenteredText(contentStream, stdItalic, 32, name, pageWidth / 2, y2);
+                            y2 -= 50;
+                            drawCenteredText(contentStream, stdFont, 14, "is the proud owner of", pageWidth / 2, y2);
+                            y2 -= 40;
+                            drawCenteredText(contentStream, stdBold, 22, subtitle, pageWidth / 2, y2);
+                            y2 -= 50;
+                            drawCenteredText(contentStream, stdFont, 14,
+                                    "and has earned the author's eternal gratitude.", pageWidth / 2, y2);
+                            if (qrCodeData != null && qrCodeData.length > 0) {
+                                addQRCode(simpleDoc, contentStream, qrCodeData, 80, 80);
+                                drawCenteredText(contentStream, stdFont, 8, "Scan to verify", 80, 60);
+                            }
+                        }
+                        simpleDoc.save(pdfPath.toFile());
+                    }
+                    System.out.println("Successfully created simplified PDF with standard fonts only");
+                } catch (Exception ex2) {
+                    System.err.println("Error in fallback: " + ex2.getMessage());
+                    throw new IOException("Failed to save PDF document: " + ex2.getMessage(), ex2);
+                }
+            }
+        }
+        return pdfPath;
+    }
+    /**
+     * Adds an in-memory QR code to the certificate.
+     */
+    private void addQRCode(PDDocument document,
+                           PDPageContentStream contentStream,
+                           byte[] qrCodeData,
+                           float x,
+                           float y) throws IOException {
+        PDImageXObject qrImage = PDImageXObject.createFromByteArray(document, qrCodeData, "qrcode.png");
+        contentStream.drawImage(qrImage, x, y);
     }
     
     /**

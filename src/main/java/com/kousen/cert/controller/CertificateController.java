@@ -92,11 +92,18 @@ public class CertificateController {
                     .map(path -> {
                         Map<String, Object> details = new HashMap<>();
                         details.put("filename", path.getFileName().toString());
-                        try {
-                            details.put("size", Files.size(path));
-                            details.put("lastModified", Files.getLastModifiedTime(path).toString());
-                        } catch (IOException e) {
-                            logger.warn("Error getting file details for {}", path, e);
+                        // Add file metadata if file exists
+                        if (Files.exists(path)) {
+                            try {
+                                details.put("size", Files.size(path));
+                            } catch (IOException e) {
+                                logger.warn("Error getting size for {}", path, e);
+                            }
+                            try {
+                                details.put("lastModified", Files.getLastModifiedTime(path).toString());
+                            } catch (IOException e) {
+                                logger.warn("Error getting lastModified for {}", path, e);
+                            }
                         }
                         return details;
                     })

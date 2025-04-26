@@ -59,6 +59,27 @@ public class QrCodeGenerator {
             throw new IOException("Failed to generate QR code: " + e.getMessage(), e);
         }
     }
+    /**
+     * Generates a QR code as a PNG byte array without writing to disk.
+     *
+     * @param name       The name of the certificate holder
+     * @param bookTitle  The book title
+     * @param size       The size of the QR code in pixels
+     * @return PNG image data as a byte array
+     * @throws IOException If there's an error during QR code generation
+     */
+    public byte[] generateQrCodeData(String name, String bookTitle, int size) throws IOException {
+        String verificationUrl = buildVerificationUrl(name, bookTitle);
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(verificationUrl, BarcodeFormat.QR_CODE, size, size);
+            java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+            return baos.toByteArray();
+        } catch (Exception e) {
+            throw new IOException("Failed to generate QR code data: " + e.getMessage(), e);
+        }
+    }
     
     /**
      * Builds a verification URL for the certificate
