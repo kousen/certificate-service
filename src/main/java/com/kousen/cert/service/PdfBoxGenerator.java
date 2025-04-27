@@ -102,16 +102,15 @@ public class PdfBoxGenerator {
                 
                 // Add QR code
                 if (qrCodePath != null && Files.exists(qrCodePath)) {
-                    addQRCode(document, contentStream, qrCodePath, 80, 80);
-                    
-                    // Add "Scan to verify" text below QR code
-                    float qrTextX = 80;
-                    float qrTextY = 60;
-                    contentStream.beginText();
-                    contentStream.setFont(textFont, 8);
-                    contentStream.newLineAtOffset(qrTextX - 20, qrTextY);
-                    contentStream.showText("Scan to verify certificate authenticity");
-                    contentStream.endText();
+                    final float qrX = 80f;
+                    final float qrY = 80f;
+                    final float qrSize = 100f;
+                    addQRCode(document, contentStream, qrCodePath, qrX, qrY);
+                    // Center "Scan to verify certificate authenticity" below the QR code
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Scan to verify certificate authenticity",
+                            qrX + qrSize / 2f,
+                            qrY - 20f);
                 }
             }
             
@@ -253,14 +252,15 @@ public class PdfBoxGenerator {
                         "and has earned the author's eternal gratitude.", centerX, y);
 
                 if (qrCodeData != null && qrCodeData.length > 0) {
-                    addQRCode(document, contentStream, qrCodeData, 80, 80);
-                    float qrTextX = 80;
-                    float qrTextY = 60;
-                    contentStream.beginText();
-                    contentStream.setFont(textFont, 8);
-                    contentStream.newLineAtOffset(qrTextX - 20, qrTextY);
-                    contentStream.showText("Scan to verify certificate authenticity");
-                    contentStream.endText();
+                    final float qrX = 80f;
+                    final float qrY = 80f;
+                    final float qrSize = 100f;
+                    addQRCode(document, contentStream, qrCodeData, qrX, qrY);
+                    // Center "Scan to verify certificate authenticity" below the QR code
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Scan to verify certificate authenticity",
+                            qrX + qrSize / 2f,
+                            qrY - 20f);
                 }
             }
 
@@ -322,8 +322,11 @@ public class PdfBoxGenerator {
                            byte[] qrCodeData,
                            float x,
                            float y) throws IOException {
+        // Create image object from in-memory QR bytes
         PDImageXObject qrImage = PDImageXObject.createFromByteArray(document, qrCodeData, "qrcode.png");
-        contentStream.drawImage(qrImage, x, y);
+        // Draw QR code at fixed size (width and height in points) to control its display dimensions
+        float qrSize = 100f;
+        contentStream.drawImage(qrImage, x, y, qrSize, qrSize);
     }
     
     /**
