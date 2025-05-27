@@ -12,6 +12,30 @@
         <p>Generate and verify digitally signed PDF certificates</p>
     </div>
 
+    <h2>Try It Out</h2>
+    <p>Generate a sample certificate for yourself to see how it works:</p>
+    
+    <div class="card">
+        <form id="demo-form">
+            <div style="margin-bottom: 15px;">
+                <label for="name" style="display: block; margin-bottom: 5px;">Your Name:</label>
+                <input type="text" id="name" name="name" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Enter your name">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label for="book" style="display: block; margin-bottom: 5px;">Book Title:</label>
+                <select id="book" name="book" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Gradle Recipes for Android">Gradle Recipes for Android</option>
+                    <option value="Help Your Boss Help You">Help Your Boss Help You</option>
+                    <option value="Kotlin Cookbook">Kotlin Cookbook</option>
+                    <option value="Making Java Groovy">Making Java Groovy</option>
+                    <option value="Mockito Made Clear">Mockito Made Clear</option>
+                    <option value="Modern Java Recipes">Modern Java Recipes</option>
+                </select>
+            </div>
+            <button type="submit" class="demo-button">Generate Certificate</button>
+        </form>
+    </div>
+
     <div class="card">
         <h2>About This Service</h2>
         <p>This application generates beautiful, digitally signed certificates of ownership for books or other digital content. Each certificate includes:</p>
@@ -70,30 +94,6 @@
             <span class="step-number">4.</span>
             <div>Check the certificate's digital signature in Adobe Reader to confirm it hasn't been tampered with</div>
         </div>
-    </div>
-
-    <h2>Try It Out</h2>
-    <p>Generate a sample certificate for yourself to see how it works:</p>
-    
-    <div class="card">
-        <form id="demo-form">
-            <div style="margin-bottom: 15px;">
-                <label for="name" style="display: block; margin-bottom: 5px;">Your Name:</label>
-                <input type="text" id="name" name="name" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="Enter your name">
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label for="book" style="display: block; margin-bottom: 5px;">Book Title:</label>
-                <select id="book" name="book" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <option value="Making Java Groovy">Making Java Groovy</option>
-                    <option value="Modern Java Recipes">Modern Java Recipes</option>
-                    <option value="Gradle Recipes for Android">Gradle Recipes for Android</option>
-                    <option value="Kotlin Cookbook">Kotlin Cookbook</option>
-                    <option value="Help Your Boss Help You">Help Your Boss Help You</option>
-                    <option value="Mockito Made Clear">Mockito Made Clear</option>
-                </select>
-            </div>
-            <button type="submit" class="demo-button">Generate Certificate</button>
-        </form>
     </div>
 
     <script>
