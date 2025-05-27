@@ -2,6 +2,13 @@
 
 A Spring Boot application that generates personalized certificates of ownership for books, complete with digital signatures and QR code verification.
 
+## Live Demo
+
+A deployed version of this service is available at:
+**https://certificate-service.kousenit.com**
+
+You can try the certificate generation feature directly on the web interface.
+
 ## Overview
 
 This service generates professionally designed certificates of ownership for book purchases. Each certificate:
