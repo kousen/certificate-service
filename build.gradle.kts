@@ -16,6 +16,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // Database
+    implementation("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
 
     // PDF generation and manipulation
     implementation("org.apache.pdfbox:pdfbox:3.0.4")
@@ -29,8 +35,14 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.google.zxing:javase:3.5.3")
 
+    // Metrics and monitoring
+    implementation("io.micrometer:micrometer-core")
+
     // Testing dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("net.jqwik:jqwik:1.8.4")
 }

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .metric-card {
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+        .activity-item {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Certificate Service</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/dashboard">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/api/certificates/stored">Certificates</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-header">
+        <div class="container">
+            <h1>Analytics Dashboard</h1>
+            <p class="mb-0">Real-time insights into certificate generation and usage</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Summary Cards -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="metric-card bg-light">
+                    <div class="metric-value" th:text="${dashboardData.summary.totalCertificates}">0</div>
+                    <div class="metric-label">Total Certificates</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card bg-light">
+                    <div class="metric-value" th:text="${dashboardData.summary.certificatesToday}">0</div>
+                    <div class="metric-label">Today</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card bg-light">
+                    <div class="metric-value" th:text="${dashboardData.summary.certificatesThisWeek}">0</div>
+                    <div class="metric-label">This Week</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card bg-light">
+                    <div class="metric-value" th:text="${dashboardData.summary.uniquePurchasers}">0</div>
+                    <div class="metric-label">Unique Users</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Certificate Generation Trend</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Popular Books</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="bookChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Performance Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Avg Generation Time:</strong><br>
+                                <span th:text="${#numbers.formatDecimal(dashboardData.performance.avgGenerationTimeMs, 0, 2)} + ' ms'">0 ms</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Success Rate:</strong><br>
+                                <span th:text="${#numbers.formatDecimal(dashboardData.performance.successRate, 0, 1)} + '%'">100%</span>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <strong>Successful:</strong><br>
+                                <span th:text="${dashboardData.performance.successCount}">0</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Failed:</strong><br>
+                                <span th:text="${dashboardData.performance.failureCount}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Recent Activity</h5>
+                    </div>
+                    <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                        <div th:each="activity : ${dashboardData.recentActivities}" class="activity-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <strong th:text="${activity.purchaserName}">User</strong><br>
+                                    <small th:text="${activity.bookTitle}">Book</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge" 
+                                          th:classappend="${activity.eventType == 'GENERATED' ? 'bg-success' : 
+                                                         (activity.eventType == 'VERIFIED' ? 'bg-info' : 
+                                                         (activity.eventType == 'DOWNLOADED' ? 'bg-primary' : 'bg-secondary'))}"
+                                          th:text="${activity.eventType}">EVENT</span><br>
+                                    <small th:text="${#temporals.format(activity.timestamp, 'MMM dd HH:mm')}">Time</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="row mt-4 mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">System Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <strong>Memory Usage:</strong><br>
+                                <span th:text="${dashboardData.systemMetrics.freeMemory} + ' MB / ' + ${dashboardData.systemMetrics.totalMemory} + ' MB'">0 MB</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Max Memory:</strong><br>
+                                <span th:text="${dashboardData.systemMetrics.maxMemory} + ' MB'">0 MB</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Processors:</strong><br>
+                                <span th:text="${dashboardData.systemMetrics.availableProcessors}">0</span>
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Most Popular Book:</strong><br>
+                                <span th:text="${dashboardData.summary.mostPopularBook}">None</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const dashboardData = /*[[${dashboardData}]]*/ {};
+        
+        // Daily Trend Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: dashboardData.dailyTrend.map(d => new Date(d.timestamp).toLocaleDateString()),
+                datasets: [{
+                    label: 'Certificates Generated',
+                    data: dashboardData.dailyTrend.map(d => d.count),
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Book Popularity Chart
+        const bookCtx = document.getElementById('bookChart').getContext('2d');
+        new Chart(bookCtx, {
+            type: 'doughnut',
+            data: {
+                labels: dashboardData.bookPopularity.map(b => b.bookTitle),
+                datasets: [{
+                    data: dashboardData.bookPopularity.map(b => b.count),
+                    backgroundColor: [
+                        '#667eea',
+                        '#764ba2',
+                        '#f093fb',
+                        '#4facfe',
+                        '#00f2fe',
+                        '#43e97b',
+                        '#38f9d7',
+                        '#fa709a',
+                        '#fee140'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12
+                        }
+                    }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

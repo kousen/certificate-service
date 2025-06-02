@@ -1,5 +1,7 @@
 package com.kousen.cert.controller;
 
+import com.kousen.cert.analytics.service.AnalyticsService;
+import com.kousen.cert.analytics.service.CertificateMetadataService;
 import com.kousen.cert.model.CertificateRequest;
 import com.kousen.cert.service.*;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,6 +24,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,44 +35,74 @@ public class CertificateController {
     private final PdfService pdfService;
     private final PdfSigner pdfSigner;
     private final CertificateStorageService storageService;
+    private final AnalyticsService analyticsService;
+    private final CertificateMetadataService metadataService;
 
     public CertificateController(
             PdfService pdfService, 
             CertificateStorageService storageService,
+            AnalyticsService analyticsService,
+            CertificateMetadataService metadataService,
             @Value("${certificate.keystore}") String keystorePath) {
         this.pdfService = pdfService;
         this.storageService = storageService;
+        this.analyticsService = analyticsService;
+        this.metadataService = metadataService;
         Path ksPath = Paths.get(keystorePath);
         this.pdfSigner = new PdfSigner(new KeyStoreProvider(ksPath));
     }
 
     @PostMapping(produces = "application/pdf")
-    public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req) throws Exception {
-        // Generate the certificate
-        Path unsigned = pdfService.createPdf(req);
-        Path signed = pdfSigner.sign(unsigned);
+    public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req, HttpServletRequest request) throws Exception {
+        long startTime = System.currentTimeMillis();
+        String certificateId = UUID.randomUUID().toString();
         
         try {
-            // Store a copy of the certificate
-            Path storedCertificate = storageService.storeCertificate(signed, req);
-            logger.info("Certificate stored successfully at: {}", storedCertificate);
+            // Generate the certificate
+            Path unsigned = pdfService.createPdf(req);
+            Path signed = pdfSigner.sign(unsigned);
             
-            // Return the certificate in the response
-            FileSystemResource res = new FileSystemResource(signed);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
-                    .header("X-Certificate-Status",
-                            "Self-signed - May show warnings in PDF readers")
-                    .body(res);
-        } finally {
-            // Clean up the temporary unsigned PDF if it still exists
-            if (Files.exists(unsigned)) {
-                try {
-                    Files.deleteIfExists(unsigned);
-                } catch (Exception e) {
-                    logger.warn("Failed to delete temporary unsigned PDF: {}", unsigned, e);
+            try {
+                // Store a copy of the certificate
+                Path storedCertificate = storageService.storeCertificate(signed, req);
+                logger.info("Certificate stored successfully at: {}", storedCertificate);
+                
+                // Track analytics
+                long duration = System.currentTimeMillis() - startTime;
+                analyticsService.trackCertificateGenerated(
+                    certificateId,
+                    req.purchaserName(),
+                    req.purchaserEmail().orElse(null),
+                    req.bookTitle(),
+                    duration,
+                    request
+                );
+                
+                // Save metadata
+                metadataService.saveCertificateMetadata(certificateId, storedCertificate);
+                
+                // Return the certificate in the response
+                FileSystemResource res = new FileSystemResource(signed);
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
+                        .header("X-Certificate-Status",
+                                "Self-signed - May show warnings in PDF readers")
+                        .header("X-Certificate-Id", certificateId)
+                        .body(res);
+            } finally {
+                // Clean up the temporary unsigned PDF if it still exists
+                if (Files.exists(unsigned)) {
+                    try {
+                        Files.deleteIfExists(unsigned);
+                    } catch (Exception e) {
+                        logger.warn("Failed to delete temporary unsigned PDF: {}", unsigned, e);
+                    }
                 }
             }
+        } catch (Exception e) {
+            // Track error
+            analyticsService.trackCertificateError(e.getMessage(), request);
+            throw e;
         }
     }
     
@@ -128,10 +162,16 @@ public class CertificateController {
      * @return The certificate PDF file
      */
     @GetMapping("/stored/{filename:.+}")
-    public ResponseEntity<FileSystemResource> getStoredCertificate(@PathVariable String filename) {
+    public ResponseEntity<FileSystemResource> getStoredCertificate(@PathVariable String filename, HttpServletRequest request) {
         try {
             Path certificatePath = storageService.getCertificate(filename);
             FileSystemResource resource = new FileSystemResource(certificatePath);
+            
+            // Track download if metadata exists
+            var metadata = metadataService.getCertificateMetadataByFilename(filename);
+            if (metadata != null) {
+                analyticsService.trackCertificateDownloaded(metadata.getCertificateId(), request);
+            }
             
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_PDF)

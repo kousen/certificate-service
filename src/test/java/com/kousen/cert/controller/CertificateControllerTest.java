@@ -1,6 +1,8 @@
 package com.kousen.cert.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kousen.cert.analytics.service.AnalyticsService;
+import com.kousen.cert.analytics.service.CertificateMetadataService;
 import com.kousen.cert.model.CertificateRequest;
 import com.kousen.cert.service.CertificateStorageService;
 import com.kousen.cert.service.PdfService;
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CertificateController.class)
+@org.springframework.test.context.ActiveProfiles("test")
 class CertificateControllerTest {
 
     @Autowired
@@ -41,6 +44,12 @@ class CertificateControllerTest {
     
     @MockitoBean
     private CertificateStorageService storageService;
+    
+    @MockitoBean
+    private AnalyticsService analyticsService;
+    
+    @MockitoBean
+    private CertificateMetadataService metadataService;
 
     @Test
     void shouldCreateCertificateAndReturnPdf() throws Exception {
