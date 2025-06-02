@@ -31,7 +31,7 @@ public interface CertificateEventRepository extends JpaRepository<CertificateEve
     
     @Query("SELECT CAST(e.timestamp AS DATE) as date, COUNT(e) as count FROM CertificateEvent e " +
            "WHERE e.eventType = :eventType AND e.timestamp BETWEEN :start AND :end " +
-           "GROUP BY CAST(e.timestamp AS DATE) ORDER BY date")
+           "GROUP BY CAST(e.timestamp AS DATE) ORDER BY CAST(e.timestamp AS DATE)")
     List<Object[]> findDailyEventCounts(@Param("eventType") EventType eventType, 
                                         @Param("start") Instant start, 
                                         @Param("end") Instant end);
