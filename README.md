@@ -25,15 +25,20 @@ This service generates professionally designed certificates of ownership for boo
 - **Digital Signatures**: Each PDF is cryptographically signed for authenticity
 - **Certificate Verification**: QR codes link to a verification page with signature details
 - **Certificate Storage**: Maintains copies of all generated certificates
+- **Analytics Dashboard**: Comprehensive analytics with charts, metrics, and usage tracking
 - **RESTful API**: Simple API for certificate generation and retrieval
 
 ## Technologies
 
 - Java 21 (with virtual threads)
 - Spring Boot 3.4
+- Spring Data JPA with Hibernate
+- H2 Database (development) / PostgreSQL (production)
 - PDFBox 3.0 for PDF manipulation and signing
 - BouncyCastle for cryptography
 - ZXing for QR code generation
+- Thymeleaf templating for web UI
+- Chart.js for analytics visualizations
 - jqwik for property-based testing
 
 ## API Endpoints
@@ -87,12 +92,43 @@ GET /verify-certificate
 
 Displays certificate verification information and instructions for validating the digital signature.
 
+### Analytics Dashboard
+
+```
+GET /admin/dashboard
+```
+
+Web interface showing comprehensive analytics including:
+- Certificate generation metrics and trends
+- Book popularity statistics
+- Performance metrics and response times
+- Recent activity logs
+
+### Analytics API
+
+```
+GET /api/analytics/dashboard    # Complete dashboard data
+GET /api/analytics/summary      # Summary statistics
+GET /api/analytics/trends       # Daily trend data
+GET /api/analytics/books        # Book popularity data
+GET /api/analytics/performance  # Performance metrics
+```
+
+Returns JSON data for programmatic access to analytics.
+
 ## Running Locally
 
 ### Prerequisites
 
 - Java 21 or higher
 - Gradle 8.5 or higher
+
+### Database Configuration
+
+The application uses H2 in-memory database for local development and PostgreSQL for production:
+
+- **Development**: Automatic H2 setup with console at `/h2-console`
+- **Production**: Configure `DATABASE_URL` environment variable for PostgreSQL
 
 ### Steps
 
@@ -158,6 +194,27 @@ Property-based testing systematically tests properties of the application with m
    ```bash
    open ada.pdf
    ```
+
+6. View analytics dashboard
+   ```
+   http://localhost:8080/admin/dashboard
+   ```
+
+## Deployment
+
+### Heroku Deployment
+
+The application is configured for easy Heroku deployment with PostgreSQL:
+
+1. **Add PostgreSQL**: `heroku addons:create heroku-postgresql:essential-0`
+2. **Set Environment Variables**:
+   ```bash
+   heroku config:set SPRING_PROFILES_ACTIVE=production
+   heroku config:set HIBERNATE_DDL_AUTO=validate
+   ```
+3. **Deploy**: Standard git push to Heroku
+
+The application automatically detects the Heroku PostgreSQL `DATABASE_URL` and switches from H2 to persistent storage.
 
 ## Notes on Digital Signatures
 
