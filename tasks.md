@@ -3,7 +3,10 @@
 This document provides a detailed, enumerated task list for implementing the analytics dashboard based on the plans.md file. Each task includes tracking capabilities to monitor progress.
 
 ## Task Status Legend
-- **Status**: Not Started | In Progress | Completed
+- **Status**: 
+  - [ ] Not Started
+  - [-] In Progress
+  - [x] Completed
 - **Priority**: Low | Medium | High | Critical
 - **Assignee**: Person responsible for the task
 - **Due Date**: Target completion date
@@ -13,58 +16,50 @@ This document provides a detailed, enumerated task list for implementing the ana
 ## 1. Data Collection Layer
 
 ### 1.1 Event Tracking Service
-1. **Create AnalyticsEventService class**
-   - Status: Not Started
+1. [ ] **Create AnalyticsEventService class**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Implement service to track events throughout the application
 
-2. **Implement certificate generation tracking**
-   - Status: Not Started
+2. [ ] **Implement certificate generation tracking**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Add method to track certificate generation events with book title, generation time, and success status
 
-3. **Implement certificate verification tracking**
-   - Status: Not Started
+3. [ ] **Implement certificate verification tracking**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Add method to track certificate verification events with certificate ID and success status
 
-4. **Implement API usage tracking**
-   - Status: Not Started
+4. [ ] **Implement API usage tracking**
    - Priority: Medium
    - Assignee: TBD
    - Due Date: TBD
    - Description: Add method to track API usage with endpoint and response time
 
 ### 1.2 Integration Points
-5. **Add tracking to CertificateController**
-   - Status: Not Started
+5. [ ] **Add tracking to CertificateController**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Integrate event tracking for certificate generation in CertificateController
 
-6. **Add tracking to VerificationController**
-   - Status: Not Started
+6. [ ] **Add tracking to VerificationController**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Integrate event tracking for certificate verification in VerificationController
 
-7. **Create request interceptor for API tracking**
-   - Status: Not Started
+7. [ ] **Create request interceptor for API tracking**
    - Priority: Medium
    - Assignee: TBD
    - Due Date: TBD
    - Description: Implement interceptor to track all API requests and response times
 
-8. **Add performance tracking aspects**
-   - Status: Not Started
+8. [ ] **Add performance tracking aspects**
    - Priority: Medium
    - Assignee: TBD
    - Due Date: TBD
@@ -73,65 +68,56 @@ This document provides a detailed, enumerated task list for implementing the ana
 ## 2. Data Storage
 
 ### 2.1 Database Schema
-9. **Create AnalyticsEvent entity**
-   - Status: Not Started
+9. [ ] **Create AnalyticsEvent entity**
    - Priority: High
    - Assignee: TBD
    - Due Date: TBD
    - Description: Define entity class for storing analytics events
 
-10. **Create certificate_events table**
-    - Status: Not Started
+10. [ ] **Create certificate_events table**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Define schema for tracking certificate generation and verification events
 
-11. **Create api_events table**
-    - Status: Not Started
+11. [ ] **Create api_events table**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Define schema for tracking API usage and performance
 
-12. **Create error_events table**
-    - Status: Not Started
+12. [ ] **Create error_events table**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Define schema for tracking system errors
 
-13. **Create aggregated_metrics table**
-    - Status: Not Started
+13. [ ] **Create aggregated_metrics table**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Define schema for storing pre-calculated aggregations
 
 ### 2.2 Repository Layer
-14. **Create AnalyticsRepository interface**
-    - Status: Not Started
+14. [ ] **Create AnalyticsRepository interface**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Define repository interface for accessing analytics data
 
-15. **Implement findByEventTypeAndTimestampBetween method**
-    - Status: Not Started
+15. [ ] **Implement findByEventTypeAndTimestampBetween method**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Add method to find events by type and time range
 
-16. **Implement getDailyEventCounts method**
-    - Status: Not Started
+16. [ ] **Implement getDailyEventCounts method**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Add method to get daily counts of events by type
 
-17. **Implement additional query methods**
-    - Status: Not Started
+17. [ ] **Implement additional query methods**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
@@ -140,94 +126,81 @@ This document provides a detailed, enumerated task list for implementing the ana
 ## 3. Dashboard UI
 
 ### 3.1 Admin Controller
-18. **Create AnalyticsDashboardController**
-    - Status: Not Started
+18. [ ] **Create AnalyticsDashboardController**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Implement controller for the admin dashboard
 
-19. **Implement dashboard method**
-    - Status: Not Started
+19. [ ] **Implement dashboard method**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Add method to display main dashboard with overview metrics
 
-20. **Implement getMetricsData API endpoint**
-    - Status: Not Started
+20. [ ] **Implement getMetricsData API endpoint**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Add method to provide metrics data for AJAX requests
 
 ### 3.2 Dashboard Views
-21. **Create dashboard.html template**
-    - Status: Not Started
+21. [ ] **Create dashboard.html template**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create main dashboard template with overview metrics
 
-22. **Create certificate-metrics.html template**
-    - Status: Not Started
+22. [ ] **Create certificate-metrics.html template**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create template for detailed certificate generation metrics
 
-23. **Create verification-metrics.html template**
-    - Status: Not Started
+23. [ ] **Create verification-metrics.html template**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create template for detailed verification metrics
 
-24. **Create performance-metrics.html template**
-    - Status: Not Started
+24. [ ] **Create performance-metrics.html template**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create template for system performance metrics
 
 ### 3.3 Visualization Components
-25. **Add Chart.js library**
-    - Status: Not Started
+25. [ ] **Add Chart.js library**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Include Chart.js or similar library for data visualization
 
-26. **Implement line charts for time-series data**
-    - Status: Not Started
+26. [ ] **Implement line charts for time-series data**
     - Priority: High
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create line charts for metrics over time
 
-27. **Implement bar charts for comparative metrics**
-    - Status: Not Started
+27. [ ] **Implement bar charts for comparative metrics**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create bar charts for comparing different metrics
 
-28. **Implement pie charts for distribution metrics**
-    - Status: Not Started
+28. [ ] **Implement pie charts for distribution metrics**
     - Priority: Medium
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create pie charts for showing distribution of metrics
 
-29. **Implement heatmaps for time patterns**
-    - Status: Not Started
+29. [ ] **Implement heatmaps for time patterns**
     - Priority: Low
     - Assignee: TBD
     - Due Date: TBD
     - Description: Create heatmaps for time-of-day patterns
 
-30. **Implement geolocation maps**
-    - Status: Not Started
+30. [ ] **Implement geolocation maps**
     - Priority: Low
     - Assignee: TBD
     - Due Date: TBD
@@ -236,8 +209,7 @@ This document provides a detailed, enumerated task list for implementing the ana
 ## 4. Implementation Phases
 
 ### 4.1 Phase 1: Core Analytics Infrastructure
-31. **Create analytics data model**
-    - Status: Not Started
+31. [ ] **Create analytics data model**
     - Priority: Critical
     - Assignee: TBD
     - Due Date: TBD
@@ -693,7 +665,10 @@ This document provides a detailed, enumerated task list for implementing the ana
 ## Task Tracking Instructions
 
 To update the status of a task:
-1. Change the "Status" field to "Not Started", "In Progress", or "Completed"
+1. Change the checkbox to reflect the current status:
+   - [ ] for Not Started
+   - [-] for In Progress
+   - [x] for Completed
 2. Assign the task to a team member by updating the "Assignee" field
 3. Set a due date in the "Due Date" field in YYYY-MM-DD format
 4. Add comments or notes as needed below the task description
