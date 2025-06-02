@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update  # Use 'update' for first deployment, then change to 'validate'
     show-sql: false
   h2:
     console:

@@ -4,7 +4,7 @@ spring:
       enabled: true
   datasource:
     url: ${DATABASE_URL:jdbc:h2:mem:testdb}
-    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
+    # driver-class-name auto-detected from URL in Spring Boot
     username: ${DATABASE_USERNAME:sa}
     password: ${DATABASE_PASSWORD:}
   jpa:
@@ -14,7 +14,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: ${DATABASE_DIALECT:org.hibernate.dialect.H2Dialect}
+        # dialect auto-detected from driver in Spring Boot
   h2:
     console:
       enabled: true
