@@ -29,9 +29,9 @@ public interface CertificateEventRepository extends JpaRepository<CertificateEve
            "GROUP BY e.bookTitle ORDER BY count DESC")
     List<Object[]> findBookPopularity(@Param("eventType") EventType eventType);
     
-    @Query("SELECT DATE(e.timestamp) as date, COUNT(e) as count FROM CertificateEvent e " +
+    @Query("SELECT CAST(e.timestamp AS DATE) as date, COUNT(e) as count FROM CertificateEvent e " +
            "WHERE e.eventType = :eventType AND e.timestamp BETWEEN :start AND :end " +
-           "GROUP BY DATE(e.timestamp) ORDER BY date")
+           "GROUP BY CAST(e.timestamp AS DATE) ORDER BY date")
     List<Object[]> findDailyEventCounts(@Param("eventType") EventType eventType, 
                                         @Param("start") Instant start, 
                                         @Param("end") Instant end);
