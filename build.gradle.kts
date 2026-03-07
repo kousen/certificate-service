@@ -24,7 +24,10 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
 
     // PDF generation and manipulation
-    implementation("org.apache.pdfbox:pdfbox:3.0.4")
+    implementation("org.apache.pdfbox:pdfbox:3.0.4") {
+        exclude(group = "commons-logging", module = "commons-logging")
+    }
+    implementation("org.slf4j:jcl-over-slf4j:2.0.17")
 
     // Security and cryptography
     implementation("org.bouncycastle:bcprov-jdk18on:1.80")
