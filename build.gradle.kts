@@ -1,12 +1,12 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.4.4"
+    id("org.springframework.boot") version "3.5.7"
     id("io.spring.dependency-management") version "1.1.7"
     id("jacoco")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 repositories { mavenCentral() }
@@ -57,7 +57,7 @@ tasks.test {
     finalizedBy(tasks.jacocoTestReport)
 
     // Disable class data sharing
-    jvmArgs("-Xshare:off")
+    jvmArgs("-XX:+EnableDynamicAgentLoading", "-Xshare:off")
     
     // Increase heap size for tests
     minHeapSize = "256m"

@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -17,9 +16,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = {
-    "certificate.keystore=classpath:test-keystore.p12"
-})
 class VerificationControllerTest {
 
     @TestConfiguration
@@ -27,13 +23,7 @@ class VerificationControllerTest {
         @Bean
         @Primary
         public VerificationController verificationController() {
-            // Use a hardcoded certificate fingerprint for testing
-            return new VerificationController() {
-                @Override
-                protected String generateCertificateFingerprint(String keystorePath) {
-                    return "Test certificate fingerprint";
-                }
-            };
+            return new VerificationController("Test certificate fingerprint", null);
         }
     }
 

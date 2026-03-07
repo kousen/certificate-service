@@ -24,40 +24,37 @@ public class CertificateMetadataService {
         this.repository = repository;
     }
     
-    @Async
+    @Async("analyticsTaskExecutor")
     public CompletableFuture<Void> saveCertificateMetadata(String certificateId, Path certificatePath) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateMetadata metadata = new CertificateMetadata(
-                    certificateId,
-                    certificatePath.getFileName().toString()
-                );
-                
-                // Calculate file size
-                if (Files.exists(certificatePath)) {
-                    metadata.setFileSize(Files.size(certificatePath));
-                    
-                    // Calculate file hash
-                    try {
-                        byte[] fileBytes = Files.readAllBytes(certificatePath);
-                        MessageDigest md = MessageDigest.getInstance("SHA-256");
-                        byte[] hashBytes = md.digest(fileBytes);
-                        StringBuilder sb = new StringBuilder();
-                        for (byte b : hashBytes) {
-                            sb.append(String.format("%02x", b));
-                        }
-                        metadata.setFileHash(sb.toString());
-                    } catch (Exception e) {
-                        logger.warn("Could not calculate file hash for {}", certificatePath, e);
+        try {
+            CertificateMetadata metadata = new CertificateMetadata(
+                certificateId,
+                certificatePath.getFileName().toString()
+            );
+
+            if (Files.exists(certificatePath)) {
+                metadata.setFileSize(Files.size(certificatePath));
+
+                try {
+                    byte[] fileBytes = Files.readAllBytes(certificatePath);
+                    MessageDigest md = MessageDigest.getInstance("SHA-256");
+                    byte[] hashBytes = md.digest(fileBytes);
+                    StringBuilder sb = new StringBuilder();
+                    for (byte b : hashBytes) {
+                        sb.append(String.format("%02x", b));
                     }
+                    metadata.setFileHash(sb.toString());
+                } catch (Exception e) {
+                    logger.warn("Could not calculate file hash for {}", certificatePath, e);
                 }
-                
-                repository.save(metadata);
-                logger.info("Saved certificate metadata for {}", certificateId);
-            } catch (Exception e) {
-                logger.error("Error saving certificate metadata", e);
             }
-        });
+            
+            repository.save(metadata);
+            logger.info("Saved certificate metadata for {}", certificateId);
+        } catch (Exception e) {
+            logger.error("Error saving certificate metadata", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
     
     public CertificateMetadata getCertificateMetadata(String certificateId) {

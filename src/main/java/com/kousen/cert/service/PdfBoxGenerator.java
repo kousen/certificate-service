@@ -11,6 +11,8 @@ import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -23,6 +25,7 @@ import java.nio.file.Path;
  */
 @Component
 public class PdfBoxGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(PdfBoxGenerator.class);
 
     // Font and color constants
     private static final Color GOLD_COLOR = new Color(255, 214, 92);
@@ -129,13 +132,13 @@ public class PdfBoxGenerator {
                 
                 // Save with modified settings
                 document.save(pdfPath.toFile());
-                System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
+                logger.debug("PDF created at {}", pdfPath.toAbsolutePath());
             } catch (Exception e) {
-                System.err.println("Error saving PDF: " + e.getMessage());
+                logger.warn("Error saving PDF, retrying with standard fonts only", e);
                 
                 // Try alternative approach with standard fonts only
                 try {
-                    System.err.println("Attempting to save with standard fonts only");
+                    logger.debug("Attempting to save with standard fonts only");
                     // Create a new document with only standard fonts
                     try (PDDocument simpleDoc = new PDDocument()) {
                         PDPage simplePage = new PDPage(new PDRectangle(pageWidth, pageHeight));
@@ -181,9 +184,9 @@ public class PdfBoxGenerator {
                         
                         simpleDoc.save(pdfPath.toFile());
                     }
-                    System.out.println("Successfully created simplified PDF with standard fonts only");
+                    logger.debug("Successfully created simplified PDF with standard fonts only");
                 } catch (Exception e2) {
-                    System.err.println("Error saving even with simplified approach: " + e2.getMessage());
+                    logger.error("Error saving even with simplified approach", e2);
                     throw new IOException("Failed to save PDF document: " + e2.getMessage(), e2);
                 }
             }
@@ -270,12 +273,12 @@ public class PdfBoxGenerator {
                 System.setProperty("org.apache.pdfbox.font.subset", "false");
                 document.getDocumentInformation().setCustomMetadataValue("DisableFontSubsetting", "true");
                 document.save(pdfPath.toFile());
-                System.out.println("PDF created at: " + pdfPath.toAbsolutePath());
+                logger.debug("PDF created at {}", pdfPath.toAbsolutePath());
             } catch (Exception e) {
-                System.err.println("Error saving PDF: " + e.getMessage());
+                logger.warn("Error saving PDF, retrying with standard fonts only", e);
                 // Fallback to standard fonts
                 try {
-                    System.err.println("Attempting to save with standard fonts only");
+                    logger.debug("Attempting to save with standard fonts only");
                     try (PDDocument simpleDoc = new PDDocument()) {
                         PDPage simplePage = new PDPage(new PDRectangle(pageWidth, pageHeight));
                         simpleDoc.addPage(simplePage);
@@ -305,9 +308,9 @@ public class PdfBoxGenerator {
                         }
                         simpleDoc.save(pdfPath.toFile());
                     }
-                    System.out.println("Successfully created simplified PDF with standard fonts only");
+                    logger.debug("Successfully created simplified PDF with standard fonts only");
                 } catch (Exception ex2) {
-                    System.err.println("Error in fallback: " + ex2.getMessage());
+                    logger.error("Error in fallback PDF generation", ex2);
                     throw new IOException("Failed to save PDF document: " + ex2.getMessage(), ex2);
                 }
             }
@@ -339,19 +342,18 @@ public class PdfBoxGenerator {
             // Load the font from classpath resources
             var fontResource = new ClassPathResource("fonts/" + fontFileName);
             if (!fontResource.exists()) {
-                System.err.println("Font file not found: " + fontFileName);
+                logger.warn("Font file not found: {}", fontFileName);
                 return fallbackFont;
             }
             
             try (var fontStream = fontResource.getInputStream()) {
                 // Set to false to disable subsetting which is causing issues on Heroku
                 PDFont font = PDType0Font.load(document, fontStream, false);
-                System.out.println("Successfully loaded font: " + fontFileName);
+                logger.debug("Successfully loaded font: {}", fontFileName);
                 return font;
             }
         } catch (IOException e) {
-            System.err.println("Error loading font " + fontFileName + ": " + e.getMessage());
-            System.err.println("Using fallback font: " + fallbackFont.getName());
+            logger.warn("Error loading font {}, using fallback font {}", fontFileName, fallbackFont.getName(), e);
             return fallbackFont;
         }
     }
@@ -375,7 +377,7 @@ public class PdfBoxGenerator {
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error adding background image: " + e.getMessage());
+            logger.warn("Error adding background image", e);
             // Continue without background if image can't be loaded
         }
     }
@@ -399,7 +401,7 @@ public class PdfBoxGenerator {
                         return;
                     }
                 } catch (Exception e) {
-                    System.err.println("Could not load test QR image: " + e.getMessage());
+                    logger.debug("Could not load test QR image", e);
                     // Fall through to try with original path
                 }
             }
@@ -416,7 +418,7 @@ public class PdfBoxGenerator {
                 contentStream.stroke();
             }
         } catch (IOException e) {
-            System.err.println("Error adding QR code: " + e.getMessage());
+            logger.warn("Error adding QR code", e);
             // Draw a placeholder rectangle
             contentStream.setStrokingColor(Color.BLACK);
             contentStream.addRect(x, y, 100, 100);

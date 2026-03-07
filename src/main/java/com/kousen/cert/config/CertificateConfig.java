@@ -1,34 +1,50 @@
 package com.kousen.cert.config;
 
 import com.kousen.cert.service.KeyStoreProvider;
-import com.kousen.cert.service.PdfService;
 import com.kousen.cert.service.PdfSigner;
-import com.kousen.cert.service.QrCodeGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 @Configuration
 public class CertificateConfig implements WebMvcConfigurer {
 
     @Bean
-    PdfService pdfService(QrCodeGenerator qrCodeGenerator) { 
-        return new PdfService(qrCodeGenerator); 
-    }
-
-    @Bean
-    KeyStoreProvider keyStoreProvider() {
-        Path ksPath = Paths.get(System.getProperty("user.home"), ".cert_keystore.p12");
-        return new KeyStoreProvider(ksPath);
+    KeyStoreProvider keyStoreProvider(@Value("${certificate.keystore}") String keystoreLocation) {
+        return new KeyStoreProvider(resolveKeyStorePath(keystoreLocation));
     }
 
     @Bean
     PdfSigner pdfSigner(KeyStoreProvider provider) {
         return new PdfSigner(provider);
+    }
+
+    private Path resolveKeyStorePath(String keystoreLocation) {
+        if (keystoreLocation.startsWith("classpath:")) {
+            String resourcePath = keystoreLocation.substring("classpath:".length());
+            ClassPathResource resource = new ClassPathResource(resourcePath);
+            try {
+                Path tempFile = Files.createTempFile("certificate-keystore-", ".p12");
+                try (var inputStream = resource.getInputStream()) {
+                    Files.copy(inputStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+                }
+                tempFile.toFile().deleteOnExit();
+                return tempFile;
+            } catch (IOException e) {
+                throw new UncheckedIOException("Unable to resolve classpath keystore: " + keystoreLocation, e);
+            }
+        }
+        return Paths.get(keystoreLocation);
     }
     
     @Override

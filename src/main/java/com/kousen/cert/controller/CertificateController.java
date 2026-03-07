@@ -1,5 +1,6 @@
 package com.kousen.cert.controller;
 
+import com.kousen.cert.analytics.model.AnalyticsRequestContext;
 import com.kousen.cert.analytics.service.AnalyticsService;
 import com.kousen.cert.analytics.service.CertificateMetadataService;
 import com.kousen.cert.model.CertificateRequest;
@@ -7,7 +8,6 @@ import com.kousen.cert.service.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,23 +38,23 @@ public class CertificateController {
     private final CertificateMetadataService metadataService;
 
     public CertificateController(
-            PdfService pdfService, 
+            PdfService pdfService,
+            PdfSigner pdfSigner,
             CertificateStorageService storageService,
             AnalyticsService analyticsService,
-            CertificateMetadataService metadataService,
-            @Value("${certificate.keystore}") String keystorePath) {
+            CertificateMetadataService metadataService) {
         this.pdfService = pdfService;
+        this.pdfSigner = pdfSigner;
         this.storageService = storageService;
         this.analyticsService = analyticsService;
         this.metadataService = metadataService;
-        Path ksPath = Paths.get(keystorePath);
-        this.pdfSigner = new PdfSigner(new KeyStoreProvider(ksPath));
     }
 
     @PostMapping(produces = "application/pdf")
     public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req, HttpServletRequest request) throws Exception {
         long startTime = System.currentTimeMillis();
         String certificateId = UUID.randomUUID().toString();
+        AnalyticsRequestContext requestContext = AnalyticsRequestContext.from(request);
         
         try {
             // Generate the certificate
@@ -75,7 +74,7 @@ public class CertificateController {
                     req.purchaserEmail().orElse(null),
                     req.bookTitle(),
                     duration,
-                    request
+                    requestContext
                 );
                 
                 // Save metadata
@@ -100,8 +99,7 @@ public class CertificateController {
                 }
             }
         } catch (Exception e) {
-            // Track error
-            analyticsService.trackCertificateError(e.getMessage(), request);
+            analyticsService.trackCertificateError(e.getMessage(), requestContext);
             throw e;
         }
     }
@@ -170,7 +168,10 @@ public class CertificateController {
             // Track download if metadata exists
             var metadata = metadataService.getCertificateMetadataByFilename(filename);
             if (metadata != null) {
-                analyticsService.trackCertificateDownloaded(metadata.getCertificateId(), request);
+                analyticsService.trackCertificateDownloaded(
+                        metadata.getCertificateId(),
+                        AnalyticsRequestContext.from(request)
+                );
             }
             
             return ResponseEntity.ok()

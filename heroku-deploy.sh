@@ -30,8 +30,13 @@ fi
 
 # Set environment variables
 echo "Setting environment variables..."
-heroku config:set CERT_PWD=changeit --app $APP_NAME
 heroku config:set JAVA_OPTS="-XX:+UseContainerSupport -Xms128m -Xmx512m" --app $APP_NAME
+
+if [ -n "${CERT_PWD:-}" ]; then
+  heroku config:set CERT_PWD="$CERT_PWD" --app $APP_NAME
+else
+  echo "CERT_PWD not set in local environment; leaving Heroku CERT_PWD unchanged"
+fi
 
 # Configure buildpacks
 echo "Configuring buildpacks..."

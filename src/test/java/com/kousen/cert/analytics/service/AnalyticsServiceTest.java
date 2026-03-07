@@ -1,6 +1,7 @@
 package com.kousen.cert.analytics.service;
 
 import com.kousen.cert.analytics.model.AnalyticsDTO;
+import com.kousen.cert.analytics.model.AnalyticsRequestContext;
 import com.kousen.cert.analytics.model.CertificateEvent;
 import com.kousen.cert.analytics.model.CertificateEvent.EventType;
 import com.kousen.cert.analytics.model.CertificateMetadata;
@@ -8,7 +9,6 @@ import com.kousen.cert.analytics.repository.CertificateEventRepository;
 import com.kousen.cert.analytics.repository.CertificateMetadataRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,9 +36,6 @@ class AnalyticsServiceTest {
     @Mock
     private CertificateMetadataRepository metadataRepository;
 
-    @Mock
-    private HttpServletRequest request;
-
     private MeterRegistry meterRegistry;
     private AnalyticsService analyticsService;
 
@@ -56,14 +53,11 @@ class AnalyticsServiceTest {
         String purchaserEmail = "john@example.com";
         String bookTitle = "Modern Java Recipes";
         long durationMs = 1500L;
-
-        when(request.getHeader("User-Agent")).thenReturn("Test Browser");
-        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        AnalyticsRequestContext requestContext = new AnalyticsRequestContext("127.0.0.1", "Test Browser");
 
         // When
         CompletableFuture<Void> future = analyticsService.trackCertificateGenerated(
-            certificateId, purchaserName, purchaserEmail, bookTitle, durationMs, request
+            certificateId, purchaserName, purchaserEmail, bookTitle, durationMs, requestContext
         );
         future.get(); // Wait for async completion
 
@@ -90,12 +84,12 @@ class AnalyticsServiceTest {
         // Given
         String certificateId = "test-cert-123";
         CertificateMetadata metadata = new CertificateMetadata(certificateId, "test.pdf");
+        AnalyticsRequestContext requestContext = new AnalyticsRequestContext("192.168.1.1", null);
 
-        when(request.getRemoteAddr()).thenReturn("192.168.1.1");
         when(metadataRepository.findById(certificateId)).thenReturn(Optional.of(metadata));
 
         // When
-        CompletableFuture<Void> future = analyticsService.trackCertificateVerified(certificateId, request);
+        CompletableFuture<Void> future = analyticsService.trackCertificateVerified(certificateId, requestContext);
         future.get();
 
         // Then
@@ -165,10 +159,10 @@ class AnalyticsServiceTest {
     @Test
     void shouldExtractIpAddressFromXForwardedFor() throws Exception {
         // Given
-        when(request.getHeader("X-Forwarded-For")).thenReturn("203.0.113.195, 70.41.3.18, 150.172.238.178");
+        AnalyticsRequestContext requestContext = new AnalyticsRequestContext("203.0.113.195", null);
 
         // When
-        CompletableFuture<Void> future = analyticsService.trackCertificateDownloaded("cert-123", request);
+        CompletableFuture<Void> future = analyticsService.trackCertificateDownloaded("cert-123", requestContext);
         future.get();
 
         // Then
@@ -182,13 +176,10 @@ class AnalyticsServiceTest {
         // Given
         String endpoint = "/api/certificates";
         long responseTime = 250L;
-
-        when(request.getHeader("User-Agent")).thenReturn("Test Browser");
-        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+        AnalyticsRequestContext requestContext = new AnalyticsRequestContext("127.0.0.1", "Test Browser");
 
         // When
-        CompletableFuture<Void> future = analyticsService.trackApiUsage(endpoint, responseTime, request);
+        CompletableFuture<Void> future = analyticsService.trackApiUsage(endpoint, responseTime, requestContext);
         future.get(); // Wait for async completion
 
         // Then

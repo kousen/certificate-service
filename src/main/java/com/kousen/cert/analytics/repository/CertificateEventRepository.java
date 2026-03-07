@@ -28,6 +28,14 @@ public interface CertificateEventRepository extends JpaRepository<CertificateEve
            "WHERE e.eventType = :eventType AND e.bookTitle IS NOT NULL " +
            "GROUP BY e.bookTitle ORDER BY count DESC")
     List<Object[]> findBookPopularity(@Param("eventType") EventType eventType);
+
+    @Query("SELECT e.bookTitle, COUNT(e) as count FROM CertificateEvent e " +
+           "WHERE e.eventType = :eventType AND e.bookTitle IS NOT NULL " +
+           "AND e.timestamp BETWEEN :start AND :end " +
+           "GROUP BY e.bookTitle ORDER BY count DESC")
+    List<Object[]> findBookPopularityBetween(@Param("eventType") EventType eventType,
+                                             @Param("start") Instant start,
+                                             @Param("end") Instant end);
     
     @Query("SELECT CAST(e.timestamp AS DATE) as date, COUNT(e) as count FROM CertificateEvent e " +
            "WHERE e.eventType = :eventType AND e.timestamp BETWEEN :start AND :end " +
@@ -45,4 +53,10 @@ public interface CertificateEventRepository extends JpaRepository<CertificateEve
     @Query("SELECT COUNT(e) FROM CertificateEvent e " +
            "WHERE e.eventType = :eventType AND e.timestamp > :since")
     long countEventsSince(@Param("eventType") EventType eventType, @Param("since") Instant since);
+
+    @Query("SELECT COUNT(e) FROM CertificateEvent e " +
+           "WHERE e.eventType = :eventType AND e.timestamp BETWEEN :start AND :end")
+    long countEventsBetween(@Param("eventType") EventType eventType,
+                            @Param("start") Instant start,
+                            @Param("end") Instant end);
 }

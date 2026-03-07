@@ -6,7 +6,6 @@ import com.kousen.cert.analytics.repository.CertificateEventRepository;
 import com.kousen.cert.analytics.repository.CertificateMetadataRepository;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -36,96 +35,91 @@ public class AnalyticsService {
         this.meterRegistry = meterRegistry;
     }
 
-    @Async
+    @Async("analyticsTaskExecutor")
     public CompletableFuture<Void> trackCertificateGenerated(String certificateId, 
                                                             String purchaserName,
                                                             String purchaserEmail,
                                                             String bookTitle,
                                                             long durationMs,
-                                                            HttpServletRequest request) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.GENERATED, certificateId);
-                event.setPurchaserName(purchaserName);
-                event.setPurchaserEmail(purchaserEmail);
-                event.setBookTitle(bookTitle);
-                event.setDurationMs(durationMs);
-                event.setIpAddress(extractIpAddress(request));
-                event.setUserAgent(request.getHeader("User-Agent"));
+                                                            AnalyticsRequestContext requestContext) {
+        try {
+            CertificateEvent event = new CertificateEvent(EventType.GENERATED, certificateId);
+            event.setPurchaserName(purchaserName);
+            event.setPurchaserEmail(purchaserEmail);
+            event.setBookTitle(bookTitle);
+            event.setDurationMs(durationMs);
+            event.setIpAddress(requestContext.ipAddress());
+            event.setUserAgent(requestContext.userAgent());
 
-                eventRepository.save(event);
+            eventRepository.save(event);
 
-                // Update metrics
-                meterRegistry.counter("certificates.generated", "book", bookTitle).increment();
-                meterRegistry.timer("certificates.generation.time").record(durationMs, java.util.concurrent.TimeUnit.MILLISECONDS);
+            meterRegistry.counter("certificates.generated", "book", bookTitle).increment();
+            meterRegistry.timer("certificates.generation.time")
+                    .record(durationMs, java.util.concurrent.TimeUnit.MILLISECONDS);
 
-                logger.info("Tracked certificate generation: {} for {}", certificateId, purchaserName);
-            } catch (Exception e) {
-                logger.error("Error tracking certificate generation", e);
-            }
-        });
+            logger.info("Tracked certificate generation: {} for {}", certificateId, purchaserName);
+        } catch (Exception e) {
+            logger.error("Error tracking certificate generation", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
-    @Async
-    public CompletableFuture<Void> trackCertificateDownloaded(String certificateId, HttpServletRequest request) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.DOWNLOADED, certificateId);
-                event.setIpAddress(extractIpAddress(request));
-                event.setUserAgent(request.getHeader("User-Agent"));
+    @Async("analyticsTaskExecutor")
+    public CompletableFuture<Void> trackCertificateDownloaded(String certificateId, AnalyticsRequestContext requestContext) {
+        try {
+            CertificateEvent event = new CertificateEvent(EventType.DOWNLOADED, certificateId);
+            event.setIpAddress(requestContext.ipAddress());
+            event.setUserAgent(requestContext.userAgent());
 
-                eventRepository.save(event);
-                meterRegistry.counter("certificates.downloaded").increment();
+            eventRepository.save(event);
+            meterRegistry.counter("certificates.downloaded").increment();
 
-                logger.info("Tracked certificate download: {}", certificateId);
-            } catch (Exception e) {
-                logger.error("Error tracking certificate download", e);
-            }
-        });
+            logger.info("Tracked certificate download: {}", certificateId);
+        } catch (Exception e) {
+            logger.error("Error tracking certificate download", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
-    @Async
-    public CompletableFuture<Void> trackCertificateVerified(String certificateId, HttpServletRequest request) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.VERIFIED, certificateId);
-                event.setIpAddress(extractIpAddress(request));
-                event.setUserAgent(request.getHeader("User-Agent"));
+    @Async("analyticsTaskExecutor")
+    public CompletableFuture<Void> trackCertificateVerified(String certificateId, AnalyticsRequestContext requestContext) {
+        try {
+            CertificateEvent event = new CertificateEvent(EventType.VERIFIED, certificateId);
+            event.setIpAddress(requestContext.ipAddress());
+            event.setUserAgent(requestContext.userAgent());
 
-                eventRepository.save(event);
+            eventRepository.save(event);
 
-                // Update metadata
-                metadataRepository.findById(certificateId).ifPresent(metadata -> {
-                    metadata.incrementVerificationCount();
-                    metadataRepository.save(metadata);
-                });
+            metadataRepository.findById(certificateId).ifPresent(metadata -> {
+                metadata.incrementVerificationCount();
+                metadataRepository.save(metadata);
+            });
 
-                meterRegistry.counter("certificates.verified").increment();
+            meterRegistry.counter("certificates.verified").increment();
 
-                logger.info("Tracked certificate verification: {}", certificateId);
-            } catch (Exception e) {
-                logger.error("Error tracking certificate verification", e);
-            }
-        });
+            logger.info("Tracked certificate verification: {}", certificateId);
+        } catch (Exception e) {
+            logger.error("Error tracking certificate verification", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
-    @Async
-    public CompletableFuture<Void> trackCertificateError(String errorMessage, HttpServletRequest request) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.FAILED, UUID.randomUUID().toString());
-                event.setErrorMessage(errorMessage);
-                event.setIpAddress(extractIpAddress(request));
-                event.setUserAgent(request.getHeader("User-Agent"));
+    @Async("analyticsTaskExecutor")
+    public CompletableFuture<Void> trackCertificateError(String errorMessage, AnalyticsRequestContext requestContext) {
+        try {
+            CertificateEvent event = new CertificateEvent(EventType.FAILED, UUID.randomUUID().toString());
+            event.setErrorMessage(errorMessage);
+            event.setIpAddress(requestContext.ipAddress());
+            event.setUserAgent(requestContext.userAgent());
 
-                eventRepository.save(event);
-                meterRegistry.counter("certificates.errors").increment();
+            eventRepository.save(event);
+            meterRegistry.counter("certificates.errors").increment();
 
-                logger.info("Tracked certificate error: {}", errorMessage);
-            } catch (Exception e) {
-                logger.error("Error tracking certificate error", e);
-            }
-        });
+            logger.info("Tracked certificate error: {}", errorMessage);
+        } catch (Exception e) {
+            logger.error("Error tracking certificate error", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     /**
@@ -135,61 +129,26 @@ public class AnalyticsService {
      * @param responseTime The response time in milliseconds
      * @param request      The HTTP request
      */
-    @Async
-    public CompletableFuture<Void> trackApiUsage(String endpoint, long responseTime, HttpServletRequest request) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.API_CALL, UUID.randomUUID().toString());
-                event.setEndpoint(endpoint);
-                event.setDurationMs(responseTime);
-                event.setIpAddress(extractIpAddress(request));
-                event.setUserAgent(request.getHeader("User-Agent"));
+    @Async("analyticsTaskExecutor")
+    public CompletableFuture<Void> trackApiUsage(String endpoint, long responseTime, AnalyticsRequestContext requestContext) {
+        try {
+            CertificateEvent event = new CertificateEvent(EventType.API_CALL, UUID.randomUUID().toString());
+            event.setEndpoint(endpoint);
+            event.setDurationMs(responseTime);
+            event.setIpAddress(requestContext.ipAddress());
+            event.setUserAgent(requestContext.userAgent());
 
-                eventRepository.save(event);
+            eventRepository.save(event);
 
-                // Update metrics
-                meterRegistry.counter("api.calls", "endpoint", endpoint).increment();
-                meterRegistry.timer("api.response.time", "endpoint", endpoint)
+            meterRegistry.counter("api.calls", "endpoint", endpoint).increment();
+            meterRegistry.timer("api.response.time", "endpoint", endpoint)
                     .record(responseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
 
-                logger.debug("Tracked API usage: {} ({}ms)", endpoint, responseTime);
-            } catch (Exception e) {
-                logger.error("Error tracking API usage", e);
-            }
-        });
-    }
-    
-    /**
-     * Track API usage with pre-extracted data to avoid request recycling issues.
-     *
-     * @param endpoint     The API endpoint
-     * @param responseTime The response time in milliseconds
-     * @param ipAddress    Pre-extracted IP address
-     * @param userAgent    Pre-extracted user agent
-     */
-    @Async
-    public CompletableFuture<Void> trackApiUsageWithExtractedData(String endpoint, long responseTime, 
-                                                                  String ipAddress, String userAgent) {
-        return CompletableFuture.runAsync(() -> {
-            try {
-                CertificateEvent event = new CertificateEvent(EventType.API_CALL, UUID.randomUUID().toString());
-                event.setEndpoint(endpoint);
-                event.setDurationMs(responseTime);
-                event.setIpAddress(ipAddress);
-                event.setUserAgent(userAgent);
-
-                eventRepository.save(event);
-
-                // Update metrics
-                meterRegistry.counter("api.calls", "endpoint", endpoint).increment();
-                meterRegistry.timer("api.response.time", "endpoint", endpoint)
-                    .record(responseTime, java.util.concurrent.TimeUnit.MILLISECONDS);
-
-                logger.debug("Tracked API usage: {} ({}ms)", endpoint, responseTime);
-            } catch (Exception e) {
-                logger.error("Error tracking API usage", e);
-            }
-        });
+            logger.debug("Tracked API usage: {} ({}ms)", endpoint, responseTime);
+        } catch (Exception e) {
+            logger.error("Error tracking API usage", e);
+        }
+        return CompletableFuture.completedFuture(null);
     }
 
     public AnalyticsDTO.DashboardData getDashboardData() {
@@ -239,14 +198,6 @@ public class AnalyticsService {
         } finally {
             sample.stop(meterRegistry.timer("analytics.dashboard.load"));
         }
-    }
-
-    private String extractIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 
     private String findMostPopularBook() {

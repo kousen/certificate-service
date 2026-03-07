@@ -54,10 +54,10 @@ class MetricsAggregationServiceTest {
             new Object[]{"Modern Java Recipes", 10L},
             new Object[]{"Spring Boot in Action", 5L}
         );
-        when(eventRepository.findBookPopularity(EventType.GENERATED)).thenReturn(bookPopularity);
+        when(eventRepository.findBookPopularityBetween(eq(EventType.GENERATED), any(), any())).thenReturn(bookPopularity);
 
         // Mock verification count
-        when(eventRepository.countEventsSince(eq(EventType.VERIFIED), any())).thenReturn(15L);
+        when(eventRepository.countEventsBetween(eq(EventType.VERIFIED), any(), any())).thenReturn(15L);
 
         // Mock API events
         CertificateEvent apiEvent1 = new CertificateEvent(EventType.API_CALL, "api-1");
@@ -77,7 +77,7 @@ class MetricsAggregationServiceTest {
             .thenReturn(apiEvents);
 
         // Mock error count
-        when(eventRepository.countEventsSince(eq(EventType.FAILED), any())).thenReturn(2L);
+        when(eventRepository.countEventsBetween(eq(EventType.FAILED), any(), any())).thenReturn(2L);
 
         // When
         aggregationService.aggregateDailyMetrics();
@@ -147,17 +147,17 @@ class MetricsAggregationServiceTest {
         // Mock book popularity data
         Object[] bookData = new Object[]{"Modern Java Recipes", 50L};
         List<Object[]> bookPopularity = Collections.singletonList(bookData);
-        when(eventRepository.findBookPopularity(EventType.GENERATED)).thenReturn(bookPopularity);
+        when(eventRepository.findBookPopularityBetween(eq(EventType.GENERATED), any(), any())).thenReturn(bookPopularity);
 
         // Mock verification count
-        when(eventRepository.countEventsSince(eq(EventType.VERIFIED), any())).thenReturn(30L);
+        when(eventRepository.countEventsBetween(eq(EventType.VERIFIED), any(), any())).thenReturn(30L);
 
         // Mock API events (empty list for simplicity)
         when(eventRepository.findByEventTypeAndTimestampBetween(eq(EventType.API_CALL), any(), any()))
             .thenReturn(Collections.emptyList());
 
         // Mock error count
-        when(eventRepository.countEventsSince(eq(EventType.FAILED), any())).thenReturn(5L);
+        when(eventRepository.countEventsBetween(eq(EventType.FAILED), any(), any())).thenReturn(5L);
 
         // When
         aggregationService.aggregateWeeklyMetrics();

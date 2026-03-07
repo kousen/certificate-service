@@ -144,7 +144,8 @@ public class MetricsAggregationService {
      * Aggregate certificate generation counts by book with specified time frame.
      */
     private void aggregateCertificateGenerationByBook(Instant start, Instant end, String timeFrame) {
-        List<Object[]> results = eventRepository.findBookPopularity(CertificateEvent.EventType.GENERATED);
+        List<Object[]> results = eventRepository.findBookPopularityBetween(
+                CertificateEvent.EventType.GENERATED, start, end);
         
         for (Object[] result : results) {
             String bookTitle = (String) result[0];
@@ -173,7 +174,7 @@ public class MetricsAggregationService {
      * Aggregate certificate verification counts with specified time frame.
      */
     private void aggregateCertificateVerifications(Instant start, Instant end, String timeFrame) {
-        long count = eventRepository.countEventsSince(CertificateEvent.EventType.VERIFIED, start);
+        long count = eventRepository.countEventsBetween(CertificateEvent.EventType.VERIFIED, start, end);
         
         AggregatedMetrics metric = new AggregatedMetrics(
             "certificate_verification_count",
@@ -251,7 +252,7 @@ public class MetricsAggregationService {
      * Aggregate error counts with specified time frame.
      */
     private void aggregateErrorCounts(Instant start, Instant end, String timeFrame) {
-        long count = eventRepository.countEventsSince(CertificateEvent.EventType.FAILED, start);
+        long count = eventRepository.countEventsBetween(CertificateEvent.EventType.FAILED, start, end);
         
         AggregatedMetrics metric = new AggregatedMetrics(
             "error_count",

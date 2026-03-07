@@ -1,5 +1,6 @@
 package com.kousen.cert.analytics.interceptor;
 
+import com.kousen.cert.analytics.model.AnalyticsRequestContext;
 import com.kousen.cert.analytics.service.AnalyticsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,26 +44,14 @@ public class ApiTrackingInterceptor implements HandlerInterceptor {
             if (startTime != null) {
                 long responseTime = System.currentTimeMillis() - startTime;
                 String endpoint = request.getRequestURI();
-                
-                // Extract request info before async operation (to avoid recycled request issues)
-                String ipAddress = extractIpAddress(request);
-                String userAgent = request.getHeader("User-Agent");
-                
-                // Track API usage with pre-extracted data
-                analyticsService.trackApiUsageWithExtractedData(endpoint, responseTime, ipAddress, userAgent);
+                AnalyticsRequestContext requestContext = AnalyticsRequestContext.from(request);
+
+                analyticsService.trackApiUsage(endpoint, responseTime, requestContext);
                 
                 logger.debug("API call to {} took {}ms", endpoint, responseTime);
             }
         } catch (Exception e) {
             logger.warn("Error tracking API usage: {}", e.getMessage());
         }
-    }
-    
-    private String extractIpAddress(HttpServletRequest request) {
-        String xForwardedFor = request.getHeader("X-Forwarded-For");
-        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
-            return xForwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 }
