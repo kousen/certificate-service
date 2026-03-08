@@ -42,6 +42,7 @@ out/
 */.DS_Store
 **/.DS_Store
 /.jqwik-database
+/youtube/
 
 ### Security Files ###
 *.p12
