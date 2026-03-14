@@ -41,7 +41,7 @@ class PdfBoxGeneratorTest {
         }
         
         // When
-        Path pdfPath = generator.createCertificatePdf(title, name, bookTitle, qrCodePath);
+        Path pdfPath = generator.createCertificatePdf(title, name, bookTitle, qrCodePath, "TEST-ID");
         
         // Then
         assertThat(pdfPath).exists();
@@ -78,7 +78,7 @@ class PdfBoxGeneratorTest {
         String bookTitle = "Another Test Book";
         
         // When - pass null QR code
-        Path pdfPath = generator.createCertificatePdf(title, name, bookTitle, null);
+        Path pdfPath = generator.createCertificatePdf(title, name, bookTitle, null, "TEST-ID");
         
         // Then - should still create a valid PDF
         assertThat(pdfPath).exists();

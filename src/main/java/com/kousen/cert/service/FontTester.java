@@ -36,7 +36,7 @@ public class FontTester implements CommandLineRunner {
         );
         
         // Generate the PDF
-        Path pdfPath = pdfService.createPdf(request);
+        Path pdfPath = pdfService.createPdf(request, "FONT-TEST-ID");
         
         // Output the result
         System.out.println("Test PDF created at: " + pdfPath.toAbsolutePath());

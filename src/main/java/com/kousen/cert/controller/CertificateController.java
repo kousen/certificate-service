@@ -68,7 +68,7 @@ public class CertificateController {
         
         try {
             // Generate the certificate
-            Path unsigned = pdfService.createPdf(req);
+            Path unsigned = pdfService.createPdf(req, certificateId);
             Path signed = pdfSigner.sign(unsigned);
             
             try {

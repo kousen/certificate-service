@@ -1,0 +1,687 @@
+Command finished with exit code 0.
+Command output:
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/Users/kennethkousen/.gradle/wrapper/dists/gradle-9.4.0-bin/lcvyxq3t37f6mx9miaydrrgs/gradle-9.4.0/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Reusing configuration cache.
+> Task :processResources UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :compileJava UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava
+> Task :testClasses
+
+> Task :test
+
+Gradle Test Executor 1 STANDARD_OUT
+    18:38:45.746 [Test worker] INFO org.testcontainers.DockerClientFactory -- Testcontainers version: 1.21.3
+    18:38:45.903 [Test worker] INFO org.testcontainers.dockerclient.DockerClientProviderStrategy -- Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+    18:38:46.001 [Test worker] INFO org.testcontainers.dockerclient.DockerMachineClientProviderStrategy -- docker-machine executable was not found on PATH ([/Users/kennethkousen/.antigravity/antigravity/bin, /Users/kennethkousen/.bun/bin, /Users/kennethkousen/.local/bin, /Users/kennethkousen/.rbenv/shims, /Users/kennethkousen/.sdkman/candidates/quarkus/current/bin, /Users/kennethkousen/.sdkman/candidates/maven/current/bin, /Users/kennethkousen/.sdkman/candidates/kotlin/current/bin, /Users/kennethkousen/.sdkman/candidates/java/current/bin, /Users/kennethkousen/.sdkman/candidates/groovy/current/bin, /Users/kennethkousen/.sdkman/candidates/gradle/current/bin, /Users/kennethkousen/.sdkman/candidates/asciidoctorj/current/bin, /Users/kennethkousen/.sdkman/candidates/ant/current/bin, /Users/kennethkousen/.cargo/bin, /Users/kennethkousen/bin, /Users/kennethkousen/.local/bin, /usr/local/bin, /opt/homebrew/bin, /Library/Frameworks/Python.framework/Versions/3.11/bin, /opt/homebrew/bin, /opt/homebrew/sbin, /usr/local/bin, /System/Cryptexes/App/usr/bin, /usr/bin, /bin, /usr/sbin, /sbin, /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin, /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin, /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin, /opt/pmk/env/global/bin, /Library/TeX/texbin, /Users/kennethkousen/.cargo/bin, /Applications/iTerm.app/Contents/Resources/utilities, /Users/kennethkousen/Library/Application Support/JetBrains/Toolbox/scripts, /Users/kennethkousen/.lmstudio/bin])
+    18:38:46.002 [Test worker] ERROR org.testcontainers.dockerclient.DockerClientProviderStrategy -- Could not find a valid Docker environment. Please check configuration. Attempted configurations were:
+    	UnixSocketClientProviderStrategy: failed with exception BadRequestException (Status 400: {"ID":"","Containers":0,"ContainersRunning":0,"ContainersPaused":0,"ContainersStopped":0,"Images":0,"Driver":"","DriverStatus":null,"Plugins":{"Volume":null,"Network":null,"Authorization":null,"Log":null},"MemoryLimit":false,"SwapLimit":false,"CpuCfsPeriod":false,"CpuCfsQuota":false,"CPUShares":false,"CPUSet":false,"PidsLimit":false,"IPv4Forwarding":false,"Debug":false,"NFd":0,"OomKillDisable":false,"NGoroutines":0,"SystemTime":"","LoggingDriver":"","CgroupDriver":"","NEventsListener":0,"KernelVersion":"","OperatingSystem":"","OSVersion":"","OSType":"","Architecture":"","IndexServerAddress":"","RegistryConfig":null,"NCPU":0,"MemTotal":0,"GenericResources":null,"DockerRootDir":"","HttpProxy":"","HttpsProxy":"","NoProxy":"","Name":"","Labels":["com.docker.desktop.address=unix:///Users/kennethkousen/Library/Containers/com.docker.docker/Data/docker-cli.sock"],"ExperimentalBuild":false,"ServerVersion":"","Runtimes":null,"DefaultRuntime":"","Swarm":{"NodeID":"","NodeAddr":"","LocalNodeState":"","ControlAvailable":false,"Error":"","RemoteManagers":null},"LiveRestoreEnabled":false,"Isolation":"","InitBinary":"","ContainerdCommit":{"ID":""},"RuncCommit":{"ID":""},"InitCommit":{"ID":""},"SecurityOptions":null,"CDISpecDirs":null,"Warnings":null})
+    	DockerDesktopClientProviderStrategy: failed with exception BadRequestException (Status 400: {"ID":"","Containers":0,"ContainersRunning":0,"ContainersPaused":0,"ContainersStopped":0,"Images":0,"Driver":"","DriverStatus":null,"Plugins":{"Volume":null,"Network":null,"Authorization":null,"Log":null},"MemoryLimit":false,"SwapLimit":false,"CpuCfsPeriod":false,"CpuCfsQuota":false,"CPUShares":false,"CPUSet":false,"PidsLimit":false,"IPv4Forwarding":false,"Debug":false,"NFd":0,"OomKillDisable":false,"NGoroutines":0,"SystemTime":"","LoggingDriver":"","CgroupDriver":"","NEventsListener":0,"KernelVersion":"","OperatingSystem":"","OSVersion":"","OSType":"","Architecture":"","IndexServerAddress":"","RegistryConfig":null,"NCPU":0,"MemTotal":0,"GenericResources":null,"DockerRootDir":"","HttpProxy":"","HttpsProxy":"","NoProxy":"","Name":"","Labels":["com.docker.desktop.address=unix:///Users/kennethkousen/Library/Containers/com.docker.docker/Data/docker-cli.sock"],"ExperimentalBuild":false,"ServerVersion":"","Runtimes":null,"DefaultRuntime":"","Swarm":{"NodeID":"","NodeAddr":"","LocalNodeState":"","ControlAvailable":false,"Error":"","RemoteManagers":null},"LiveRestoreEnabled":false,"Isolation":"","InitBinary":"","ContainerdCommit":{"ID":""},"RuncCommit":{"ID":""},"InitCommit":{"ID":""},"SecurityOptions":null,"CDISpecDirs":null,"Warnings":null})As no valid configuration was found, execution cannot continue.
+    See https://java.testcontainers.org/on_failure.html for more details.
+
+AnalyticsIntegrationTest > shouldRetrieveAnalyticsSummary() SKIPPED
+
+AnalyticsIntegrationTest > shouldRetrieveAnalyticsDashboard() SKIPPED
+
+AnalyticsIntegrationTest > shouldPersistEventsToDatabase() SKIPPED
+
+AnalyticsServiceTest > shouldGetDashboardData() PASSED
+
+AnalyticsServiceTest > shouldTrackCertificateVerified() STANDARD_OUT
+    18:38:46.571 [Test worker] INFO com.kousen.cert.analytics.service.AnalyticsService -- Tracked certificate verification: test-cert-123
+
+AnalyticsServiceTest > shouldTrackCertificateVerified() PASSED
+
+AnalyticsServiceTest > shouldTrackCertificateGenerated() STANDARD_OUT
+    18:38:46.575 [Test worker] INFO com.kousen.cert.analytics.service.AnalyticsService -- Tracked certificate generation: test-cert-123 for John Doe
+
+AnalyticsServiceTest > shouldTrackCertificateGenerated() PASSED
+
+AnalyticsServiceTest > shouldExtractIpAddressFromXForwardedFor() STANDARD_OUT
+    18:38:46.577 [Test worker] INFO com.kousen.cert.analytics.service.AnalyticsService -- Tracked certificate download: cert-123
+
+AnalyticsServiceTest > shouldExtractIpAddressFromXForwardedFor() PASSED
+
+AnalyticsServiceTest > shouldTrackApiUsage() PASSED
+
+MetricsAggregationServiceTest > shouldAggregateDailyMetrics() STANDARD_OUT
+    18:38:46.611 [Test worker] INFO com.kousen.cert.analytics.service.MetricsAggregationService -- Starting daily metrics aggregation
+    18:38:46.613 [Test worker] INFO com.kousen.cert.analytics.service.MetricsAggregationService -- Cleaned up metrics older than 2026-03-14T22:38:46.613217Z
+    18:38:46.613 [Test worker] INFO com.kousen.cert.analytics.service.MetricsAggregationService -- Daily metrics aggregation completed successfully
+
+MetricsAggregationServiceTest > shouldAggregateDailyMetrics() PASSED
+
+MetricsAggregationServiceTest > shouldAggregateWeeklyMetrics() STANDARD_OUT
+    18:38:46.616 [Test worker] INFO com.kousen.cert.analytics.service.MetricsAggregationService -- Starting weekly metrics aggregation
+    18:38:46.616 [Test worker] INFO com.kousen.cert.analytics.service.MetricsAggregationService -- Weekly metrics aggregation completed successfully
+
+MetricsAggregationServiceTest > shouldAggregateWeeklyMetrics() PASSED
+
+CertificateControllerTest STANDARD_OUT
+    18:38:46.661 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.kousen.cert.controller.CertificateControllerTest]: CertificateControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+    18:38:46.735 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.kousen.cert.Application for test class com.kousen.cert.controller.CertificateControllerTest
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v3.5.7)
+
+    2026-03-14T18:38:46.969-04:00  INFO 69140 --- [    Test worker] c.k.c.c.CertificateControllerTest        : Starting CertificateControllerTest using Java 25.0.2 with PID 69140 (started by kennethkousen in /Users/kennethkousen/Documents/java/certificate-service)
+    2026-03-14T18:38:46.970-04:00  INFO 69140 --- [    Test worker] c.k.c.c.CertificateControllerTest        : The following 1 profile is active: "test"
+    2026-03-14T18:38:47.501-04:00  INFO 69140 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+    2026-03-14T18:38:47.645-04:00  INFO 69140 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+    2026-03-14T18:38:47.645-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-03-14T18:38:47.646-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+    2026-03-14T18:38:47.659-04:00  INFO 69140 --- [    Test worker] c.k.c.c.CertificateControllerTest        : Started CertificateControllerTest in 0.896 seconds (process running for 2.494)
+
+CertificateControllerTest > shouldGetStoredCertificate() PASSED
+
+CertificateControllerTest > shouldRejectInvalidBookTitle() PASSED
+
+CertificateControllerTest > shouldCreateCertificateAndReturnPdf() STANDARD_OUT
+    2026-03-14T18:38:47.843-04:00  INFO 69140 --- [    Test worker] c.k.c.controller.CertificateController   : Certificate stored successfully at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/test-cert-signed-11810685292290436618.pdf
+
+CertificateControllerTest > shouldCreateCertificateAndReturnPdf() PASSED
+
+CertificateControllerTest > shouldListStoredCertificates() PASSED
+
+CertificateControllerTest > shouldReturnAvailableBooks() PASSED
+
+VerificationControllerDeepVerifyTest STANDARD_OUT
+    2026-03-14T18:38:47.861-04:00  INFO 69140 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.kousen.cert.controller.VerificationControllerDeepVerifyTest]: VerificationControllerDeepVerifyTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+    2026-03-14T18:38:47.864-04:00  INFO 69140 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.kousen.cert.Application for test class com.kousen.cert.controller.VerificationControllerDeepVerifyTest
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v3.5.7)
+
+    2026-03-14T18:38:47.879-04:00  INFO 69140 --- [    Test worker] c.c.VerificationControllerDeepVerifyTest : Starting VerificationControllerDeepVerifyTest using Java 25.0.2 with PID 69140 (started by kennethkousen in /Users/kennethkousen/Documents/java/certificate-service)
+    2026-03-14T18:38:47.880-04:00  INFO 69140 --- [    Test worker] c.c.VerificationControllerDeepVerifyTest : No active profile set, falling back to 1 default profile: "default"
+    2026-03-14T18:38:48.004-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-03-14T18:38:48.022-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 13 ms. Found 3 JPA repository interfaces.
+    2026-03-14T18:38:48.247-04:00  INFO 69140 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+    2026-03-14T18:38:48.273-04:00  INFO 69140 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.33.Final
+    2026-03-14T18:38:48.289-04:00  INFO 69140 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+    2026-03-14T18:38:48.348-04:00  INFO 69140 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-03-14T18:38:48.365-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+    2026-03-14T18:38:48.495-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+    2026-03-14T18:38:48.496-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+    2026-03-14T18:38:48.532-04:00  INFO 69140 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+    	Database driver: undefined/unknown
+    	Database version: 2.3.232
+    	Autocommit mode: undefined/unknown
+    	Isolation level: undefined/unknown
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-03-14T18:38:48.878-04:00  INFO 69140 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-03-14T18:38:48.912-04:00  INFO 69140 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-03-14T18:38:49.043-04:00  INFO 69140 --- [    Test worker] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+    2026-03-14T18:38:49.584-04:00  INFO 69140 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+    2026-03-14T18:38:49.692-04:00  INFO 69140 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+    2026-03-14T18:38:49.700-04:00  INFO 69140 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+    2026-03-14T18:38:49.700-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-03-14T18:38:49.703-04:00  INFO 69140 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-03-14T18:38:49.707-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 7 ms
+    2026-03-14T18:38:49.733-04:00  INFO 69140 --- [    Test worker] c.c.VerificationControllerDeepVerifyTest : Started VerificationControllerDeepVerifyTest in 1.865 seconds (process running for 4.568)
+
+VerificationControllerDeepVerifyTest > should return error when metadata is not found PASSED
+
+VerificationControllerDeepVerifyTest > should perform deep verification successfully PASSED
+
+VerificationControllerTest STANDARD_OUT
+    2026-03-14T18:38:49.791-04:00  INFO 69140 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.kousen.cert.Application for test class com.kousen.cert.controller.VerificationControllerTest
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v3.5.7)
+
+    2026-03-14T18:38:49.802-04:00  INFO 69140 --- [    Test worker] c.k.c.c.VerificationControllerTest       : Starting VerificationControllerTest using Java 25.0.2 with PID 69140 (started by kennethkousen in /Users/kennethkousen/Documents/java/certificate-service)
+    2026-03-14T18:38:49.802-04:00  INFO 69140 --- [    Test worker] c.k.c.c.VerificationControllerTest       : No active profile set, falling back to 1 default profile: "default"
+    2026-03-14T18:38:49.860-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-03-14T18:38:49.862-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 3 JPA repository interfaces.
+    2026-03-14T18:38:49.904-04:00  INFO 69140 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+    2026-03-14T18:38:49.905-04:00  INFO 69140 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+    2026-03-14T18:38:49.908-04:00  INFO 69140 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-03-14T18:38:49.908-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+    2026-03-14T18:38:49.909-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:testdb user=SA
+    2026-03-14T18:38:49.909-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+    2026-03-14T18:38:49.909-04:00  INFO 69140 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-2)']
+    	Database driver: undefined/unknown
+    	Database version: 2.3.232
+    	Autocommit mode: undefined/unknown
+    	Isolation level: undefined/unknown
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-03-14T18:38:49.931-04:00  INFO 69140 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-03-14T18:38:49.934-04:00  INFO 69140 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-03-14T18:38:49.991-04:00  INFO 69140 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+    2026-03-14T18:38:50.031-04:00  INFO 69140 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+    2026-03-14T18:38:50.034-04:00  INFO 69140 --- [    Test worker] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+    2026-03-14T18:38:50.034-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+    2026-03-14T18:38:50.034-04:00  INFO 69140 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-03-14T18:38:50.037-04:00  INFO 69140 --- [    Test worker] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 3 ms
+    2026-03-14T18:38:50.044-04:00  INFO 69140 --- [    Test worker] c.k.c.c.VerificationControllerTest       : Started VerificationControllerTest in 0.252 seconds (process running for 4.879)
+
+VerificationControllerTest > shouldReturnVerificationPageWithProvidedParameters() STANDARD_OUT
+    2026-03-14T18:38:50.049-04:00  INFO 69140 --- [    Test worker] c.k.c.controller.VerificationController  : Verification request received for: name=John Doe, book=Modern Java Recipes, date=2025-04-18, id=null
+
+VerificationControllerTest > shouldReturnVerificationPageWithProvidedParameters() PASSED
+
+VerificationControllerTest > shouldReturnVerificationPageWithDefaultValues() STANDARD_OUT
+    2026-03-14T18:38:50.207-04:00  INFO 69140 --- [    Test worker] c.k.c.controller.VerificationController  : Verification request received for: name=null, book=null, date=null, id=null
+
+VerificationControllerTest > shouldReturnVerificationPageWithDefaultValues() PASSED
+
+CertificateServiceIntegrationTest STANDARD_OUT
+    2026-03-14T18:38:50.211-04:00  INFO 69140 --- [    Test worker] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.kousen.cert.integration.CertificateServiceIntegrationTest]: CertificateServiceIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+    2026-03-14T18:38:50.214-04:00  INFO 69140 --- [    Test worker] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.kousen.cert.Application for test class com.kousen.cert.integration.CertificateServiceIntegrationTest
+
+      .   ____          _            __ _ _
+     /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+    ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+     \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+      '  |____| .__|_| |_|_| |_\__, | / / / /
+     =========|_|==============|___/=/_/_/_/
+
+     :: Spring Boot ::                (v3.5.7)
+
+    2026-03-14T18:38:50.225-04:00  INFO 69140 --- [    Test worker] .k.c.i.CertificateServiceIntegrationTest : Starting CertificateServiceIntegrationTest using Java 25.0.2 with PID 69140 (started by kennethkousen in /Users/kennethkousen/Documents/java/certificate-service)
+    2026-03-14T18:38:50.225-04:00  INFO 69140 --- [    Test worker] .k.c.i.CertificateServiceIntegrationTest : No active profile set, falling back to 1 default profile: "default"
+    2026-03-14T18:38:50.268-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+    2026-03-14T18:38:50.270-04:00  INFO 69140 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 1 ms. Found 3 JPA repository interfaces.
+    2026-03-14T18:38:50.359-04:00  INFO 69140 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 0 (http)
+    2026-03-14T18:38:50.367-04:00  INFO 69140 --- [    Test worker] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+    2026-03-14T18:38:50.367-04:00  INFO 69140 --- [    Test worker] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.48]
+    2026-03-14T18:38:50.394-04:00  INFO 69140 --- [    Test worker] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+    2026-03-14T18:38:50.394-04:00  INFO 69140 --- [    Test worker] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 169 ms
+    2026-03-14T18:38:50.423-04:00  INFO 69140 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+    2026-03-14T18:38:50.424-04:00  INFO 69140 --- [    Test worker] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+    2026-03-14T18:38:50.427-04:00  INFO 69140 --- [    Test worker] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+    2026-03-14T18:38:50.427-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+    2026-03-14T18:38:50.428-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection conn20: url=jdbc:h2:mem:testdb user=SA
+    2026-03-14T18:38:50.428-04:00  INFO 69140 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+    2026-03-14T18:38:50.428-04:00  INFO 69140 --- [    Test worker] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+    	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-3)']
+    	Database driver: undefined/unknown
+    	Database version: 2.3.232
+    	Autocommit mode: undefined/unknown
+    	Isolation level: undefined/unknown
+    	Minimum pool size: undefined/unknown
+    	Maximum pool size: undefined/unknown
+    2026-03-14T18:38:50.450-04:00  INFO 69140 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+    2026-03-14T18:38:50.452-04:00  INFO 69140 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+    2026-03-14T18:38:50.490-04:00  INFO 69140 --- [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page: class path resource [static/index.html]
+    2026-03-14T18:38:50.526-04:00  INFO 69140 --- [    Test worker] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+    2026-03-14T18:38:50.528-04:00  INFO 69140 --- [    Test worker] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+    2026-03-14T18:38:50.589-04:00  INFO 69140 --- [    Test worker] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 55727 (http) with context path '/'
+    2026-03-14T18:38:50.592-04:00  INFO 69140 --- [    Test worker] .k.c.i.CertificateServiceIntegrationTest : Started CertificateServiceIntegrationTest in 0.377 seconds (process running for 5.427)
+
+CertificateServiceIntegrationTest > createCertificateReturnsPdf() STANDARD_OUT
+    2026-03-14T18:38:50.654-04:00  INFO 69140 --- [omcat-handler-0] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+    2026-03-14T18:38:50.654-04:00  INFO 69140 --- [omcat-handler-0] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+    2026-03-14T18:38:50.655-04:00  INFO 69140 --- [omcat-handler-0] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+    2026-03-14T18:38:51.313-04:00  INFO 69140 --- [omcat-handler-0] c.k.c.service.CertificateStorageService  : Certificate stored at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/cert-test-storage/integrationtestuser_modernjavarecipes_20260314183851.pdf
+    2026-03-14T18:38:51.313-04:00  INFO 69140 --- [omcat-handler-0] c.k.c.controller.CertificateController   : Certificate stored successfully at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/cert-test-storage/integrationtestuser_modernjavarecipes_20260314183851.pdf
+    2026-03-14T18:38:51.318-04:00  INFO 69140 --- [    analytics-1] c.k.c.a.service.AnalyticsService         : Tracked certificate generation: B3FB54896E1CF551 for Integration Test User
+    2026-03-14T18:38:51.319-04:00  INFO 69140 --- [    analytics-2] c.kousen.cert.service.BlockchainService  : Anchored certificate B3FB54896E1CF551 to block 721302b03bf8200fdc31faf923a0fdf7307df9f8a23d4eb8ea4ad213282c08ce
+    2026-03-14T18:38:51.338-04:00  INFO 69140 --- [    analytics-2] c.k.c.a.s.CertificateMetadataService     : Saved certificate metadata for B3FB54896E1CF551
+
+CertificateServiceIntegrationTest > createCertificateReturnsPdf() PASSED
+
+CertificateServiceIntegrationTest > availableBooksEndpoint() PASSED
+
+BookTitleValidatorTest > shouldValidateNullTitle() PASSED
+
+BookTitleValidatorTest > shouldMatchExactTitleWithCorrectCase() PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [1] bookTitle=Gradle Recipes for Android PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [2] bookTitle=Help Your Boss Help You PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [3] bookTitle=Kotlin Cookbook PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [4] bookTitle=Making Java Groovy PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [5] bookTitle=Mockito Made Clear PASSED
+
+BookTitleValidatorTest > shouldValidateAllowedTitles(String) > [6] bookTitle=Modern Java Recipes PASSED
+
+BookTitleValidatorTest > shouldRejectInvalidTitles(String) > [1] bookTitle=Invalid Book Title PASSED
+
+BookTitleValidatorTest > shouldRejectInvalidTitles(String) > [2] bookTitle=Java For Dummies PASSED
+
+BookTitleValidatorTest > shouldRejectInvalidTitles(String) > [3] bookTitle=Unknown Book PASSED
+
+BookTitleValidatorTest > shouldRejectInvalidTitles(String) > [4] bookTitle=Random Title PASSED
+
+BlockchainServiceTest > should retrieve the same Merkle Proof for a certificate STANDARD_OUT
+    2026-03-14T18:38:51.422-04:00  INFO 69140 --- [    Test worker] c.kousen.cert.service.BlockchainService  : Anchored certificate cert-456 to block 384f2541f495240c202a00baa69d4a5d921b3575c82e7221b26cc5049cb23aa0
+
+BlockchainServiceTest > should retrieve the same Merkle Proof for a certificate PASSED
+
+BlockchainServiceTest > should return NO_PROOF_FOUND for unknown certificate PASSED
+
+BlockchainServiceTest > should maintain chain integrity with unique hashes STANDARD_OUT
+    2026-03-14T18:38:51.423-04:00  INFO 69140 --- [    Test worker] c.kousen.cert.service.BlockchainService  : Anchored certificate cert-1 to block eca3437977ab5254f9d15efa5bfb5e17631372cf010a2fc816287da248c645fd
+    2026-03-14T18:38:51.424-04:00  INFO 69140 --- [    Test worker] c.kousen.cert.service.BlockchainService  : Anchored certificate cert-2 to block 3f417c9d583ead52aaffffb2d98070be3b6786c60e7929ddc7b9274ff8ad4241
+
+BlockchainServiceTest > should maintain chain integrity with unique hashes PASSED
+
+BlockchainServiceTest > should return active network status PASSED
+
+BlockchainServiceTest > should anchor certificate and return a valid hash STANDARD_OUT
+    2026-03-14T18:38:51.424-04:00  INFO 69140 --- [    Test worker] c.kousen.cert.service.BlockchainService  : Anchored certificate cert-123 to block 4f61a7855c1f12cbbca079d310adda8b810a6383be2aedcf180fe3dd5030aac9
+
+BlockchainServiceTest > should anchor certificate and return a valid hash PASSED
+
+CertificateStorageServiceTest > shouldStoreAndRetrieveCertificate() STANDARD_OUT
+    2026-03-14T18:38:51.428-04:00  INFO 69140 --- [    Test worker] c.k.c.service.CertificateStorageService  : Certificate stored at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/junit-4587050314039046238/johndoe_modernjavarecipes_20260314183851.pdf
+
+CertificateStorageServiceTest > shouldStoreAndRetrieveCertificate() PASSED
+
+CertificateStorageServiceTest > shouldAbbreviateLongBookTitles() STANDARD_OUT
+    2026-03-14T18:38:51.437-04:00  INFO 69140 --- [    Test worker] c.k.c.service.CertificateStorageService  : Certificate stored at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/junit-123933798007894250/janesmith_mockitomadeclear_20260314183851.pdf
+
+CertificateStorageServiceTest > shouldAbbreviateLongBookTitles() PASSED
+
+CertificateStorageServiceTest > shouldSanitizeFilenames() STANDARD_OUT
+    2026-03-14T18:38:51.438-04:00  INFO 69140 --- [    Test worker] c.k.c.service.CertificateStorageService  : Certificate stored at: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/junit-10488530549706024644/johnodoefamily_makingjavagroovy_20260314183851.pdf
+
+CertificateStorageServiceTest > shouldSanitizeFilenames() PASSED
+
+KeyStoreProviderTest > shouldCreateKeyStoreWhenFileDoesNotExist() PASSED
+
+KeyStoreProviderTest > shouldLoadExistingKeyStore() PASSED
+
+PdfBoxGeneratorTest > shouldCreateValidPdfCertificate() PASSED
+
+PdfBoxGeneratorTest > shouldHandleNullQrCode() PASSED
+
+PdfServiceTest > shouldCreateValidPdf() PASSED
+
+PdfSignerTest > shouldProcessSimpleByteArray() PASSED
+
+PdfSignerTest > shouldCreateTestPdf() PASSED
+
+PdfVerificationServiceTest > should return false when verifying PDF without signatures STANDARD_OUT
+    2026-03-14T18:38:53.802-04:00  WARN 69140 --- [    Test worker] c.k.cert.service.PdfVerificationService  : No signatures found in PDF: /var/folders/7l/5nlqqhrx2hjbyljzwq0f22nc0000gn/T/junit-6410422404712396921/simple.pdf
+
+PdfVerificationServiceTest > should return false when verifying PDF without signatures PASSED
+
+PdfVerificationServiceTest > should perform biometric analysis on PDF with image PASSED
+
+PdfVerificationServiceTest > should return IMAGE_NOT_FOUND when performing biometric analysis on PDF without images STANDARD_OUT
+    2026-03-14T18:38:53.813-04:00  WARN 69140 --- [    Test worker] c.k.cert.service.PdfVerificationService  : Could not perform biometric analysis: Cannot invoke "org.apache.pdfbox.pdmodel.PDResources.getXObjectNames()" because "resources" is null
+
+PdfVerificationServiceTest > should return IMAGE_NOT_FOUND when performing biometric analysis on PDF without images PASSED
+
+QrCodeGeneratorTest > shouldHandleSpecialCharactersInParameters() PASSED
+
+QrCodeGeneratorTest > shouldGenerateQrCodeWithCorrectUrl() PASSED
+
+QrCodeGeneratorTest > shouldGenerateQrCodeWithCorrectDateFormat() PASSED
+
+BookTitleValidatorPropertyTest > titlesMustBeExactlyAsSpecified PASSED
+
+BookTitleValidatorPropertyTest > randomStringsAreInvalidUnlessTheyMatchAllowedTitles STANDARD_OUT
+    timestamp = 2026-03-14T18:38:53.934442, BookTitleValidatorPropertyTest:randomStringsAreInvalidUnlessTheyMatchAllowedTitles = 
+                                  |-----------------------jqwik-----------------------
+    tries = 1000                  | # of calls to property
+    checks = 1000                 | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 3310454330602235466    | random seed to reproduce generated values
+
+
+
+BookTitleValidatorPropertyTest > randomStringsAreInvalidUnlessTheyMatchAllowedTitles PASSED
+
+BookTitleValidatorPropertyTest > allAllowedBookTitlesAreValid STANDARD_OUT
+    timestamp = 2026-03-14T18:38:53.940321, BookTitleValidatorPropertyTest:allAllowedBookTitlesAreValid = 
+                                  |-----------------------jqwik-----------------------
+    tries = 6                     | # of calls to property
+    checks = 6                    | # of not rejected calls
+    generation = EXHAUSTIVE       | parameters are exhaustively generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 3992856359262217648    | random seed to reproduce generated values
+
+
+
+BookTitleValidatorPropertyTest > allAllowedBookTitlesAreValid PASSED
+
+BookTitleValidatorPropertyTest > nullValueIsAlwaysValid PASSED
+
+BookTitleValidatorPropertyTest > caseSensitivityMatters STANDARD_OUT
+    timestamp = 2026-03-14T18:38:53.941475, BookTitleValidatorPropertyTest:caseSensitivityMatters = 
+                                  |-----------------------jqwik-----------------------
+    tries = 6                     | # of calls to property
+    checks = 6                    | # of not rejected calls
+    generation = EXHAUSTIVE       | parameters are exhaustively generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -1917371228435489832   | random seed to reproduce generated values
+
+
+
+BookTitleValidatorPropertyTest > caseSensitivityMatters PASSED
+
+BookTitleValidatorPropertyTest > whitespaceMatters STANDARD_OUT
+    timestamp = 2026-03-14T18:38:53.942046, BookTitleValidatorPropertyTest:whitespaceMatters = 
+                                  |-----------------------jqwik-----------------------
+    tries = 6                     | # of calls to property
+    checks = 6                    | # of not rejected calls
+    generation = EXHAUSTIVE       | parameters are exhaustively generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 4283862233617546781    | random seed to reproduce generated values
+
+
+
+BookTitleValidatorPropertyTest > whitespaceMatters PASSED
+
+KeyStoreProviderPropertyTest > keystoreShouldHaveConsistentStructure STANDARD_OUT
+    timestamp = 2026-03-14T18:38:56.428046, KeyStoreProviderPropertyTest:keystoreShouldHaveConsistentStructure = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 5          | # of all combined edge cases
+    edge-cases#tried = 2          | # of edge cases tried in current run
+    seed = 1882400687607066874    | random seed to reproduce generated values
+
+
+
+KeyStoreProviderPropertyTest > keystoreShouldHaveConsistentStructure PASSED
+
+KeyStoreProviderPropertyTest > shouldAllowPrivateKeyRetrieval STANDARD_OUT
+    timestamp = 2026-03-14T18:38:58.569399, KeyStoreProviderPropertyTest:shouldAllowPrivateKeyRetrieval = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 5          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 2223360965354342949    | random seed to reproduce generated values
+
+
+
+KeyStoreProviderPropertyTest > shouldAllowPrivateKeyRetrieval PASSED
+
+KeyStoreProviderPropertyTest > loadingKeystoreShouldPreserveContents STANDARD_OUT
+    timestamp = 2026-03-14T18:39:01.588080, KeyStoreProviderPropertyTest:loadingKeystoreShouldPreserveContents = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 5          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -3626178818026676590   | random seed to reproduce generated values
+
+
+
+KeyStoreProviderPropertyTest > loadingKeystoreShouldPreserveContents PASSED
+
+PdfBoxGeneratorPropertyTest > shouldHandleMultipleCertificateCreations STANDARD_OUT
+    timestamp = 2026-03-14T18:39:03.345855, PdfBoxGeneratorPropertyTest:shouldHandleMultipleCertificateCreations = 
+                                  |-----------------------jqwik-----------------------
+    tries = 3                     | # of calls to property
+    checks = 3                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 4          | # of all combined edge cases
+    edge-cases#tried = 3          | # of edge cases tried in current run
+    seed = 8576695089969284404    | random seed to reproduce generated values
+
+
+
+PdfBoxGeneratorPropertyTest > shouldHandleMultipleCertificateCreations PASSED
+
+PdfBoxGeneratorPropertyTest > shouldHandleVariableNameLengths STANDARD_OUT
+    timestamp = 2026-03-14T18:39:04.756883, PdfBoxGeneratorPropertyTest:shouldHandleVariableNameLengths = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 2          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 4586279695970555522    | random seed to reproduce generated values
+
+
+
+PdfBoxGeneratorPropertyTest > shouldHandleVariableNameLengths PASSED
+
+PdfBoxGeneratorPropertyTest > shouldMaintainReasonableFileSize STANDARD_OUT
+    timestamp = 2026-03-14T18:39:06.126760, PdfBoxGeneratorPropertyTest:shouldMaintainReasonableFileSize = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 4          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -8251318270735538714   | random seed to reproduce generated values
+
+
+
+PdfBoxGeneratorPropertyTest > shouldMaintainReasonableFileSize PASSED
+
+PdfBoxGeneratorPropertyTest > shouldHandleSpecialCharactersInName STANDARD_OUT
+    timestamp = 2026-03-14T18:39:07.530679, PdfBoxGeneratorPropertyTest:shouldHandleSpecialCharactersInName = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 4          | # of all combined edge cases
+    edge-cases#tried = 2          | # of edge cases tried in current run
+    seed = -2451634297232327418   | random seed to reproduce generated values
+
+
+
+PdfBoxGeneratorPropertyTest > shouldHandleSpecialCharactersInName PASSED
+
+PdfBoxGeneratorPropertyTest > shouldHandleVariableBookTitleLengths STANDARD_OUT
+    timestamp = 2026-03-14T18:39:08.956358, PdfBoxGeneratorPropertyTest:shouldHandleVariableBookTitleLengths = 
+                                  |-----------------------jqwik-----------------------
+    tries = 5                     | # of calls to property
+    checks = 5                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 2          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = 6597425588211356395    | random seed to reproduce generated values
+
+
+
+PdfBoxGeneratorPropertyTest > shouldHandleVariableBookTitleLengths PASSED
+
+PdfSignerPropertyTest > signingShouldPreserveOriginalContent STANDARD_OUT
+    Signature filter: Adobe.PPKLite
+    Signature subfilter: adbe.pkcs7.detached
+    Signature name: Ken Kousen
+    Signature reason: Certificate of Ownership
+    Signature filter: Adobe.PPKLite
+    Signature subfilter: adbe.pkcs7.detached
+    Signature name: Ken Kousen
+    Signature reason: Certificate of Ownership
+    timestamp = 2026-03-14T18:39:09.589057, PdfSignerPropertyTest:signingShouldPreserveOriginalContent = 
+                                  |-----------------------jqwik-----------------------
+    tries = 2                     | # of calls to property
+    checks = 2                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 2          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -8020205452082791517   | random seed to reproduce generated values
+
+
+
+PdfSignerPropertyTest > signingShouldPreserveOriginalContent PASSED
+
+PdfSignerPropertyTest > multiplePdfsCanBeSignedSuccessively STANDARD_OUT
+    Multiple signing - signature filter: Adobe.PPKLite
+    Multiple signing - signature filter: Adobe.PPKLite
+    Multiple signing - signature filter: Adobe.PPKLite
+    Multiple signing - signature filter: Adobe.PPKLite
+    Multiple signing - signature filter: Adobe.PPKLite
+    Multiple signing - signature filter: Adobe.PPKLite
+    timestamp = 2026-03-14T18:39:11.292755, PdfSignerPropertyTest:multiplePdfsCanBeSignedSuccessively = 
+                                  |-----------------------jqwik-----------------------
+    tries = 2                     | # of calls to property
+    checks = 2                    | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 2          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -778372483852343794    | random seed to reproduce generated values
+
+
+
+PdfSignerPropertyTest > multiplePdfsCanBeSignedSuccessively PASSED
+
+QrCodeGeneratorPropertyTest > encodingIsConsistentForTheSameInput STANDARD_OUT
+    timestamp = 2026-03-14T18:39:11.365909, QrCodeGeneratorPropertyTest:encodingIsConsistentForTheSameInput = 
+                                  |-----------------------jqwik-----------------------
+    tries = 1000                  | # of calls to property
+    checks = 1000                 | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -280110357823827258    | random seed to reproduce generated values
+
+
+
+QrCodeGeneratorPropertyTest > encodingIsConsistentForTheSameInput PASSED
+
+QrCodeGeneratorPropertyTest > encodingPreservesOriginalStringAfterDecoding STANDARD_OUT
+    timestamp = 2026-03-14T18:39:11.401932, QrCodeGeneratorPropertyTest:encodingPreservesOriginalStringAfterDecoding = 
+                                  |-----------------------jqwik-----------------------
+    tries = 1000                  | # of calls to property
+    checks = 1000                 | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -7880794978424780711   | random seed to reproduce generated values
+
+
+
+QrCodeGeneratorPropertyTest > encodingPreservesOriginalStringAfterDecoding PASSED
+
+QrCodeGeneratorPropertyTest > specialCharactersAreEncodedCorrectly STANDARD_OUT
+    timestamp = 2026-03-14T18:39:11.447704, QrCodeGeneratorPropertyTest:specialCharactersAreEncodedCorrectly = 
+                                  |-----------------------jqwik-----------------------
+    tries = 1000                  | # of calls to property
+    checks = 1000                 | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 12         | # of all combined edge cases
+    edge-cases#tried = 12         | # of edge cases tried in current run
+    seed = -3453633725038282241   | random seed to reproduce generated values
+
+
+
+QrCodeGeneratorPropertyTest > specialCharactersAreEncodedCorrectly PASSED
+
+QrCodeGeneratorPropertyTest > handlesNullInput PASSED
+
+QrCodeGeneratorPropertyTest > generatedUrlContainsAllRequiredParameters STANDARD_OUT
+    timestamp = 2026-03-14T18:39:11.496303, QrCodeGeneratorPropertyTest:generatedUrlContainsAllRequiredParameters = 
+                                  |-----------------------jqwik-----------------------
+    tries = 1000                  | # of calls to property
+    checks = 1000                 | # of not rejected calls
+    generation = RANDOMIZED       | parameters are randomly generated
+    after-failure = SAMPLE_FIRST  | try previously failed sample, then previous seed
+    when-fixed-seed = ALLOW       | fixing the random seed is allowed
+    edge-cases#mode = MIXIN       | edge cases are mixed in
+    edge-cases#total = 0          | # of all combined edge cases
+    edge-cases#tried = 0          | # of edge cases tried in current run
+    seed = -983849502398060537    | random seed to reproduce generated values
+
+
+
+QrCodeGeneratorPropertyTest > generatedUrlContainsAllRequiredParameters PASSED
+
+2026-03-14T18:39:11.508-04:00  INFO 69140 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-14T18:39:11.509-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-14T18:39:11.510-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-03-14T18:39:11.511-04:00  INFO 69140 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-14T18:39:11.512-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-03-14T18:39:11.512-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-03-14T18:39:11.513-04:00  INFO 69140 --- [ionShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-03-14T18:39:11.517-04:00  INFO 69140 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-03-14T18:39:11.723-04:00  INFO 69140 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-14T18:39:11.723-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown initiated...
+2026-03-14T18:39:11.724-04:00  INFO 69140 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Shutdown completed.
+
+> Task :jacocoTestReport
+
+BUILD SUCCESSFUL in 27s
+6 actionable tasks: 3 executed, 3 up-to-date
+Configuration cache entry reused.

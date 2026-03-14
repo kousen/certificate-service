@@ -35,11 +35,12 @@ public class PdfService {
     /**
      * Creates a PDF certificate from a certificate request
      *
-     * @param request The certificate request with recipient and book info
+     * @param request       The certificate request with recipient and book info
+     * @param certificateId The unique certificate ID to include in the PDF
      * @return Path to the generated PDF file
      * @throws IOException If there's an error during PDF creation
      */
-    public Path createPdf(CertificateRequest request) throws IOException {
+    public Path createPdf(CertificateRequest request, String certificateId) throws IOException {
         try {
             // Generate QR code in-memory
             byte[] qrCodeData = qrCodeGenerator.generateQrCodeData(
@@ -53,7 +54,8 @@ public class PdfService {
                     "Certificate of Ownership",
                     request.purchaserName(),
                     request.bookTitle(),
-                    qrCodeData);
+                    qrCodeData,
+                    certificateId);
         } catch (Exception e) {
             throw new IOException("Failed to generate PDF: " + e.getMessage(), e);
         }

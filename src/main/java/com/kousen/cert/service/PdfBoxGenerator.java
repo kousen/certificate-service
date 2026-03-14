@@ -39,10 +39,11 @@ public class PdfBoxGenerator {
      * @param name The recipient's name
      * @param subtitle The subtitle or book title
      * @param qrCodePath Path to the QR code image
+     * @param certificateId The unique certificate ID
      * @return Path to the generated PDF file
      * @throws IOException If there's an error during PDF creation
      */
-    public Path createCertificatePdf(String title, String name, String subtitle, Path qrCodePath) throws IOException {
+    public Path createCertificatePdf(String title, String name, String subtitle, Path qrCodePath, String certificateId) throws IOException {
         // Create temp file for PDF output
         Path pdfPath = Files.createTempFile("cert-", ".pdf");
         
@@ -102,6 +103,25 @@ public class PdfBoxGenerator {
                 y -= 50;
                 drawCenteredText(contentStream, textFont, 14,
                         "and has earned the author's eternal gratitude.", centerX, y);
+
+                // Add Gag Features Metadata if certificateId is provided
+                if (certificateId != null && !certificateId.isEmpty()) {
+                    y -= 60;
+                    contentStream.setNonStrokingColor(Color.DARK_GRAY);
+                    drawCenteredText(contentStream, textFont, 10,
+                            "NUCLEAR-GRADE SECURITY VERIFIED", centerX, y);
+                    
+                    y -= 20;
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Certificate ID: " + certificateId + " | Merkle Root: [PENDING_ANCHOR]", centerX, y);
+                    
+                    y -= 15;
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, y);
+                    
+                    // Reset color
+                    contentStream.setNonStrokingColor(GOLD_COLOR);
+                }
                 
                 // Add QR code
                 if (qrCodePath != null && Files.exists(qrCodePath)) {
@@ -211,10 +231,11 @@ public class PdfBoxGenerator {
      * @param name         The recipient's name
      * @param subtitle     The subtitle or book title
      * @param qrCodeData   QR code image bytes in PNG format
+     * @param certificateId The unique certificate ID
      * @return Path to the generated PDF file
      * @throws IOException If there's an error during PDF creation
      */
-    public Path createCertificatePdfWithQrData(String title, String name, String subtitle, byte[] qrCodeData) throws IOException {
+    public Path createCertificatePdfWithQrData(String title, String name, String subtitle, byte[] qrCodeData, String certificateId) throws IOException {
         Path pdfPath = Files.createTempFile("cert-", ".pdf");
         float pageWidth = PDRectangle.A4.getHeight();
         float pageHeight = PDRectangle.A4.getWidth();
@@ -253,6 +274,25 @@ public class PdfBoxGenerator {
                 y -= 50;
                 drawCenteredText(contentStream, textFont, 14,
                         "and has earned the author's eternal gratitude.", centerX, y);
+
+                // Add Gag Features Metadata if certificateId is provided
+                if (certificateId != null && !certificateId.isEmpty()) {
+                    y -= 60;
+                    contentStream.setNonStrokingColor(Color.DARK_GRAY);
+                    drawCenteredText(contentStream, textFont, 10,
+                            "NUCLEAR-GRADE SECURITY VERIFIED", centerX, y);
+
+                    y -= 20;
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Certificate ID: " + certificateId + " | Merkle Root: [PENDING_ANCHOR]", centerX, y);
+
+                    y -= 15;
+                    drawCenteredText(contentStream, textFont, 8,
+                            "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, y);
+
+                    // Reset color
+                    contentStream.setNonStrokingColor(GOLD_COLOR);
+                }
 
                 if (qrCodeData != null && qrCodeData.length > 0) {
                     final float qrX = 80f;
