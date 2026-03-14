@@ -23,7 +23,7 @@ class VerificationControllerTest {
         @Bean
         @Primary
         public VerificationController verificationController() {
-            return new VerificationController("Test certificate fingerprint", null);
+            return new VerificationController((String) null, null, null, null, null, null);
         }
     }
 
