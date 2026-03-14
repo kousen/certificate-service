@@ -162,6 +162,10 @@
             <span class="details-label">Quantum Hash:</span>
             <div class="quantum-hash" th:text="${quantumHash}">SHA3-512 Hash Value</div>
         </div>
+        <div class="details-item" th:if="${merkleProof}">
+            <span class="details-label">Merkle Proof:</span>
+            <div class="quantum-hash" th:text="${merkleProof}">Merkle Proof</div>
+        </div>
         <div class="deep-verify-container" th:if="${certificateId}">
             <button id="deep-verify-btn" th:onclick="'startDeepVerify(\'' + ${certificateId} + '\')'">
                 Run Nuclear-Grade Deep Verification
@@ -219,7 +223,9 @@ Certificate Fingerprint (SHA-256):
                 "Initializing entropy harvest...",
                 "Syncing with Stratospheric Atomic Clock...",
                 "Calculating SHA3-512 Quantum-Resistant hash...",
+                "Analyzing Biometric Stylometry and signature pressure...",
                 "Locating cryptographic signature in PDF byte stream...",
+                "Querying Local Immutable Blockchain nodes...",
                 "Parsing ASN.1 PKCS#7 detached signature block...",
                 "Extracting X.509 certificate chain...",
                 "Performing RSA 4096-bit modular exponentiation...",
@@ -256,6 +262,20 @@ Certificate Fingerprint (SHA-256):
                     line.style.fontWeight = 'bold';
                     line.innerText = `[SUCCESS] CRYPTOGRAPHIC SIGNATURE VERIFIED. Certificate is authentic.`;
                     log.appendChild(line);
+                    
+                    if (data.merkleProof) {
+                        const blockchainLine = document.createElement('div');
+                        blockchainLine.style.color = '#3498db';
+                        blockchainLine.innerText = `[BLOCKCHAIN] Merkle Proof confirmed: ${data.merkleProof} (${data.blockchainStatus})`;
+                        log.appendChild(blockchainLine);
+                    }
+                    
+                    if (data.biometricAnalysis && data.biometricAnalysis.status === 'VALIDATED') {
+                        const biometricLine = document.createElement('div');
+                        biometricLine.style.color = '#f1c40f';
+                        biometricLine.innerText = `[BIOMETRIC] Stylometry confirmed (Confidence: ${(data.biometricAnalysis.stylometricConfidence * 100).toFixed(2)}%)`;
+                        log.appendChild(biometricLine);
+                    }
                     
                     const hashLine = document.createElement('div');
                     hashLine.style.fontSize = '11px';

@@ -20,10 +20,13 @@ import org.bouncycastle.util.encoders.Hex;
 public class CertificateMetadataService {
     private static final Logger logger = LoggerFactory.getLogger(CertificateMetadataService.class);
     
-    private final CertificateMetadataRepository repository;
+    private final com.kousen.cert.analytics.repository.CertificateMetadataRepository repository;
+    private final com.kousen.cert.service.BlockchainService blockchainService;
     
-    public CertificateMetadataService(CertificateMetadataRepository repository) {
+    public CertificateMetadataService(com.kousen.cert.analytics.repository.CertificateMetadataRepository repository,
+                                    com.kousen.cert.service.BlockchainService blockchainService) {
         this.repository = repository;
+        this.blockchainService = blockchainService;
     }
     
     @Async("analyticsTaskExecutor")
@@ -55,6 +58,14 @@ public class CertificateMetadataService {
                         MessageDigest md512 = MessageDigest.getInstance("SHA-512");
                         byte[] hashBytes512 = md512.digest(fileBytes);
                         metadata.setQuantumHash(Hex.toHexString(hashBytes512));
+                    }
+                    
+                    // Local Blockchain Anchoring
+                    try {
+                        String merkleProof = blockchainService.anchorCertificate(certificateId, metadata.getFileHash());
+                        metadata.setMerkleProof(merkleProof);
+                    } catch (Exception e) {
+                        logger.warn("Blockchain anchoring failed: {}", e.getMessage());
                     }
                 } catch (Exception e) {
                     logger.warn("Could not calculate file hashes for {}", certificatePath, e);

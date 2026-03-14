@@ -40,18 +40,21 @@ public class CertificateController {
     private final CertificateStorageService storageService;
     private final AnalyticsService analyticsService;
     private final CertificateMetadataService metadataService;
+    private final BlockchainService blockchainService;
 
     public CertificateController(
             PdfService pdfService,
             PdfSigner pdfSigner,
             CertificateStorageService storageService,
             AnalyticsService analyticsService,
-            CertificateMetadataService metadataService) {
+            CertificateMetadataService metadataService,
+            BlockchainService blockchainService) {
         this.pdfService = pdfService;
         this.pdfSigner = pdfSigner;
         this.storageService = storageService;
         this.analyticsService = analyticsService;
         this.metadataService = metadataService;
+        this.blockchainService = blockchainService;
     }
 
     @PostMapping(produces = "application/pdf")

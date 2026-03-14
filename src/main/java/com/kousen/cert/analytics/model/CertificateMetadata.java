@@ -17,6 +17,8 @@ public class CertificateMetadata {
     
     private String quantumHash;
     
+    private String merkleProof;
+    
     private Long fileSize;
     
     @Column(nullable = false)
@@ -78,6 +80,14 @@ public class CertificateMetadata {
     
     public void setQuantumHash(String quantumHash) {
         this.quantumHash = quantumHash;
+    }
+    
+    public String getMerkleProof() {
+        return merkleProof;
+    }
+    
+    public void setMerkleProof(String merkleProof) {
+        this.merkleProof = merkleProof;
     }
     
     public Long getFileSize() {

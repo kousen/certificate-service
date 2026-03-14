@@ -34,22 +34,25 @@ public class VerificationController {
     private final CertificateMetadataService metadataService;
     private final PdfVerificationService pdfVerificationService;
     private final CertificateStorageService storageService;
+    private final com.kousen.cert.service.BlockchainService blockchainService;
 
     // Default constructor for tests
     public VerificationController() {
-        this("Certificate fingerprint not available during test", null, null, null, null);
+        this("Certificate fingerprint not available during test", null, null, null, null, null);
     }
 
     VerificationController(String certificateFingerprint, 
                            AnalyticsService analyticsService,
                            CertificateMetadataService metadataService,
                            PdfVerificationService pdfVerificationService,
-                           CertificateStorageService storageService) {
+                           CertificateStorageService storageService,
+                           com.kousen.cert.service.BlockchainService blockchainService) {
         this.certificateFingerprint = certificateFingerprint;
         this.analyticsService = analyticsService;
         this.metadataService = metadataService;
         this.pdfVerificationService = pdfVerificationService;
         this.storageService = storageService;
+        this.blockchainService = blockchainService;
     }
 
     @Autowired
@@ -57,8 +60,9 @@ public class VerificationController {
                                   AnalyticsService analyticsService,
                                   CertificateMetadataService metadataService,
                                   PdfVerificationService pdfVerificationService,
-                                  CertificateStorageService storageService) {
-        this(generateCertificateFingerprint(keyStoreProvider), analyticsService, metadataService, pdfVerificationService, storageService);
+                                  CertificateStorageService storageService,
+                                  com.kousen.cert.service.BlockchainService blockchainService) {
+        this(generateCertificateFingerprint(keyStoreProvider), analyticsService, metadataService, pdfVerificationService, storageService, blockchainService);
     }
 
     @GetMapping("/verify-certificate")
@@ -114,14 +118,18 @@ public class VerificationController {
 
             Path pdfPath = storageService.getCertificate(metadata.getFilename());
             boolean isValid = pdfVerificationService.verifySignature(pdfPath);
+            Map<String, Object> biometricAnalysis = pdfVerificationService.performBiometricAnalysis(pdfPath);
 
             response.put("status", "success");
             response.put("isValid", isValid);
             response.put("filename", metadata.getFilename());
             response.put("fileHash", metadata.getFileHash());
             response.put("quantumHash", metadata.getQuantumHash());
+            response.put("merkleProof", metadata.getMerkleProof());
+            response.put("blockchainStatus", blockchainService != null ? blockchainService.getNetworkStatus() : "OFFLINE");
+            response.put("biometricAnalysis", biometricAnalysis);
             response.put("timestamp", java.time.Instant.now().toString());
-            response.put("verificationMethod", "Server-side Cryptographic Signature Validation");
+            response.put("verificationMethod", "Server-side Cryptographic Signature Validation & Biometric Stylometry");
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
