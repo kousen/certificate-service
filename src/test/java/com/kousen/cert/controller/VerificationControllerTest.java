@@ -23,7 +23,7 @@ class VerificationControllerTest {
         @Bean
         @Primary
         public VerificationController verificationController() {
-            return new VerificationController((String) null, null, null, null, null, null);
+            return new VerificationController();
         }
     }
 

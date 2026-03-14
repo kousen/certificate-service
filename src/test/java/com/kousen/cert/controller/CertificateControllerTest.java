@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kousen.cert.analytics.service.AnalyticsService;
 import com.kousen.cert.analytics.service.CertificateMetadataService;
 import com.kousen.cert.model.CertificateRequest;
+import com.kousen.cert.service.BlockchainService;
 import com.kousen.cert.service.CertificateStorageService;
 import com.kousen.cert.service.PdfService;
+import com.kousen.cert.service.PdfSigner;
 import org.apache.pdfbox.pdmodel.PDDocument; // Import PDFBox
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,12 @@ class CertificateControllerTest {
     @MockitoBean
     private CertificateMetadataService metadataService;
 
+    @MockitoBean
+    private PdfSigner pdfSigner;
+
+    @MockitoBean
+    private BlockchainService blockchainService;
+
     @Test
     void shouldCreateCertificateAndReturnPdf() throws Exception {
         // Given
@@ -62,13 +70,16 @@ class CertificateControllerTest {
 
         // Create a temporary real PDF file for the mock using PDFBox
         Path tempPdf = Files.createTempFile("test-cert-", ".pdf");
+        Path tempSignedPdf = Files.createTempFile("test-cert-signed-", ".pdf");
         try (PDDocument doc = new PDDocument()) {
             doc.addPage(new PDPage());
             doc.save(tempPdf.toFile());
+            doc.save(tempSignedPdf.toFile());
         }
 
         when(pdfService.createPdf(any())).thenReturn(tempPdf);
-        when(storageService.storeCertificate(any(), any())).thenReturn(tempPdf);
+        when(pdfSigner.sign(any(Path.class))).thenReturn(tempSignedPdf);
+        when(storageService.storeCertificate(any(), any())).thenReturn(tempSignedPdf);
 
         // When/Then
         mockMvc.perform(post("/api/certificates")
@@ -79,6 +90,7 @@ class CertificateControllerTest {
 
         // Clean up
         Files.deleteIfExists(tempPdf);
+        Files.deleteIfExists(tempSignedPdf);
     }
     
     @Test
