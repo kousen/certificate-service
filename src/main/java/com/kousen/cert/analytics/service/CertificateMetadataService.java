@@ -11,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CompletableFuture;
+import org.bouncycastle.util.encoders.Hex;
 
 @Service
 @Transactional
@@ -37,15 +39,25 @@ public class CertificateMetadataService {
 
                 try {
                     byte[] fileBytes = Files.readAllBytes(certificatePath);
-                    MessageDigest md = MessageDigest.getInstance("SHA-256");
-                    byte[] hashBytes = md.digest(fileBytes);
-                    StringBuilder sb = new StringBuilder();
-                    for (byte b : hashBytes) {
-                        sb.append(String.format("%02x", b));
+                    
+                    // Standard SHA-256
+                    MessageDigest md256 = MessageDigest.getInstance("SHA-256");
+                    byte[] hashBytes256 = md256.digest(fileBytes);
+                    metadata.setFileHash(Hex.toHexString(hashBytes256));
+                    
+                    // Quantum-Resistant SHA-3 512-bit
+                    try {
+                        MessageDigest md512 = MessageDigest.getInstance("SHA3-512");
+                        byte[] hashBytes512 = md512.digest(fileBytes);
+                        metadata.setQuantumHash(Hex.toHexString(hashBytes512));
+                    } catch (NoSuchAlgorithmException e) {
+                        logger.warn("SHA3-512 not available, falling back to SHA-512");
+                        MessageDigest md512 = MessageDigest.getInstance("SHA-512");
+                        byte[] hashBytes512 = md512.digest(fileBytes);
+                        metadata.setQuantumHash(Hex.toHexString(hashBytes512));
                     }
-                    metadata.setFileHash(sb.toString());
                 } catch (Exception e) {
-                    logger.warn("Could not calculate file hash for {}", certificatePath, e);
+                    logger.warn("Could not calculate file hashes for {}", certificatePath, e);
                 }
             }
             

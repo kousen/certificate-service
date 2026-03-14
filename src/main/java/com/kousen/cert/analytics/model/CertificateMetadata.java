@@ -15,6 +15,8 @@ public class CertificateMetadata {
     
     private String fileHash;
     
+    private String quantumHash;
+    
     private Long fileSize;
     
     @Column(nullable = false)
@@ -68,6 +70,14 @@ public class CertificateMetadata {
     
     public void setFileHash(String fileHash) {
         this.fileHash = fileHash;
+    }
+    
+    public String getQuantumHash() {
+        return quantumHash;
+    }
+    
+    public void setQuantumHash(String quantumHash) {
+        this.quantumHash = quantumHash;
     }
     
     public Long getFileSize() {

@@ -92,6 +92,46 @@
             border-radius: 3px;
             font-weight: bold;
         }
+        .deep-verify-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #deep-verify-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #deep-verify-btn:hover {
+            background-color: #2980b9;
+        }
+        #deep-verify-btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .verification-log {
+            margin-top: 15px;
+            background-color: #1e272e;
+            color: #2ecc71;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 13px;
+            text-align: left;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .quantum-hash {
+            font-size: 10px;
+            color: #7f8c8d;
+            word-break: break-all;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +157,16 @@
         <div class="details-item">
             <span class="details-label">Status:</span>
             <span class="valid-badge">Valid</span>
+        </div>
+        <div class="details-item" th:if="${quantumHash}">
+            <span class="details-label">Quantum Hash:</span>
+            <div class="quantum-hash" th:text="${quantumHash}">SHA3-512 Hash Value</div>
+        </div>
+        <div class="deep-verify-container" th:if="${certificateId}">
+            <button id="deep-verify-btn" th:onclick="'startDeepVerify(\'' + ${certificateId} + '\')'">
+                Run Nuclear-Grade Deep Verification
+            </button>
+            <div id="verification-log" class="verification-log"></div>
         </div>
     </div>
 
@@ -154,5 +204,83 @@ Tales from the Jar Side
 Certificate Fingerprint (SHA-256):
 <span th:text="${certificateFingerprint}">EXAMPLE:FINGERPRINT:HASH:VALUE</span></div>
     </div>
+
+    <script th:inline="javascript">
+        function startDeepVerify(id) {
+            const btn = document.getElementById('deep-verify-btn');
+            const log = document.getElementById('verification-log');
+            
+            btn.disabled = true;
+            btn.innerText = 'Verifying...';
+            log.style.display = 'block';
+            log.innerHTML = '';
+
+            const messages = [
+                "Initializing entropy harvest...",
+                "Syncing with Stratospheric Atomic Clock...",
+                "Calculating SHA3-512 Quantum-Resistant hash...",
+                "Locating cryptographic signature in PDF byte stream...",
+                "Parsing ASN.1 PKCS#7 detached signature block...",
+                "Extracting X.509 certificate chain...",
+                "Performing RSA 4096-bit modular exponentiation...",
+                "Verifying message digest against signed attributes...",
+                "Cross-referencing with Tales from the Jar Side immutable ledger..."
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < messages.length) {
+                    const line = document.createElement('div');
+                    line.innerText = `[${new Date().toLocaleTimeString()}] ${messages[i]}`;
+                    log.appendChild(line);
+                    log.scrollTop = log.scrollHeight;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    performServerVerification(id);
+                }
+            }, 600);
+        }
+
+        async function performServerVerification(id) {
+            const log = document.getElementById('verification-log');
+            const btn = document.getElementById('deep-verify-btn');
+
+            try {
+                const response = await fetch(`/api/verify/deep/${id}`);
+                const data = await response.json();
+
+                if (data.status === 'success' && data.isValid) {
+                    const line = document.createElement('div');
+                    line.style.color = '#2ecc71';
+                    line.style.fontWeight = 'bold';
+                    line.innerText = `[SUCCESS] CRYPTOGRAPHIC SIGNATURE VERIFIED. Certificate is authentic.`;
+                    log.appendChild(line);
+                    
+                    const hashLine = document.createElement('div');
+                    hashLine.style.fontSize = '11px';
+                    hashLine.innerText = `Quantum Hash: ${data.quantumHash}`;
+                    log.appendChild(hashLine);
+                    
+                    btn.innerText = 'Verified! (Click to re-run)';
+                } else {
+                    const line = document.createElement('div');
+                    line.style.color = '#e74c3c';
+                    line.innerText = `[FAILED] Signature verification failed or certificate not found.`;
+                    log.appendChild(line);
+                    btn.innerText = 'Verification Failed';
+                }
+            } catch (error) {
+                const line = document.createElement('div');
+                line.style.color = '#e74c3c';
+                line.innerText = `[ERROR] System fault during deep verification: ${error.message}`;
+                log.appendChild(line);
+                btn.innerText = 'System Error';
+            } finally {
+                btn.disabled = false;
+                log.scrollTop = log.scrollHeight;
+            }
+        }
+    </script>
 </body>
 </html>

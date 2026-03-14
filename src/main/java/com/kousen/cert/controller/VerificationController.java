@@ -1,19 +1,29 @@
 package com.kousen.cert.controller;
 
 import com.kousen.cert.analytics.model.AnalyticsRequestContext;
+import com.kousen.cert.analytics.model.CertificateMetadata;
 import com.kousen.cert.analytics.service.AnalyticsService;
+import com.kousen.cert.analytics.service.CertificateMetadataService;
+import com.kousen.cert.service.CertificateStorageService;
+import com.kousen.cert.service.PdfVerificationService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class VerificationController {
@@ -21,20 +31,34 @@ public class VerificationController {
     private static final Logger logger = LoggerFactory.getLogger(VerificationController.class);
     private final String certificateFingerprint;
     private final AnalyticsService analyticsService;
+    private final CertificateMetadataService metadataService;
+    private final PdfVerificationService pdfVerificationService;
+    private final CertificateStorageService storageService;
 
     // Default constructor for tests
     public VerificationController() {
-        this("Certificate fingerprint not available during test", null);
+        this("Certificate fingerprint not available during test", null, null, null, null);
     }
 
-    VerificationController(String certificateFingerprint, AnalyticsService analyticsService) {
+    VerificationController(String certificateFingerprint, 
+                           AnalyticsService analyticsService,
+                           CertificateMetadataService metadataService,
+                           PdfVerificationService pdfVerificationService,
+                           CertificateStorageService storageService) {
         this.certificateFingerprint = certificateFingerprint;
         this.analyticsService = analyticsService;
+        this.metadataService = metadataService;
+        this.pdfVerificationService = pdfVerificationService;
+        this.storageService = storageService;
     }
 
     @Autowired
-    public VerificationController(com.kousen.cert.service.KeyStoreProvider keyStoreProvider, AnalyticsService analyticsService) {
-        this(generateCertificateFingerprint(keyStoreProvider), analyticsService);
+    public VerificationController(com.kousen.cert.service.KeyStoreProvider keyStoreProvider, 
+                                  AnalyticsService analyticsService,
+                                  CertificateMetadataService metadataService,
+                                  PdfVerificationService pdfVerificationService,
+                                  CertificateStorageService storageService) {
+        this(generateCertificateFingerprint(keyStoreProvider), analyticsService, metadataService, pdfVerificationService, storageService);
     }
 
     @GetMapping("/verify-certificate")
@@ -53,6 +77,14 @@ public class VerificationController {
         model.addAttribute("bookTitle", bookTitle != null ? bookTitle : "Not specified");
         model.addAttribute("issueDate", issueDate != null ? issueDate : "Not specified");
         model.addAttribute("certificateFingerprint", certificateFingerprint);
+        model.addAttribute("certificateId", certificateId);
+
+        if (certificateId != null && !certificateId.isEmpty() && metadataService != null) {
+            CertificateMetadata metadata = metadataService.getCertificateMetadata(certificateId);
+            if (metadata != null) {
+                model.addAttribute("quantumHash", metadata.getQuantumHash());
+            }
+        }
 
         // Track verification event if analytics service is available and certificate ID is provided
         if (analyticsService != null && certificateId != null && !certificateId.isEmpty()) {
@@ -66,6 +98,37 @@ public class VerificationController {
 
         // Using the verification template
         return "verify-certificate";
+    }
+
+    @GetMapping("/api/verify/deep/{id}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deepVerify(@PathVariable String id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            CertificateMetadata metadata = metadataService.getCertificateMetadata(id);
+            if (metadata == null) {
+                response.put("status", "error");
+                response.put("message", "Certificate metadata not found");
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            Path pdfPath = storageService.getCertificate(metadata.getFilename());
+            boolean isValid = pdfVerificationService.verifySignature(pdfPath);
+
+            response.put("status", "success");
+            response.put("isValid", isValid);
+            response.put("filename", metadata.getFilename());
+            response.put("fileHash", metadata.getFileHash());
+            response.put("quantumHash", metadata.getQuantumHash());
+            response.put("timestamp", java.time.Instant.now().toString());
+            response.put("verificationMethod", "Server-side Cryptographic Signature Validation");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
     }
 
     /**

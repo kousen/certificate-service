@@ -18,13 +18,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.bouncycastle.util.encoders.Hex;
 
 @RestController
 @RequestMapping("/api/certificates")
@@ -53,7 +57,10 @@ public class CertificateController {
     @PostMapping(produces = "application/pdf")
     public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req, HttpServletRequest request) throws Exception {
         long startTime = System.currentTimeMillis();
-        String certificateId = UUID.randomUUID().toString();
+        
+        // Nuclear-Grade Entropy ID Generation
+        String certificateId = generateNuclearId(req);
+        
         AnalyticsRequestContext requestContext = AnalyticsRequestContext.from(request);
         
         try {
@@ -197,6 +204,30 @@ public class CertificateController {
             "userExperience", "Recipients will need to manually trust the certificate or simply " +
                               "accept the warning to view the certificate."
         ));
+    }
+
+    private String generateNuclearId(CertificateRequest req) {
+        try {
+            // Mix multiple sources of "entropy" for the gag
+            SecureRandom sr = new SecureRandom();
+            StringBuilder entropySource = new StringBuilder();
+            entropySource.append(UUID.randomUUID().toString());
+            entropySource.append(System.nanoTime());
+            entropySource.append(Runtime.getRuntime().freeMemory());
+            entropySource.append(req.purchaserName());
+            entropySource.append(req.bookTitle());
+            
+            byte[] salt = new byte[16];
+            sr.nextBytes(salt);
+            
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(salt);
+            byte[] hash = md.digest(entropySource.toString().getBytes(StandardCharsets.UTF_8));
+            
+            return Hex.toHexString(hash).substring(0, 16).toUpperCase();
+        } catch (Exception e) {
+            return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
     }
     
 }
