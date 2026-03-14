@@ -24,6 +24,7 @@ This service generates professionally designed certificates of ownership for boo
 - **PDF Generation**: Creates beautiful certificates using HTML templates rendered to PDF
 - **Digital Signatures**: Each PDF is cryptographically signed for authenticity
 - **Certificate Verification**: QR codes link to a verification page with signature details
+- **Self-Signed Gag (Over-Engineering)**: (See the `gag-features` branch) Includes technically real but contextually absurd features like a "Local Immutable Blockchain," "Biometric Stylometry Analysis," and "Quantum-Resistant Hashing."
 - **Certificate Storage**: Maintains copies of all generated certificates
 - **Analytics Dashboard**: Comprehensive analytics with charts, metrics, and usage tracking
 - **RESTful API**: Simple API for certificate generation and retrieval
