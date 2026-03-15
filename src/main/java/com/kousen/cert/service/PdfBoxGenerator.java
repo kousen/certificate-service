@@ -106,17 +106,17 @@ public class PdfBoxGenerator {
 
                 // Add Gag Features Metadata if certificateId is provided
                 if (certificateId != null && !certificateId.isEmpty()) {
-                    y -= 60;
+                    y -= 65;
                     contentStream.setNonStrokingColor(Color.DARK_GRAY);
-                    drawCenteredText(contentStream, textFont, 10,
+                    drawCenteredText(contentStream, textFont, 14,
                             "NUCLEAR-GRADE SECURITY VERIFIED", centerX, y);
                     
-                    y -= 20;
-                    drawCenteredText(contentStream, textFont, 8,
+                    y -= 25;
+                    drawCenteredText(contentStream, textFont, 11,
                             "Certificate ID: " + certificateId + " | Merkle Root: [PENDING_ANCHOR]", centerX, y);
                     
-                    y -= 15;
-                    drawCenteredText(contentStream, textFont, 8,
+                    y -= 20;
+                    drawCenteredText(contentStream, textFont, 11,
                             "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, y);
                     
                     // Reset color
