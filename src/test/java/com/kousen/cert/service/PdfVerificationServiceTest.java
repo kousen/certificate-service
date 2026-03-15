@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.awt.image.BufferedImage;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -33,6 +34,22 @@ class PdfVerificationServiceTest {
     void shouldReturnFalseWhenVerifyingPdfWithoutSignatures() throws Exception {
         Path pdfPath = createSimplePdf();
         assertFalse(pdfVerificationService.verifySignature(pdfPath));
+    }
+
+    @Test
+    @DisplayName("should verify a PDF signed by the project signer")
+    void shouldVerifySignedPdf() throws Exception {
+        Path unsignedPdf = createSimplePdf();
+        KeyStoreProvider keyStoreProvider = new KeyStoreProvider(tempDir.resolve("test-keystore.p12"));
+        PdfSigner pdfSigner = new PdfSigner(keyStoreProvider);
+
+        Path signedPdf = pdfSigner.sign(unsignedPdf);
+
+        try {
+            assertTrue(pdfVerificationService.verifySignature(signedPdf));
+        } finally {
+            Files.deleteIfExists(signedPdf);
+        }
     }
 
     @Test

@@ -46,6 +46,7 @@ public class PdfService {
             byte[] qrCodeData = qrCodeGenerator.generateQrCodeData(
                     request.purchaserName(),
                     request.bookTitle(),
+                    certificateId,
                     220);
 
             // Create PDF with PDFBox using in-memory QR code

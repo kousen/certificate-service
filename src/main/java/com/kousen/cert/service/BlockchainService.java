@@ -45,7 +45,7 @@ public class BlockchainService {
     }
 
     public String getNetworkStatus() {
-        return "DECENTRALIZED_LOCAL_NODE_ACTIVE";
+        return "LOCAL_DEMO_LEDGER_ACTIVE";
     }
 
     private String calculateHash(String prevHash, String certId, String fileHash) {

@@ -25,12 +25,17 @@ class TestableQrCodeGenerator extends QrCodeGenerator {
     
     @Override
     public Path generateQrCode(String name, String bookTitle, int size) throws IOException {
+        return generateQrCode(name, bookTitle, null, size);
+    }
+
+    public Path generateQrCode(String name, String bookTitle, String certificateId, int size) throws IOException {
         // Create a verification URL using parent's private method via reflection
         String verificationUrl;
         try {
-            var method = QrCodeGenerator.class.getDeclaredMethod("buildVerificationUrl", String.class, String.class);
+            var method = QrCodeGenerator.class.getDeclaredMethod(
+                    "buildVerificationUrl", String.class, String.class, String.class);
             method.setAccessible(true);
-            verificationUrl = (String) method.invoke(this, name, bookTitle);
+            verificationUrl = (String) method.invoke(this, name, bookTitle, certificateId);
         } catch (Exception e) {
             throw new IOException("Failed to create URL: " + e.getMessage(), e);
         }
@@ -116,5 +121,18 @@ class QrCodeGeneratorTest {
         assertThat(urlContent).startsWith("https://test-server.com/verify-certificate");
         assertThat(urlContent).contains("name=Test%20User");
         assertThat(urlContent).contains("book=Test%20Book");
+    }
+
+    @Test
+    void shouldIncludeCertificateIdWhenProvided() throws Exception {
+        ServerUrlConfig mockConfig = mock(ServerUrlConfig.class);
+        when(mockConfig.getUrl()).thenReturn("https://test-server.com");
+
+        TestableQrCodeGenerator generator = new TestableQrCodeGenerator(mockConfig, tempDir);
+
+        Path urlFilePath = generator.generateQrCode("Test User", "Test Book", "CERT-123", 100);
+        String urlContent = Files.readString(urlFilePath);
+
+        assertThat(urlContent).contains("id=CERT-123");
     }
 }

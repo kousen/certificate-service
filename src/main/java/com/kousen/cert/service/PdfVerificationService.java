@@ -7,18 +7,24 @@ import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.graphics.PDXObject;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.pdmodel.interactive.digitalsignature.PDSignature;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.CMSProcessableByteArray;
+import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.SignerInformationStore;
+import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.Store;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +33,12 @@ import java.util.Map;
 @Service
 public class PdfVerificationService {
     private static final Logger logger = LoggerFactory.getLogger(PdfVerificationService.class);
+
+    public PdfVerificationService() {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     public boolean verifySignature(Path pdfPath) {
         try (PDDocument document = Loader.loadPDF(pdfPath.toFile())) {
@@ -43,17 +55,40 @@ public class PdfVerificationService {
                 CMSProcessableByteArray processable = new CMSProcessableByteArray(signedContent);
                 CMSSignedData signedData = new CMSSignedData(processable, signatureContent);
                 Store<X509CertificateHolder> certs = signedData.getCertificates();
-                Collection<X509CertificateHolder> allCerts = certs.getMatches(null);
+                SignerInformationStore signerStore = signedData.getSignerInfos();
+                Collection<SignerInformation> signers = signerStore.getSigners();
 
-                if (allCerts.isEmpty()) {
-                    logger.warn("No certificates found in signature");
-                    return false;
+                if (signers.isEmpty()) {
+                    logger.warn("No signer information found in signature");
+                    continue;
                 }
 
-                // In our "gag" project, we just want to know if it's technically a valid CMS signature
-                // signed by our own self-signed cert.
-                // For the "gag", we'll just return true if we can parse the signed data.
-                return true;
+                boolean allSignersValid = true;
+                for (SignerInformation signer : signers) {
+                    Collection<X509CertificateHolder> matches = certs.getMatches(signer.getSID());
+                    if (matches.isEmpty()) {
+                        logger.warn("No matching certificate found for signer in {}", pdfPath);
+                        allSignersValid = false;
+                        break;
+                    }
+
+                    X509CertificateHolder holder = matches.iterator().next();
+                    X509Certificate certificate = new JcaX509CertificateConverter()
+                            .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                            .getCertificate(holder);
+
+                    boolean signerValid = signer.verify(new JcaSimpleSignerInfoVerifierBuilder()
+                            .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                            .build(certificate));
+                    if (!signerValid) {
+                        allSignersValid = false;
+                        break;
+                    }
+                }
+
+                if (allSignersValid) {
+                    return true;
+                }
             }
         } catch (Exception e) {
             logger.error("Error verifying PDF signature", e);
@@ -70,14 +105,15 @@ public class PdfVerificationService {
         try (PDDocument document = Loader.loadPDF(pdfPath.toFile())) {
             PDPage page = document.getPage(0);
             PDResources resources = page.getResources();
+            if (resources == null) {
+                return imageNotFoundAnalysis(analysis);
+            }
             
             for (org.apache.pdfbox.cos.COSName name : resources.getXObjectNames()) {
                 PDXObject xObject = resources.getXObject(name);
                 if (xObject instanceof PDImageXObject image) {
                     BufferedImage bufferedImage = image.getImage();
                     
-                    // Extract real metrics but give them "gag" names
-                    long pixelCount = (long) bufferedImage.getWidth() * bufferedImage.getHeight();
                     double avgBrightness = calculateAverageBrightness(bufferedImage);
                     String pixelDistribution = String.format("STYL-%04x-%04x", 
                             bufferedImage.getWidth(), bufferedImage.getHeight());
@@ -95,10 +131,8 @@ public class PdfVerificationService {
         } catch (Exception e) {
             logger.warn("Could not perform biometric analysis: {}", e.getMessage());
         }
-        
-        analysis.put("status", "IMAGE_NOT_FOUND");
-        analysis.put("stylometricConfidence", 0.0);
-        return analysis;
+
+        return imageNotFoundAnalysis(analysis);
     }
 
     private double calculateAverageBrightness(BufferedImage img) {
@@ -115,5 +149,11 @@ public class PdfVerificationService {
             }
         }
         return (double) sum / (width * height);
+    }
+
+    private Map<String, Object> imageNotFoundAnalysis(Map<String, Object> analysis) {
+        analysis.put("status", "IMAGE_NOT_FOUND");
+        analysis.put("stylometricConfidence", 0.0);
+        return analysis;
     }
 }

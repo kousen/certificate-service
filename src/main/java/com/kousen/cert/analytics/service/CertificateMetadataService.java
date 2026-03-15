@@ -4,7 +4,6 @@ import com.kousen.cert.analytics.model.CertificateMetadata;
 import com.kousen.cert.analytics.repository.CertificateMetadataRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.CompletableFuture;
 import org.bouncycastle.util.encoders.Hex;
 
 @Service
@@ -29,8 +27,7 @@ public class CertificateMetadataService {
         this.blockchainService = blockchainService;
     }
     
-    @Async("analyticsTaskExecutor")
-    public CompletableFuture<Void> saveCertificateMetadata(String certificateId, Path certificatePath) {
+    public void saveCertificateMetadata(String certificateId, Path certificatePath) {
         try {
             CertificateMetadata metadata = new CertificateMetadata(
                 certificateId,
@@ -77,7 +74,6 @@ public class CertificateMetadataService {
         } catch (Exception e) {
             logger.error("Error saving certificate metadata", e);
         }
-        return CompletableFuture.completedFuture(null);
     }
     
     public CertificateMetadata getCertificateMetadata(String certificateId) {

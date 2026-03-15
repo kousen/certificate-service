@@ -158,16 +158,16 @@
             <span class="valid-badge">Valid</span>
         </div>
         <div class="details-item" th:if="${quantumHash}">
-            <span class="details-label">Quantum Hash:</span>
+            <span class="details-label">SHA-3-512:</span>
             <div class="quantum-hash" th:text="${quantumHash}">SHA3-512 Hash Value</div>
         </div>
         <div class="details-item" th:if="${merkleProof}">
-            <span class="details-label">Merkle Proof:</span>
-            <div class="quantum-hash" th:text="${merkleProof}">Merkle Proof</div>
+            <span class="details-label">Ledger Entry:</span>
+            <div class="quantum-hash" th:text="${merkleProof}">Local Ledger Entry</div>
         </div>
         <div class="deep-verify-container" th:if="${certificateId}">
             <button id="deep-verify-btn" th:onclick="'startDeepVerify(\'' + ${certificateId} + '\')'">
-                Run Nuclear-Grade Deep Verification
+                Run Over-Engineered Inspection
             </button>
             <div id="verification-log" class="verification-log"></div>
         </div>
@@ -219,17 +219,14 @@ Certificate Fingerprint (SHA-256):
             log.innerHTML = '';
 
             const messages = [
-                "Initializing entropy harvest...",
-                "Syncing with Stratospheric Atomic Clock...",
-                "Calculating SHA3-512 Quantum-Resistant hash...",
-                "Analyzing Biometric Stylometry and signature pressure...",
-                "Locating cryptographic signature in PDF byte stream...",
-                "Querying Local Immutable Blockchain nodes...",
-                "Parsing ASN.1 PKCS#7 detached signature block...",
-                "Extracting X.509 certificate chain...",
-                "Performing RSA 4096-bit modular exponentiation...",
-                "Verifying message digest against signed attributes...",
-                "Cross-referencing with Tales from the Jar Side immutable ledger..."
+                "Loading stored certificate metadata...",
+                "Computing SHA-3-512 digest...",
+                "Locating detached CMS signature in PDF byte stream...",
+                "Parsing ASN.1 / PKCS#7 signature container...",
+                "Matching signer certificate from embedded chain...",
+                "Validating signature against signed content...",
+                "Inspecting embedded signature image for fun...",
+                "Checking local demo ledger entry..."
             ];
 
             let i = 0;
@@ -259,40 +256,40 @@ Certificate Fingerprint (SHA-256):
                     const line = document.createElement('div');
                     line.style.color = '#2ecc71';
                     line.style.fontWeight = 'bold';
-                    line.innerText = `[SUCCESS] CRYPTOGRAPHIC SIGNATURE VERIFIED. Certificate is authentic.`;
+                    line.innerText = `[SUCCESS] Detached CMS signature validated against the embedded signing certificate.`;
                     log.appendChild(line);
                     
                     if (data.merkleProof) {
                         const blockchainLine = document.createElement('div');
                         blockchainLine.style.color = '#3498db';
-                        blockchainLine.innerText = `[BLOCKCHAIN] Merkle Proof confirmed: ${data.merkleProof} (${data.blockchainStatus})`;
+                        blockchainLine.innerText = `[LEDGER] Local demo ledger entry: ${data.merkleProof} (${data.blockchainStatus})`;
                         log.appendChild(blockchainLine);
                     }
                     
                     if (data.biometricAnalysis && data.biometricAnalysis.status === 'VALIDATED') {
                         const biometricLine = document.createElement('div');
                         biometricLine.style.color = '#f1c40f';
-                        biometricLine.innerText = `[BIOMETRIC] Stylometry confirmed (Confidence: ${(data.biometricAnalysis.stylometricConfidence * 100).toFixed(2)}%)`;
+                        biometricLine.innerText = `[IMAGE] Embedded signature image inspected (Confidence: ${(data.biometricAnalysis.stylometricConfidence * 100).toFixed(2)}%)`;
                         log.appendChild(biometricLine);
                     }
                     
                     const hashLine = document.createElement('div');
                     hashLine.style.fontSize = '11px';
-                    hashLine.innerText = `Quantum Hash: ${data.quantumHash}`;
+                    hashLine.innerText = `SHA-3-512 Digest: ${data.quantumHash}`;
                     log.appendChild(hashLine);
                     
-                    btn.innerText = 'Verified! (Click to re-run)';
+                    btn.innerText = 'Inspection Complete';
                 } else {
                     const line = document.createElement('div');
                     line.style.color = '#e74c3c';
-                    line.innerText = `[FAILED] Signature verification failed or certificate not found.`;
+                    line.innerText = `[FAILED] ${data.message || 'Signature validation did not pass.'}`;
                     log.appendChild(line);
-                    btn.innerText = 'Verification Failed';
+                    btn.innerText = 'Inspection Failed';
                 }
             } catch (error) {
                 const line = document.createElement('div');
                 line.style.color = '#e74c3c';
-                line.innerText = `[ERROR] System fault during deep verification: ${error.message}`;
+                line.innerText = `[ERROR] Inspection fault: ${error.message}`;
                 log.appendChild(line);
                 btn.innerText = 'System Error';
             } finally {

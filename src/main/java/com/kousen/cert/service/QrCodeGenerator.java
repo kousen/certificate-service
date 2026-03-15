@@ -38,8 +38,11 @@ public class QrCodeGenerator {
      * @throws IOException If there's an error during QR code generation
      */
     public Path generateQrCode(String name, String bookTitle, int size) throws IOException {
-        // Create verification URL
-        String verificationUrl = buildVerificationUrl(name, bookTitle);
+        return generateQrCode(name, bookTitle, null, size);
+    }
+
+    public Path generateQrCode(String name, String bookTitle, String certificateId, int size) throws IOException {
+        String verificationUrl = buildVerificationUrl(name, bookTitle, certificateId);
         
         // Create temporary file for the QR code
         Path qrCodePath = Files.createTempFile("qrcode-", ".png");
@@ -69,7 +72,11 @@ public class QrCodeGenerator {
      * @throws IOException If there's an error during QR code generation
      */
     public byte[] generateQrCodeData(String name, String bookTitle, int size) throws IOException {
-        String verificationUrl = buildVerificationUrl(name, bookTitle);
+        return generateQrCodeData(name, bookTitle, null, size);
+    }
+
+    public byte[] generateQrCodeData(String name, String bookTitle, String certificateId, int size) throws IOException {
+        String verificationUrl = buildVerificationUrl(name, bookTitle, certificateId);
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(verificationUrl, BarcodeFormat.QR_CODE, size, size);
@@ -85,16 +92,25 @@ public class QrCodeGenerator {
      * Builds a verification URL for the certificate
      */
     private String buildVerificationUrl(String name, String bookTitle) {
+        return buildVerificationUrl(name, bookTitle, null);
+    }
+
+    private String buildVerificationUrl(String name, String bookTitle, String certificateId) {
         String baseUrl = serverConfig.getUrl();
         String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        
-        // Create the verification URL with parameters
-        return String.format(Locale.US, 
+
+        String verificationUrl = String.format(Locale.US,
                 "%s/verify-certificate?name=%s&book=%s&date=%s",
                 baseUrl,
                 encodeUrlParam(name),
                 encodeUrlParam(bookTitle),
                 date);
+
+        if (certificateId != null && !certificateId.isBlank()) {
+            verificationUrl += "&id=" + encodeUrlParam(certificateId);
+        }
+
+        return verificationUrl;
     }
     
     /**

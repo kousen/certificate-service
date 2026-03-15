@@ -50,7 +50,7 @@ class BlockchainServiceTest {
     @Test
     @DisplayName("should return active network status")
     void shouldReturnActiveNetworkStatus() {
-        assertEquals("DECENTRALIZED_LOCAL_NODE_ACTIVE", blockchainService.getNetworkStatus());
+        assertEquals("LOCAL_DEMO_LEDGER_ACTIVE", blockchainService.getNetworkStatus());
     }
 
     @Test

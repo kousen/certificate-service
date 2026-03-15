@@ -150,15 +150,15 @@ class QrCodeGeneratorPropertyTest {
         
         // Set up reflection to access the private method
         Method buildUrlMethod = QrCodeGenerator.class.
-                getDeclaredMethod("buildVerificationUrl", String.class, String.class);
+                getDeclaredMethod("buildVerificationUrl", String.class, String.class, String.class);
         buildUrlMethod.setAccessible(true);
         
         // Act
-        String url = (String) buildUrlMethod.invoke(generator, name, book);
+        String url = (String) buildUrlMethod.invoke(generator, name, book, "CERT-123");
         
         // Assert
         assertThat(url)
             .startsWith("https://test-server.com/verify-certificate")
-            .contains("name=", "book=", "date=");
+            .contains("name=", "book=", "date=", "id=CERT-123");
     }
 }

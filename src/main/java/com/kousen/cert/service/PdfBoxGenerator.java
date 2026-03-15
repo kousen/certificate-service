@@ -30,7 +30,6 @@ public class PdfBoxGenerator {
     // Font and color constants
     private static final Color GOLD_COLOR = new Color(255, 214, 92);
     private static final Color NUCLEAR_GREEN = new Color(57, 255, 20); // Fluorescent Green
-    private static final Color DEEP_BLACK = new Color(10, 10, 10);
     
     // Font cache removed - PDType0Font must be loaded per document in PDFBox 3.0.4
     
@@ -108,42 +107,7 @@ public class PdfBoxGenerator {
 
                 // Add Gag Features Metadata if certificateId is provided
                 if (certificateId != null && !certificateId.isEmpty()) {
-                    y -= 65;
-                    
-                    String line1 = "NUCLEAR-GRADE SECURITY VERIFIED";
-                    String line2 = "Certificate ID: " + certificateId;
-                    String line3 = "Quantum-Resistant SHA-3 512 Integrity Verified";
-                    
-                    float line1Width = textFont.getStringWidth(line1) / 1000 * 14;
-                    float line2Width = textFont.getStringWidth(line2) / 1000 * 11;
-                    float line3Width = textFont.getStringWidth(line3) / 1000 * 11;
-                    
-                    float maxTextWidth = Math.max(line1Width, Math.max(line2Width, line3Width));
-                    float paddingX = 20f;
-                    float paddingY = 15f;
-                    
-                    float rectWidth = maxTextWidth + (paddingX * 2);
-                    float rectHeight = 85f; // Keep height consistent for the 3 lines
-                    float rectX = (pageWidth - rectWidth) / 2f;
-                    float rectY = y - 55f;
-                    
-                    // Remove black background rectangle (requested transparency)
-                    // contentStream.setNonStrokingColor(DEEP_BLACK);
-                    // contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
-                    // contentStream.fill();
-                    
-                    // Draw Nuclear Green text directly on the background
-                    contentStream.setNonStrokingColor(NUCLEAR_GREEN);
-                    drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
-                    
-                    y -= 25;
-                    drawCenteredText(contentStream, textFont, 11, line2, centerX, y);
-
-                    y -= 20;
-                    drawCenteredText(contentStream, textFont, 11, line3, centerX, y);
-                    
-                    // Reset color
-                    contentStream.setNonStrokingColor(GOLD_COLOR);
+                    drawGagMetadata(contentStream, textFont, centerX, y - 65, certificateId);
                 }
                 
                 // Add QR code
@@ -216,6 +180,10 @@ public class PdfBoxGenerator {
                             y -= 50;
                             drawCenteredText(contentStream, stdFont, 14,
                                     "and has earned the author's eternal gratitude.", pageWidth/2, y);
+
+                            if (certificateId != null && !certificateId.isEmpty()) {
+                                drawGagMetadata(contentStream, stdFont, pageWidth / 2, y - 65, certificateId);
+                            }
                             
                             // Add QR code if available
                             if (qrCodePath != null && Files.exists(qrCodePath)) {
@@ -300,41 +268,7 @@ public class PdfBoxGenerator {
 
                 // Add Gag Features Metadata if certificateId is provided
                 if (certificateId != null && !certificateId.isEmpty()) {
-                    y -= 65;
-                    
-                    String line1 = "NUCLEAR-GRADE SECURITY VERIFIED";
-                    String line2 = "Certificate ID: " + certificateId;
-                    String line3 = "Quantum-Resistant SHA-3 512 Integrity Verified";
-                    
-                    float line1Width = textFont.getStringWidth(line1) / 1000 * 14;
-                    float line2Width = textFont.getStringWidth(line2) / 1000 * 11;
-                    float line3Width = textFont.getStringWidth(line3) / 1000 * 11;
-                    
-                    float maxTextWidth = Math.max(line1Width, Math.max(line2Width, line3Width));
-                    float paddingX = 20f;
-                    
-                    float rectWidth = maxTextWidth + (paddingX * 2);
-                    float rectHeight = 85f; // Keep height consistent for the 3 lines
-                    float rectX = (pageWidth - rectWidth) / 2f;
-                    float rectY = y - 55f;
-                    
-                    // Remove black background rectangle (requested transparency)
-                    // contentStream.setNonStrokingColor(DEEP_BLACK);
-                    // contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
-                    // contentStream.fill();
-                    
-                    // Draw Nuclear Green text directly on the background
-                    contentStream.setNonStrokingColor(NUCLEAR_GREEN);
-                    drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
-                    
-                    y -= 25;
-                    drawCenteredText(contentStream, textFont, 11, line2, centerX, y);
-
-                    y -= 20;
-                    drawCenteredText(contentStream, textFont, 11, line3, centerX, y);
-                    
-                    // Reset color
-                    contentStream.setNonStrokingColor(GOLD_COLOR);
+                    drawGagMetadata(contentStream, textFont, centerX, y - 65, certificateId);
                 }
 
                 if (qrCodeData != null && qrCodeData.length > 0) {
@@ -384,6 +318,10 @@ public class PdfBoxGenerator {
                             y2 -= 50;
                             drawCenteredText(contentStream, stdFont, 14,
                                     "and has earned the author's eternal gratitude.", pageWidth / 2, y2);
+
+                            if (certificateId != null && !certificateId.isEmpty()) {
+                                drawGagMetadata(contentStream, stdFont, pageWidth / 2, y2 - 65, certificateId);
+                            }
                             if (qrCodeData != null && qrCodeData.length > 0) {
                                 addQRCode(simpleDoc, contentStream, qrCodeData, 80, 80);
                                 drawCenteredText(contentStream, stdFont, 8, "Scan to verify", 80, 60);
@@ -413,6 +351,18 @@ public class PdfBoxGenerator {
         // Draw QR code at fixed size (width and height in points) to control its display dimensions
         float qrSize = 100f;
         contentStream.drawImage(qrImage, x, y, qrSize, qrSize);
+    }
+
+    private void drawGagMetadata(PDPageContentStream contentStream,
+                                 PDFont font,
+                                 float centerX,
+                                 float topY,
+                                 String certificateId) throws IOException {
+        contentStream.setNonStrokingColor(NUCLEAR_GREEN);
+        drawCenteredText(contentStream, font, 14, "NUCLEAR-GRADE SECURITY VERIFIED", centerX, topY);
+        drawCenteredText(contentStream, font, 11, "Certificate ID: " + certificateId, centerX, topY - 25);
+        drawCenteredText(contentStream, font, 11, "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, topY - 45);
+        contentStream.setNonStrokingColor(GOLD_COLOR);
     }
     
     /**

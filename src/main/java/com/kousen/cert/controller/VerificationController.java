@@ -87,6 +87,7 @@ public class VerificationController {
             CertificateMetadata metadata = metadataService.getCertificateMetadata(certificateId);
             if (metadata != null) {
                 model.addAttribute("quantumHash", metadata.getQuantumHash());
+                model.addAttribute("merkleProof", metadata.getMerkleProof());
             }
         }
 
@@ -129,7 +130,7 @@ public class VerificationController {
             response.put("blockchainStatus", blockchainService != null ? blockchainService.getNetworkStatus() : "OFFLINE");
             response.put("biometricAnalysis", biometricAnalysis);
             response.put("timestamp", java.time.Instant.now().toString());
-            response.put("verificationMethod", "Server-side Cryptographic Signature Validation & Biometric Stylometry");
+            response.put("verificationMethod", "Detached CMS signature validation plus optional image inspection");
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
