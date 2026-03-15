@@ -109,8 +109,21 @@ public class PdfBoxGenerator {
                 // Add Gag Features Metadata if certificateId is provided
                 if (certificateId != null && !certificateId.isEmpty()) {
                     y -= 65;
-                    float rectWidth = pageWidth * 0.8f;
-                    float rectHeight = 85f;
+                    
+                    String line1 = "NUCLEAR-GRADE SECURITY VERIFIED";
+                    String line2 = "Certificate ID: " + certificateId;
+                    String line3 = "Quantum-Resistant SHA-3 512 Integrity Verified";
+                    
+                    float line1Width = textFont.getStringWidth(line1) / 1000 * 14;
+                    float line2Width = textFont.getStringWidth(line2) / 1000 * 11;
+                    float line3Width = textFont.getStringWidth(line3) / 1000 * 11;
+                    
+                    float maxTextWidth = Math.max(line1Width, Math.max(line2Width, line3Width));
+                    float paddingX = 20f;
+                    float paddingY = 15f;
+                    
+                    float rectWidth = maxTextWidth + (paddingX * 2);
+                    float rectHeight = 85f; // Keep height consistent for the 3 lines
                     float rectX = (pageWidth - rectWidth) / 2f;
                     float rectY = y - 55f;
                     
@@ -121,16 +134,13 @@ public class PdfBoxGenerator {
                     
                     // Draw Nuclear Green text
                     contentStream.setNonStrokingColor(NUCLEAR_GREEN);
-                    drawCenteredText(contentStream, textFont, 14,
-                            "NUCLEAR-GRADE SECURITY VERIFIED", centerX, y);
+                    drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
                     
                     y -= 25;
-                    drawCenteredText(contentStream, textFont, 11,
-                            "Certificate ID: " + certificateId + " | Merkle Root: [PENDING_ANCHOR]", centerX, y);
-                    
+                    drawCenteredText(contentStream, textFont, 11, line2, centerX, y);
+
                     y -= 20;
-                    drawCenteredText(contentStream, textFont, 11,
-                            "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, y);
+                    drawCenteredText(contentStream, textFont, 11, line3, centerX, y);
                     
                     // Reset color
                     contentStream.setNonStrokingColor(GOLD_COLOR);
@@ -291,8 +301,20 @@ public class PdfBoxGenerator {
                 // Add Gag Features Metadata if certificateId is provided
                 if (certificateId != null && !certificateId.isEmpty()) {
                     y -= 65;
-                    float rectWidth = pageWidth * 0.8f;
-                    float rectHeight = 85f;
+                    
+                    String line1 = "NUCLEAR-GRADE SECURITY VERIFIED";
+                    String line2 = "Certificate ID: " + certificateId;
+                    String line3 = "Quantum-Resistant SHA-3 512 Integrity Verified";
+                    
+                    float line1Width = textFont.getStringWidth(line1) / 1000 * 14;
+                    float line2Width = textFont.getStringWidth(line2) / 1000 * 11;
+                    float line3Width = textFont.getStringWidth(line3) / 1000 * 11;
+                    
+                    float maxTextWidth = Math.max(line1Width, Math.max(line2Width, line3Width));
+                    float paddingX = 20f;
+                    
+                    float rectWidth = maxTextWidth + (paddingX * 2);
+                    float rectHeight = 85f; // Keep height consistent for the 3 lines
                     float rectX = (pageWidth - rectWidth) / 2f;
                     float rectY = y - 55f;
                     
@@ -303,17 +325,14 @@ public class PdfBoxGenerator {
                     
                     // Draw Nuclear Green text
                     contentStream.setNonStrokingColor(NUCLEAR_GREEN);
-                    drawCenteredText(contentStream, textFont, 14,
-                            "NUCLEAR-GRADE SECURITY VERIFIED", centerX, y);
-
+                    drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
+                    
                     y -= 25;
-                    drawCenteredText(contentStream, textFont, 11,
-                            "Certificate ID: " + certificateId + " | Merkle Root: [PENDING_ANCHOR]", centerX, y);
+                    drawCenteredText(contentStream, textFont, 11, line2, centerX, y);
 
                     y -= 20;
-                    drawCenteredText(contentStream, textFont, 11,
-                            "Quantum-Resistant SHA-3 512 Integrity Verified", centerX, y);
-
+                    drawCenteredText(contentStream, textFont, 11, line3, centerX, y);
+                    
                     // Reset color
                     contentStream.setNonStrokingColor(GOLD_COLOR);
                 }
