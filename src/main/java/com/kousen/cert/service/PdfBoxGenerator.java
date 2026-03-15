@@ -127,12 +127,12 @@ public class PdfBoxGenerator {
                     float rectX = (pageWidth - rectWidth) / 2f;
                     float rectY = y - 55f;
                     
-                    // Draw black background rectangle
-                    contentStream.setNonStrokingColor(DEEP_BLACK);
-                    contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
-                    contentStream.fill();
+                    // Remove black background rectangle (requested transparency)
+                    // contentStream.setNonStrokingColor(DEEP_BLACK);
+                    // contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
+                    // contentStream.fill();
                     
-                    // Draw Nuclear Green text
+                    // Draw Nuclear Green text directly on the background
                     contentStream.setNonStrokingColor(NUCLEAR_GREEN);
                     drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
                     
@@ -318,12 +318,12 @@ public class PdfBoxGenerator {
                     float rectX = (pageWidth - rectWidth) / 2f;
                     float rectY = y - 55f;
                     
-                    // Draw black background rectangle
-                    contentStream.setNonStrokingColor(DEEP_BLACK);
-                    contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
-                    contentStream.fill();
+                    // Remove black background rectangle (requested transparency)
+                    // contentStream.setNonStrokingColor(DEEP_BLACK);
+                    // contentStream.addRect(rectX, rectY, rectWidth, rectHeight);
+                    // contentStream.fill();
                     
-                    // Draw Nuclear Green text
+                    // Draw Nuclear Green text directly on the background
                     contentStream.setNonStrokingColor(NUCLEAR_GREEN);
                     drawCenteredText(contentStream, textFont, 14, line1, centerX, y);
                     
