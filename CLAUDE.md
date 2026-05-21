@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Property-based tests should use controlled parameter generation for cryptographic tests to avoid ASN.1 parsing issues
 
 ## Code Style Guidelines
-- Java 21 with Spring Boot 3.4.4
+- Java 25 (toolchain) with Spring Boot 3.5.7 (build uses Kotlin DSL `build.gradle.kts`)
 - Class names use PascalCase, method/variable names use camelCase
 - Organize imports: java.*, javax.*, org.*, com.* (alphabetical within groups)
 - Prefer Optional<T> over null for optional values
@@ -36,8 +36,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Web UI**: Thymeleaf templates with Bootstrap and Chart.js for analytics dashboard
 
 ## Database Configuration
-- Uses environment variable overrides: DATABASE_URL, DATABASE_DRIVER, DATABASE_USERNAME, etc.
-- Hibernate DDL mode configurable via HIBERNATE_DDL_AUTO environment variable
+- Uses environment variable overrides: DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD (see application.yaml). The JDBC driver and Hibernate dialect are auto-detected from the URL — there is no DATABASE_DRIVER property in the code.
+- Hibernate DDL mode configurable via HIBERNATE_DDL_AUTO environment variable (defaults to `update`)
 - Production profile available in application-production.yaml
 - Analytics tables: certificate_events, certificate_metadata, aggregated_metrics
 
