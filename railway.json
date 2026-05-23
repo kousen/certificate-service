@@ -1,0 +1,8 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "deploy": {
+    "startCommand": "sh -c 'echo \"$CERTIFICATE_KEYSTORE_B64\" | base64 -d > /tmp/keystore.p12 && exec java -Dserver.port=${PORT:-8080} -jar /app/build/libs/app.jar'",
+    "healthcheckPath": "/actuator/health",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
