@@ -31,7 +31,7 @@ This service generates professionally designed certificates of ownership for boo
 ## Technologies
 
 - Java 25 (with virtual threads)
-- Spring Boot 3.5
+- Spring Boot 3.5.7
 - Spring Data JPA with Hibernate
 - H2 Database (development) / PostgreSQL (production)
 - PDFBox 3.0 for PDF manipulation and signing
@@ -248,6 +248,10 @@ The application is configured for easy Heroku deployment with PostgreSQL:
 3. **Deploy**: Standard git push to Heroku
 
 The application automatically detects the Heroku PostgreSQL `DATABASE_URL` and switches from H2 to persistent storage.
+
+### Railway Deployment
+
+The repository also includes `railway.json` and a `Procfile` for deployment to [Railway](https://railway.app/). Provision a PostgreSQL plugin on the project and set `SPRING_PROFILES_ACTIVE=production` (and `HIBERNATE_DDL_AUTO=validate` once the schema is stable); Railway injects `DATABASE_URL` automatically, which the application picks up the same way it does on Heroku.
 
 ## Notes on Digital Signatures
 
