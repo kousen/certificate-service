@@ -50,3 +50,6 @@ out/
 *.keystore
 *.pfx
 /.claude/
+
+# Graphify knowledge-graph output (embeds source content; do not commit)
+graphify-out/
