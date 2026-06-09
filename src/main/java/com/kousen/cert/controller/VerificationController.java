@@ -1,7 +1,9 @@
 package com.kousen.cert.controller;
 
 import com.kousen.cert.analytics.model.AnalyticsRequestContext;
+import com.kousen.cert.analytics.model.CertificateMetadata;
 import com.kousen.cert.analytics.service.AnalyticsService;
+import com.kousen.cert.analytics.service.CertificateMetadataService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,7 @@ public class VerificationController {
     private static final Logger logger = LoggerFactory.getLogger(VerificationController.class);
     private final String certificateFingerprint;
     private final AnalyticsService analyticsService;
+    private final CertificateMetadataService metadataService;
 
     // Default constructor for tests
     public VerificationController() {
@@ -28,13 +31,22 @@ public class VerificationController {
     }
 
     VerificationController(String certificateFingerprint, AnalyticsService analyticsService) {
+        this(certificateFingerprint, analyticsService, null);
+    }
+
+    VerificationController(String certificateFingerprint,
+                           AnalyticsService analyticsService,
+                           CertificateMetadataService metadataService) {
         this.certificateFingerprint = certificateFingerprint;
         this.analyticsService = analyticsService;
+        this.metadataService = metadataService;
     }
 
     @Autowired
-    public VerificationController(com.kousen.cert.service.KeyStoreProvider keyStoreProvider, AnalyticsService analyticsService) {
-        this(generateCertificateFingerprint(keyStoreProvider), analyticsService);
+    public VerificationController(com.kousen.cert.service.KeyStoreProvider keyStoreProvider,
+                                  AnalyticsService analyticsService,
+                                  CertificateMetadataService metadataService) {
+        this(generateCertificateFingerprint(keyStoreProvider), analyticsService, metadataService);
     }
 
     @GetMapping("/verify-certificate")
@@ -53,6 +65,26 @@ public class VerificationController {
         model.addAttribute("bookTitle", bookTitle != null ? bookTitle : "Not specified");
         model.addAttribute("issueDate", issueDate != null ? issueDate : "Not specified");
         model.addAttribute("certificateFingerprint", certificateFingerprint);
+
+        // Check the certificate ID against the issuance records so the page can
+        // report a real verification result instead of echoing the URL parameters
+        String recordStatus = "NO_ID";
+        if (certificateId != null && !certificateId.isEmpty()) {
+            recordStatus = "UNAVAILABLE";
+            if (metadataService != null) {
+                CertificateMetadata metadata = metadataService.getCertificateMetadata(certificateId);
+                if (metadata != null) {
+                    recordStatus = "FOUND";
+                    model.addAttribute("certificateId", certificateId);
+                    model.addAttribute("issuedAt", metadata.getCreatedAt());
+                    model.addAttribute("fileHash", metadata.getFileHash());
+                } else {
+                    recordStatus = "NOT_FOUND";
+                    model.addAttribute("certificateId", certificateId);
+                }
+            }
+        }
+        model.addAttribute("recordStatus", recordStatus);
 
         // Track verification event if analytics service is available and certificate ID is provided
         if (analyticsService != null && certificateId != null && !certificateId.isEmpty()) {

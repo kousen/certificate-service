@@ -1,5 +1,7 @@
 package com.kousen.cert.controller;
 
+import com.kousen.cert.analytics.model.CertificateMetadata;
+import com.kousen.cert.analytics.service.CertificateMetadataService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -9,6 +11,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -22,13 +26,22 @@ class VerificationControllerTest {
     static class TestConfig {
         @Bean
         @Primary
-        public VerificationController verificationController() {
-            return new VerificationController("Test certificate fingerprint", null);
+        public CertificateMetadataService testMetadataService() {
+            return mock(CertificateMetadataService.class);
+        }
+
+        @Bean
+        @Primary
+        public VerificationController verificationController(CertificateMetadataService metadataService) {
+            return new VerificationController("Test certificate fingerprint", null, metadataService);
         }
     }
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private CertificateMetadataService metadataService;
 
     @Test
     void shouldReturnVerificationPageWithDefaultValues() throws Exception {
@@ -55,5 +68,38 @@ class VerificationControllerTest {
                 .andExpect(model().attribute("bookTitle", "Modern Java Recipes"))
                 .andExpect(model().attribute("issueDate", "2025-04-18"))
                 .andExpect(model().attributeExists("certificateFingerprint"));
+    }
+
+    @Test
+    void shouldReportNoIdWhenLinkOmitsCertificateId() throws Exception {
+        mockMvc.perform(get("/verify-certificate"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("recordStatus", "NO_ID"));
+    }
+
+    @Test
+    void shouldConfirmCertificateWhenRecordExists() throws Exception {
+        // Given
+        CertificateMetadata metadata = new CertificateMetadata("cert-123", "john_doe.pdf");
+        metadata.setFileHash("abc123hash");
+        when(metadataService.getCertificateMetadata("cert-123")).thenReturn(metadata);
+
+        // When/Then
+        mockMvc.perform(get("/verify-certificate").param("id", "cert-123"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("recordStatus", "FOUND"))
+                .andExpect(model().attribute("certificateId", "cert-123"))
+                .andExpect(model().attribute("fileHash", "abc123hash"));
+    }
+
+    @Test
+    void shouldReportMissingRecordForUnknownCertificateId() throws Exception {
+        // Given
+        when(metadataService.getCertificateMetadata("bogus-id")).thenReturn(null);
+
+        // When/Then
+        mockMvc.perform(get("/verify-certificate").param("id", "bogus-id"))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("recordStatus", "NOT_FOUND"));
     }
 }

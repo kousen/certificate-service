@@ -7,6 +7,8 @@ import net.jqwik.api.constraints.StringLength;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -40,14 +42,10 @@ class QrCodeGeneratorPropertyTest {
             }
         }
         
-        // Simple decode function to reverse the encoding process
-        // This simulates how a server would decode the parameters
+        // Standard URL decoding, as a server would apply to the parameters
         public String decode(String encoded) {
             if (encoded == null) return "";
-            return encoded.replace("%20", " ")
-                         .replace("%26", "&")
-                         .replace("%3D", "=")
-                         .replace("%3F", "?");
+            return URLDecoder.decode(encoded, StandardCharsets.UTF_8);
         }
     }
     

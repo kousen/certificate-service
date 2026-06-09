@@ -94,13 +94,35 @@ GET /api/certificates/signature-info
 
 Returns JSON describing the signing certificate (self-signed X.509, SHA512withRSA, 4096-bit key) and notes about reader warnings.
 
-### Certificate Verification
+### Verify a PDF's Digital Signature
+
+```
+POST /api/certificates/verify
+```
+
+Upload a PDF as multipart form data (field name `file`) to cryptographically verify its embedded signature:
+
+```bash
+curl -F file=@certificate.pdf http://localhost:8080/api/certificates/verify
+```
+
+Returns JSON reporting whether a signature is present, whether the document is intact (unmodified since signing), whether it was signed by this service's certificate, and whether the signature covers the entire file.
+
+### Download the Signing Certificate
+
+```
+GET /api/certificates/public-key
+```
+
+Returns the service's self-signed X.509 signing certificate in PEM format. Import it into your PDF reader's trusted identities to make signature warnings go away (a personal trust decision — that's the joke).
+
+### Certificate Verification Page
 
 ```
 GET /verify-certificate
 ```
 
-Displays certificate verification information and instructions for validating the digital signature.
+Displays certificate verification information. The QR code embedded in each generated PDF links here with the certificate's unique ID; the page checks that ID against the issuance records and, when found, shows the issue timestamp and the SHA-256 hash of the issued file so you can compare it against your copy (`shasum -a 256 certificate.pdf`). Without an ID, the page makes clear that the displayed details are unverified.
 
 ### Analytics Dashboard
 
@@ -157,6 +179,8 @@ All of the following are optional; defaults shown are from `src/main/resources/a
 | `CERTIFICATE_KEYSTORE` | `${user.home}/.cert_keystore.p12` | Path to the PKCS#12 signing keystore (auto-created if absent). |
 | `CERTIFICATE_STORAGE_PATH` | `${user.home}/certificate-service/certificates` | Directory where generated certificates are stored. |
 | `CERT_PWD` | `changeit` | Password for the signing keystore. |
+| `ADMIN_USERNAME` | `admin` | Username for HTTP basic auth on admin endpoints. |
+| `ADMIN_PASSWORD` | (empty) | When set, `/admin/**`, `/api/analytics/**`, and `/api/certificates/stored*` require HTTP basic auth. When empty (e.g. local development), all endpoints are open. |
 | `SPRING_PROFILES_ACTIVE` | (none) | Set to `production` to activate the production profile. |
 
 ### Steps

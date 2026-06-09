@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CertificateStorageServiceTest {
 
@@ -103,5 +104,27 @@ class CertificateStorageServiceTest {
         String filename = storedPath.getFileName().toString();
         assertThat(filename).contains("janesmith");
         assertThat(filename).contains("mockitomadeclear");
+    }
+
+    @Test
+    void shouldRejectPathTraversalInFilename() throws IOException {
+        // Given - a file outside the storage directory
+        Path outsideFile = Files.createTempFile("outside-storage-", ".pdf");
+        Files.writeString(outsideFile, "Secret content");
+
+        try {
+            // When/Then - relative traversal out of the storage directory is rejected
+            assertThatThrownBy(() ->
+                    storageService.getCertificate("../" + outsideFile.getFileName()))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageContaining("Invalid certificate filename");
+
+            assertThatThrownBy(() ->
+                    storageService.getCertificate("../../etc/passwd"))
+                    .isInstanceOf(IOException.class)
+                    .hasMessageContaining("Invalid certificate filename");
+        } finally {
+            Files.deleteIfExists(outsideFile);
+        }
     }
 }
