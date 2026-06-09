@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -69,7 +71,23 @@ public class QrCodeGenerator {
      * @throws IOException If there's an error during QR code generation
      */
     public byte[] generateQrCodeData(String name, String bookTitle, int size) throws IOException {
-        String verificationUrl = buildVerificationUrl(name, bookTitle);
+        return generateQrCodeData(name, bookTitle, null, size);
+    }
+
+    /**
+     * Generates a QR code as a PNG byte array whose verification URL includes the
+     * certificate ID, allowing the verification page to confirm the certificate
+     * against the issuance records.
+     *
+     * @param name          The name of the certificate holder
+     * @param bookTitle     The book title
+     * @param certificateId The unique ID assigned to the certificate (may be null)
+     * @param size          The size of the QR code in pixels
+     * @return PNG image data as a byte array
+     * @throws IOException If there's an error during QR code generation
+     */
+    public byte[] generateQrCodeData(String name, String bookTitle, String certificateId, int size) throws IOException {
+        String verificationUrl = buildVerificationUrl(name, bookTitle, certificateId);
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(verificationUrl, BarcodeFormat.QR_CODE, size, size);
@@ -85,26 +103,32 @@ public class QrCodeGenerator {
      * Builds a verification URL for the certificate
      */
     private String buildVerificationUrl(String name, String bookTitle) {
+        return buildVerificationUrl(name, bookTitle, null);
+    }
+
+    private String buildVerificationUrl(String name, String bookTitle, String certificateId) {
         String baseUrl = serverConfig.getUrl();
         String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        
+
         // Create the verification URL with parameters
-        return String.format(Locale.US, 
+        String url = String.format(Locale.US,
                 "%s/verify-certificate?name=%s&book=%s&date=%s",
                 baseUrl,
                 encodeUrlParam(name),
                 encodeUrlParam(bookTitle),
                 date);
+        if (certificateId != null && !certificateId.isBlank()) {
+            url += "&id=" + encodeUrlParam(certificateId);
+        }
+        return url;
     }
-    
+
     /**
-     * Simple URL parameter encoding
+     * URL parameter encoding using percent-encoding for spaces so the result
+     * is valid in both query strings and QR code payloads.
      */
     private String encodeUrlParam(String param) {
         if (param == null) return "";
-        return param.replace(" ", "%20")
-                  .replace("&", "%26")
-                  .replace("=", "%3D")
-                  .replace("?", "%3F");
+        return URLEncoder.encode(param, StandardCharsets.UTF_8).replace("+", "%20");
     }
 }

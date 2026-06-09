@@ -22,6 +22,11 @@ spring:
       path: /h2-console
 server:
   url: ${SERVER_URL:https://certificate-service-997e5d9f565a.herokuapp.com}
+admin:
+  # When admin.password is set (e.g. via ADMIN_PASSWORD), the analytics
+  # dashboard and stored-certificate endpoints require HTTP basic auth
+  username: ${ADMIN_USERNAME:admin}
+  password: ${ADMIN_PASSWORD:}
 certificate:
   keystore: ${CERTIFICATE_KEYSTORE:${user.home}/.cert_keystore.p12}
   storage:

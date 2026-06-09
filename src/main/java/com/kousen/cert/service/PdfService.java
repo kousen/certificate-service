@@ -40,11 +40,26 @@ public class PdfService {
      * @throws IOException If there's an error during PDF creation
      */
     public Path createPdf(CertificateRequest request) throws IOException {
+        return createPdf(request, null);
+    }
+
+    /**
+     * Creates a PDF certificate whose embedded QR code links back to the
+     * verification page with the given certificate ID, so the certificate can
+     * be checked against the issuance records.
+     *
+     * @param request The certificate request with recipient and book info
+     * @param certificateId The unique ID assigned to this certificate (may be null)
+     * @return Path to the generated PDF file
+     * @throws IOException If there's an error during PDF creation
+     */
+    public Path createPdf(CertificateRequest request, String certificateId) throws IOException {
         try {
             // Generate QR code in-memory
             byte[] qrCodeData = qrCodeGenerator.generateQrCodeData(
                     request.purchaserName(),
                     request.bookTitle(),
+                    certificateId,
                     220);
 
             // Create PDF with PDFBox using in-memory QR code

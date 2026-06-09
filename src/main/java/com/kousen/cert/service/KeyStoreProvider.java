@@ -1,5 +1,6 @@
 package com.kousen.cert.service;
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -14,6 +15,7 @@ import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
+import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -52,6 +54,21 @@ public class KeyStoreProvider {
 
     public KeyStore keyStore() { return keyStore; }
 
+    /**
+     * Returns the signing certificate stored under the key alias.
+     */
+    public X509Certificate certificate() {
+        try {
+            Certificate cert = keyStore.getCertificate(KEY_ALIAS);
+            if (!(cert instanceof X509Certificate x509)) {
+                throw new IllegalStateException("No X.509 certificate found under alias " + KEY_ALIAS);
+            }
+            return x509;
+        } catch (java.security.KeyStoreException e) {
+            throw new IllegalStateException("Failed to read certificate: " + e.getMessage(), e);
+        }
+    }
+
     private KeyStore create() {
         try {
             // Generate a strong RSA key pair
@@ -62,7 +79,8 @@ public class KeyStoreProvider {
             // Create certificate subject with more details
             var subject = new X500Name(
                     "CN=Ken Kousen, O=Tales from the Jar Side, OU=PDF Signing, L=Connecticut, ST=CT, C=US");
-            var serial = BigInteger.valueOf(System.currentTimeMillis());
+            // Random positive serial with at least 64 bits of entropy (CA/Browser Forum practice)
+            var serial = new BigInteger(64, new SecureRandom()).add(BigInteger.ONE);
             var notBefore = new Date();
             var notAfter  = Date.from(Instant.now().plus(3650, ChronoUnit.DAYS)); // 10 years
 
@@ -90,15 +108,15 @@ public class KeyStoreProvider {
                     true,
                     new KeyUsage(KeyUsage.digitalSignature | KeyUsage.nonRepudiation));
             
-            // Extended key usage - PDF signing
+            // Extended key usage - PDF signing (non-critical so validators that
+            // don't recognize the Adobe OID still accept the certificate)
             certBuilder.addExtension(
                     Extension.extendedKeyUsage,
-                    true,
+                    false,
                     new ExtendedKeyUsage(new KeyPurposeId[] {
                             KeyPurposeId.id_kp_emailProtection,
-                            KeyPurposeId.id_kp_codeSigning
-                            // Adobe's PDF signing OID is 1.2.840.113583.1.1.5,
-                            // but we can't use it directly due to access restrictions
+                            // Adobe's "PDF signing" purpose
+                            KeyPurposeId.getInstance(new ASN1ObjectIdentifier("1.2.840.113583.1.1.5"))
                     }));
 
             // Sign the certificate

@@ -8,18 +8,22 @@ import com.kousen.cert.service.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +37,8 @@ public class CertificateController {
 
     private final PdfService pdfService;
     private final PdfSigner pdfSigner;
+    private final PdfSignatureVerifier signatureVerifier;
+    private final KeyStoreProvider keyStoreProvider;
     private final CertificateStorageService storageService;
     private final AnalyticsService analyticsService;
     private final CertificateMetadataService metadataService;
@@ -40,67 +46,117 @@ public class CertificateController {
     public CertificateController(
             PdfService pdfService,
             PdfSigner pdfSigner,
+            PdfSignatureVerifier signatureVerifier,
+            KeyStoreProvider keyStoreProvider,
             CertificateStorageService storageService,
             AnalyticsService analyticsService,
             CertificateMetadataService metadataService) {
         this.pdfService = pdfService;
         this.pdfSigner = pdfSigner;
+        this.signatureVerifier = signatureVerifier;
+        this.keyStoreProvider = keyStoreProvider;
         this.storageService = storageService;
         this.analyticsService = analyticsService;
         this.metadataService = metadataService;
     }
 
     @PostMapping(produces = "application/pdf")
-    public ResponseEntity<FileSystemResource> create(@Valid @RequestBody CertificateRequest req, HttpServletRequest request) throws Exception {
+    public ResponseEntity<Resource> create(@Valid @RequestBody CertificateRequest req, HttpServletRequest request) throws Exception {
         long startTime = System.currentTimeMillis();
+        // Generated before the PDF so the embedded QR code can reference it
         String certificateId = UUID.randomUUID().toString();
         AnalyticsRequestContext requestContext = AnalyticsRequestContext.from(request);
-        
+
+        Path unsigned = null;
+        Path signed = null;
         try {
             // Generate the certificate
-            Path unsigned = pdfService.createPdf(req);
-            Path signed = pdfSigner.sign(unsigned);
-            
-            try {
-                // Store a copy of the certificate
-                Path storedCertificate = storageService.storeCertificate(signed, req);
-                logger.info("Certificate stored successfully at: {}", storedCertificate);
-                
-                // Track analytics
-                long duration = System.currentTimeMillis() - startTime;
-                analyticsService.trackCertificateGenerated(
-                    certificateId,
-                    req.purchaserName(),
-                    req.purchaserEmail().orElse(null),
-                    req.bookTitle(),
-                    duration,
-                    requestContext
-                );
-                
-                // Save metadata
-                metadataService.saveCertificateMetadata(certificateId, storedCertificate);
-                
-                // Return the certificate in the response
-                FileSystemResource res = new FileSystemResource(signed);
-                return ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
-                        .header("X-Certificate-Status",
-                                "Self-signed - May show warnings in PDF readers")
-                        .header("X-Certificate-Id", certificateId)
-                        .body(res);
-            } finally {
-                // Clean up the temporary unsigned PDF if it still exists
-                if (Files.exists(unsigned)) {
-                    try {
-                        Files.deleteIfExists(unsigned);
-                    } catch (Exception e) {
-                        logger.warn("Failed to delete temporary unsigned PDF: {}", unsigned, e);
-                    }
-                }
-            }
+            unsigned = pdfService.createPdf(req, certificateId);
+            signed = pdfSigner.sign(unsigned);
+
+            // Store a copy of the certificate
+            Path storedCertificate = storageService.storeCertificate(signed, req);
+            logger.info("Certificate stored successfully at: {}", storedCertificate);
+
+            // Track analytics
+            long duration = System.currentTimeMillis() - startTime;
+            analyticsService.trackCertificateGenerated(
+                certificateId,
+                req.purchaserName(),
+                req.purchaserEmail().orElse(null),
+                req.bookTitle(),
+                duration,
+                requestContext
+            );
+
+            // Save metadata
+            metadataService.saveCertificateMetadata(certificateId, storedCertificate);
+
+            // Return the certificate in the response (read into memory so the
+            // temporary files can be deleted before the response is streamed)
+            byte[] pdfBytes = Files.readAllBytes(signed);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"certificate.pdf\"")
+                    .header("X-Certificate-Status",
+                            "Self-signed - May show warnings in PDF readers")
+                    .header("X-Certificate-Id", certificateId)
+                    .body(new ByteArrayResource(pdfBytes));
         } catch (Exception e) {
             analyticsService.trackCertificateError(e.getMessage(), requestContext);
             throw e;
+        } finally {
+            deleteQuietly(unsigned);
+            deleteQuietly(signed);
+        }
+    }
+
+    private void deleteQuietly(Path path) {
+        if (path == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            logger.warn("Failed to delete temporary PDF: {}", path, e);
+        }
+    }
+
+    /**
+     * Verifies the digital signature of an uploaded PDF and reports whether it
+     * is intact and was signed by this service's certificate.
+     *
+     * @param file The PDF to verify
+     * @return Signature verification details
+     */
+    @PostMapping(value = "/verify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PdfSignatureVerifier.VerificationResult> verifySignature(
+            @RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uploaded file is empty");
+        }
+        return ResponseEntity.ok(signatureVerifier.verify(file.getBytes()));
+    }
+
+    /**
+     * Returns the service's signing certificate in PEM format so recipients can
+     * inspect it or import it into their PDF reader's trusted identities.
+     *
+     * @return The X.509 signing certificate as PEM text
+     */
+    @GetMapping(value = "/public-key", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> getPublicCertificate() {
+        try {
+            byte[] encoded = keyStoreProvider.certificate().getEncoded();
+            String pem = "-----BEGIN CERTIFICATE-----\n"
+                    + Base64.getMimeEncoder(64, "\n".getBytes()).encodeToString(encoded)
+                    + "\n-----END CERTIFICATE-----\n";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"signing-certificate.pem\"")
+                    .body(pem);
+        } catch (Exception e) {
+            logger.error("Failed to encode signing certificate", e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Could not encode signing certificate", e);
         }
     }
     
