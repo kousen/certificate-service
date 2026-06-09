@@ -1,5 +1,7 @@
 # Analytics Dashboard Implementation Plan
 
+> **⚠️ Historical document** — this plan was executed and the analytics dashboard is fully implemented (see `com.kousen.cert.analytics`, `/admin/dashboard`, and `/api/analytics/*`). Kept as a record of the design process; do not treat as open work.
+
 ## Overview
 This document outlines the implementation plan for adding an analytics dashboard to the Certificate Service application. The dashboard will provide insights into certificate generation, verification, and usage patterns to help administrators understand system usage and make data-driven decisions.
 
