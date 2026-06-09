@@ -70,6 +70,41 @@ class PdfBoxGeneratorTest {
     }
     
     @Test
+    void shouldDrawPlaceholderForInvalidQrData() throws Exception {
+        // Given
+        PdfBoxGenerator generator = new PdfBoxGenerator();
+        byte[] notAnImage = "definitely not a PNG".getBytes();
+
+        // When
+        Path pdfPath = generator.createCertificatePdfWithQrData(
+                "Certificate of Ownership", "John Doe", "Test Book", notAnImage);
+
+        // Then - PDF is still created, with a placeholder where the QR would be
+        assertThat(pdfPath).exists();
+        try (PDDocument document = Loader.loadPDF(pdfPath.toFile())) {
+            assertThat(document.getNumberOfPages()).isEqualTo(1);
+        }
+
+        Files.deleteIfExists(pdfPath);
+    }
+
+    @Test
+    void shouldSkipQrCodeForEmptyData() throws Exception {
+        // Given
+        PdfBoxGenerator generator = new PdfBoxGenerator();
+
+        // When
+        Path pdfPath = generator.createCertificatePdfWithQrData(
+                "Certificate of Ownership", "John Doe", "Test Book", new byte[0]);
+
+        // Then
+        assertThat(pdfPath).exists();
+        assertThat(Files.size(pdfPath)).isGreaterThan(0);
+
+        Files.deleteIfExists(pdfPath);
+    }
+
+    @Test
     void shouldHandleNullQrCode() throws Exception {
         // Given
         PdfBoxGenerator generator = new PdfBoxGenerator();

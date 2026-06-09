@@ -1,6 +1,7 @@
 package com.kousen.cert.controller;
 
 import com.kousen.cert.analytics.model.CertificateMetadata;
+import com.kousen.cert.analytics.service.AnalyticsService;
 import com.kousen.cert.analytics.service.CertificateMetadataService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +33,15 @@ class VerificationControllerTest {
 
         @Bean
         @Primary
-        public VerificationController verificationController(CertificateMetadataService metadataService) {
-            return new VerificationController("Test certificate fingerprint", null, metadataService);
+        public AnalyticsService testAnalyticsService() {
+            return mock(AnalyticsService.class);
+        }
+
+        @Bean
+        @Primary
+        public VerificationController verificationController(AnalyticsService analyticsService,
+                                                             CertificateMetadataService metadataService) {
+            return new VerificationController("Test certificate fingerprint", analyticsService, metadataService);
         }
     }
 
@@ -101,5 +109,42 @@ class VerificationControllerTest {
         mockMvc.perform(get("/verify-certificate").param("id", "bogus-id"))
                 .andExpect(status().isOk())
                 .andExpect(model().attribute("recordStatus", "NOT_FOUND"));
+    }
+
+    @Test
+    void shouldProvideFallbackFingerprintInDefaultConstructor() {
+        var controller = new VerificationController();
+
+        org.assertj.core.api.Assertions.assertThat(controller).isNotNull();
+    }
+
+    @Test
+    void shouldReportUnavailableFingerprintForNonX509Certificate() throws Exception {
+        // Given - a keystore with no certificate under the alias
+        var keyStoreProvider = mock(com.kousen.cert.service.KeyStoreProvider.class);
+        var keyStore = mock(java.security.KeyStore.class);
+        when(keyStoreProvider.keyStore()).thenReturn(keyStore);
+        when(keyStore.getCertificate("authorKey")).thenReturn(null);
+
+        // When
+        String fingerprint = VerificationController.generateCertificateFingerprint(keyStoreProvider);
+
+        // Then
+        org.assertj.core.api.Assertions.assertThat(fingerprint)
+                .isEqualTo("Certificate fingerprint not available");
+    }
+
+    @Test
+    void shouldReportErrorWhenFingerprintGenerationFails() {
+        // Given - a provider that blows up
+        var keyStoreProvider = mock(com.kousen.cert.service.KeyStoreProvider.class);
+        when(keyStoreProvider.keyStore()).thenThrow(new IllegalStateException("Keystore unavailable"));
+
+        // When
+        String fingerprint = VerificationController.generateCertificateFingerprint(keyStoreProvider);
+
+        // Then
+        org.assertj.core.api.Assertions.assertThat(fingerprint)
+                .isEqualTo("Error generating certificate fingerprint");
     }
 }

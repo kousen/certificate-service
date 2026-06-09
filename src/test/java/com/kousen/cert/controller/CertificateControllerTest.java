@@ -127,6 +127,78 @@ class CertificateControllerTest {
         mockMvc.perform(multipart("/api/certificates/verify").file(file))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void shouldReturnSignatureInfo() throws Exception {
+        mockMvc.perform(get("/api/certificates/signature-info"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.certificateType").value("Self-signed X.509"))
+                .andExpect(jsonPath("$.signatureAlgorithm").value("SHA512withRSA"))
+                .andExpect(jsonPath("$.keySize").value("4096 bits"));
+    }
+
+    @Test
+    void shouldReturn404WhenStoredCertificateNotFound() throws Exception {
+        when(storageService.getCertificate("missing.pdf"))
+                .thenThrow(new java.io.IOException("Certificate not found: missing.pdf"));
+
+        mockMvc.perform(get("/api/certificates/stored/missing.pdf"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldReturn500WhenListingFails() throws Exception {
+        when(storageService.listAllCertificates())
+                .thenThrow(new java.io.IOException("Disk on fire"));
+
+        mockMvc.perform(get("/api/certificates/stored"))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void shouldTrackDownloadWhenMetadataExists() throws Exception {
+        // Given
+        Path tempPdf = Files.createTempFile("test-cert-", ".pdf");
+        try {
+            Files.writeString(tempPdf, "Test PDF content");
+            String filename = tempPdf.getFileName().toString();
+            when(storageService.getCertificate(filename)).thenReturn(tempPdf);
+            var metadata = new com.kousen.cert.analytics.model.CertificateMetadata("cert-9", filename);
+            when(metadataService.getCertificateMetadataByFilename(filename)).thenReturn(metadata);
+
+            // When/Then
+            mockMvc.perform(get("/api/certificates/stored/" + filename))
+                    .andExpect(status().isOk());
+
+            org.mockito.Mockito.verify(analyticsService)
+                    .trackCertificateDownloaded(org.mockito.ArgumentMatchers.eq("cert-9"), any());
+        } finally {
+            Files.deleteIfExists(tempPdf);
+        }
+    }
+
+    @Test
+    void shouldTrackErrorWhenGenerationFails() throws Exception {
+        // Given
+        CertificateRequest request = new CertificateRequest(
+                "Failing User",
+                "Modern Java Recipes",
+                Optional.empty()
+        );
+        when(pdfService.createPdf(any(), any()))
+                .thenThrow(new java.io.IOException("Font exploded"));
+
+        // When - the exception propagates out of the controller
+        org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                mockMvc.perform(post("/api/certificates")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))))
+                .hasMessageContaining("Font exploded");
+
+        // Then - the failure was tracked
+        org.mockito.Mockito.verify(analyticsService)
+                .trackCertificateError(org.mockito.ArgumentMatchers.contains("Font exploded"), any());
+    }
     
     @Test
     void shouldRejectInvalidBookTitle() throws Exception {
