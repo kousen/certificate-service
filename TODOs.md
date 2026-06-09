@@ -2,16 +2,24 @@
 
 This document outlines suggested improvements for the Certificate Service application, organized by category and priority.
 
+## Completed
+
+- ✅ **Analytics Dashboard**: Implemented under `com.kousen.cert.analytics` — dashboard at `/admin/dashboard`, REST API under `/api/analytics/`.
+- ✅ **Verification API**: `POST /api/certificates/verify` cryptographically verifies an uploaded PDF's signature; the QR-code verification page checks certificate IDs against issuance records.
+- ✅ **Basic Admin Authentication**: HTTP basic auth on `/admin/**`, `/api/analytics/**`, and stored-certificate endpoints when `ADMIN_PASSWORD` is set.
+- ✅ **Coverage Gate**: `./gradlew build` enforces 80% line coverage via JaCoCo.
+
 ## Security Enhancements
 
 ### High Priority
 - **Implement Rate Limiting**: Add rate limiting to prevent abuse of the certificate generation API.
-- **Add CSRF Protection**: Ensure all forms have CSRF protection to prevent cross-site request forgery attacks.
 - **Security Headers**: Implement security headers (Content-Security-Policy, X-Content-Type-Options, etc.) to improve web security.
 - **Certificate Revocation**: Add ability to revoke certificates and maintain a Certificate Revocation List (CRL).
 
+> **Note on CSRF**: CSRF protection is *deliberately disabled* in `SecurityConfig` — the service exposes a stateless JSON/PDF API with no session-based forms, so CSRF tokens don't apply. Revisit only if session-authenticated browser forms are added.
+
 ### Medium Priority
-- **OAuth2 Integration**: Add OAuth2 support for API authentication to secure the API endpoints.
+- **OAuth2 Integration**: Add OAuth2 support for API authentication to secure the API endpoints. (Basic auth for admin endpoints exists; this would extend protection to the generation API.)
 - **Audit Logging**: Implement comprehensive audit logging for all certificate operations.
 - **Secure Storage**: Encrypt stored certificates at rest for additional security.
 
@@ -42,10 +50,8 @@ This document outlines suggested improvements for the Certificate Service applic
 ### High Priority
 - **Certificate Expiration**: Add support for certificate expiration dates.
 - **Custom Fields**: Allow additional custom fields on certificates.
-- **Verification API**: Create a programmatic API for certificate verification.
 
 ### Medium Priority
-- **Analytics Dashboard**: Add analytics for certificate generation and verification.
 - **Batch Processing**: Support batch operations for certificate management.
 - **Integration with Learning Management Systems**: Create plugins for popular LMS platforms.
 

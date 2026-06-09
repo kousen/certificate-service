@@ -1,5 +1,7 @@
 # Analytics Dashboard Implementation Tasks
 
+> **⚠️ Historical document** — the analytics dashboard described here was implemented and shipped; the checkboxes below were never updated and do **not** reflect current status. See `com.kousen.cert.analytics` for the actual implementation. Kept as a record of the planning process; do not treat as open work.
+
 This document provides a detailed, enumerated task list for implementing the analytics dashboard based on the plans.md file. Each task includes tracking capabilities to monitor progress.
 
 ## Task Status Legend

@@ -136,6 +136,8 @@ Web interface showing comprehensive analytics including:
 - Performance metrics and response times
 - Recent activity logs
 
+When the `ADMIN_PASSWORD` environment variable is set, this dashboard (along with the analytics API and stored-certificate endpoints) requires HTTP basic auth; with no password configured, everything stays open for local development.
+
 ### Analytics API
 
 ```
@@ -162,7 +164,7 @@ No manual keystore or certificate setup is required: on first run the app genera
 The application uses an H2 in-memory database for local development and PostgreSQL for production. The JDBC driver and Hibernate dialect are auto-detected from the datasource URL, so no driver property needs to be set.
 
 - **Development**: With no environment variables set, the app falls back to an in-memory H2 database (`jdbc:h2:mem:testdb`, user `sa`, empty password). The H2 web console is enabled at `/h2-console`.
-- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool. Note: on Heroku, the platform-provided `DATABASE_URL` is consumed automatically.
+- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool. Note: hosting platforms such as Railway and Heroku provide `DATABASE_URL` automatically when you attach a PostgreSQL database.
 
 ### Environment Variables
 
@@ -174,9 +176,10 @@ All of the following are optional; defaults shown are from `src/main/resources/a
 | `DATABASE_USERNAME` | `sa` | Datasource username. |
 | `DATABASE_PASSWORD` | (empty) | Datasource password. |
 | `HIBERNATE_DDL_AUTO` | `update` | Hibernate DDL mode (`update`, `validate`, etc.). |
-| `SERVER_URL` | the deployed Heroku URL | Base server URL; used as the default for the QR-code verification base URL. |
+| `SERVER_URL` | a legacy deployed URL (see `application.yaml`) | Base server URL; used as the default for the QR-code verification base URL. Set this to the public URL of your deployment. |
 | `CERTIFICATE_VERIFICATION_BASE_URL` | value of `SERVER_URL` | Absolute base URL embedded in generated QR-code verification links. |
 | `CERTIFICATE_KEYSTORE` | `${user.home}/.cert_keystore.p12` | Path to the PKCS#12 signing keystore (auto-created if absent). |
+| `CERTIFICATE_KEYSTORE_B64` | (none) | Not read by the application itself: the Railway start command (`railway.json`) decodes this base64-encoded keystore to `/tmp/keystore.p12` at container startup, so the same signing key survives redeploys. Pair it with `CERTIFICATE_KEYSTORE=/tmp/keystore.p12`. |
 | `CERTIFICATE_STORAGE_PATH` | `${user.home}/certificate-service/certificates` | Directory where generated certificates are stored. |
 | `CERT_PWD` | `changeit` | Password for the signing keystore. |
 | `ADMIN_USERNAME` | `admin` | Username for HTTP basic auth on admin endpoints. |
@@ -219,6 +222,8 @@ See the Environment Variables table above for all settings. As an example, the s
 
 No manual keystore setup is needed. On startup, if no keystore exists at the configured path (`CERTIFICATE_KEYSTORE`, default `${user.home}/.cert_keystore.p12`), the application generates a self-signed 4096-bit RSA certificate (SHA512withRSA) and stores it as a PKCS#12 file. The keystore password is read from the `CERT_PWD` environment variable (or the `CERT_PWD` system property), defaulting to `changeit`. If a keystore already exists at that path, it is loaded with the same password instead of being regenerated.
 
+**In production (Railway)**, the container filesystem is ephemeral, so the keystore is supplied through the `CERTIFICATE_KEYSTORE_B64` environment variable: the start command in `railway.json` base64-decodes it to `/tmp/keystore.p12` before launching the app, and `CERTIFICATE_KEYSTORE` points there. This keeps the signing key stable across deploys — otherwise every redeploy would generate a new key and invalidate the signatures on previously issued certificates. To produce the value: `base64 -i ~/.cert_keystore.p12`.
+
 ### Testing
 
 This project uses both traditional unit tests and property-based testing:
@@ -238,6 +243,8 @@ This project uses both traditional unit tests and property-based testing:
    ```
 
 Property-based testing systematically tests properties of the application with many random inputs, helping to discover edge cases that traditional unit tests might miss.
+
+**Coverage gate**: `./gradlew build` (or `check`) runs JaCoCo coverage verification and fails if overall line coverage drops below 80%, or if any class in `com.kousen.cert.service` falls below 70% (except `PdfBoxGenerator`, whose remaining gap is a defensive fallback). The HTML report lands in `build/jacocoHtml/index.html`.
 
 4. Generate a certificate (example using curl)
    ```bash
@@ -259,19 +266,23 @@ Property-based testing systematically tests properties of the application with m
 
 ## Deployment
 
-### Heroku Deployment
+### Railway Deployment
 
-The application is configured for easy Heroku deployment with PostgreSQL:
+The application currently deploys to [Railway](https://railway.com); `railway.json` holds the deploy configuration (start command, `/actuator/health` health check, restart policy).
 
-1. **Add PostgreSQL**: `heroku addons:create heroku-postgresql:essential-0`
-2. **Set Environment Variables**:
-   ```bash
-   heroku config:set SPRING_PROFILES_ACTIVE=production
-   heroku config:set HIBERNATE_DDL_AUTO=validate
-   ```
-3. **Deploy**: Standard git push to Heroku
+1. **Add PostgreSQL**: attach a Railway PostgreSQL database; it provides `DATABASE_URL` automatically
+2. **Set environment variables**:
+   - `SPRING_PROFILES_ACTIVE=production`
+   - `HIBERNATE_DDL_AUTO=validate` (after the first deploy has created the schema)
+   - `CERTIFICATE_KEYSTORE_B64` — your base64-encoded PKCS#12 keystore (see "Signing Keystore" above)
+   - `CERTIFICATE_KEYSTORE=/tmp/keystore.p12` and `CERT_PWD` — to match the decoded keystore
+   - `SERVER_URL` — the public URL of the deployment, so QR codes link to the right host
+   - `ADMIN_PASSWORD` — to protect the analytics dashboard and stored-certificate endpoints
+3. **Deploy**: push to the connected branch; Railway builds and runs the boot jar
 
-The application automatically detects the Heroku PostgreSQL `DATABASE_URL` and switches from H2 to persistent storage.
+### Heroku (legacy)
+
+The repository retains a `Procfile` and `system.properties` from its original Heroku deployment, so a standard `git push heroku` flow with the `heroku-postgresql` add-on still works using the same environment variables.
 
 ## Notes on Digital Signatures
 
