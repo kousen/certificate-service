@@ -300,9 +300,7 @@ The application currently deploys to [Railway](https://railway.com); `railway.js
    - `ADMIN_PASSWORD` — to protect the analytics dashboard and stored-certificate endpoints
 3. **Deploy**: push to the connected branch; Railway builds and runs the boot jar
 
-### Heroku (legacy)
-
-The repository retains a `Procfile` and `system.properties` from its original Heroku deployment, so a standard `git push heroku` flow with the `heroku-postgresql` add-on still works using the same environment variables.
+The service originally ran on Heroku. `Procfile`, `system.properties`, and `heroku-deploy.sh` are leftovers from that deployment and are not used by Railway.
 
 ## Notes on Digital Signatures
 
