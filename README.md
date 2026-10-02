@@ -39,7 +39,10 @@ This service generates professionally designed certificates of ownership for boo
 - ZXing for QR code generation
 - Thymeleaf templating for web UI
 - Chart.js for analytics visualizations
+- Spring Boot Actuator (health endpoint used by the Railway health check)
 - jqwik for property-based testing
+- Testcontainers (PostgreSQL) for the analytics integration test
+- JaCoCo for test coverage reports
 
 ## API Endpoints
 
@@ -70,13 +73,27 @@ GET /api/certificates/books
 
 Returns the list of available book titles that can be used in certificate generation. The `bookTitle` in a create request must match one of these exactly. Currently allowed titles: Gradle Recipes for Android, Help Your Boss Help You, Kotlin Cookbook, Making Java Groovy, Mockito Made Clear, Modern Java Recipes.
 
+Response:
+```json
+{ "availableBooks": ["Gradle Recipes for Android", "..."] }
+```
+
 ### List Stored Certificates
 
 ```
 GET /api/certificates/stored
 ```
 
-Returns a list of all stored certificates.
+Returns a JSON object describing all stored certificates:
+```json
+{
+  "storagePath": "/path/to/certificates",
+  "count": 1,
+  "certificates": [
+    { "filename": "ada_lovelace_modern_java_recipes_20250418123045.pdf", "size": 123456, "lastModified": "2025-04-18T12:30:45Z" }
+  ]
+}
+```
 
 ### Retrieve a Stored Certificate
 
@@ -97,10 +114,10 @@ Returns JSON describing the signing certificate (self-signed X.509, SHA512withRS
 ### Certificate Verification
 
 ```
-GET /verify-certificate
+GET /verify-certificate?name=...&book=...&date=...&id=...
 ```
 
-Displays certificate verification information and instructions for validating the digital signature.
+Displays certificate verification information and instructions for validating the digital signature. All query parameters are optional: `name`, `book`, and `date` are shown on the page; `id` (a certificate ID from the `X-Certificate-Id` header) records a verification event in analytics. The QR codes on generated certificates currently include `name`, `book`, and `date` but not `id`, so QR scans are not counted as verifications.
 
 ### Analytics Dashboard
 
@@ -139,8 +156,8 @@ No manual keystore or certificate setup is required: on first run the app genera
 
 The application uses an H2 in-memory database for local development and PostgreSQL for production. The JDBC driver and Hibernate dialect are auto-detected from the datasource URL, so no driver property needs to be set.
 
-- **Development**: With no environment variables set, the app falls back to an in-memory H2 database (`jdbc:h2:mem:testdb`, user `sa`, empty password). The H2 web console is enabled at `/h2-console`.
-- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool. Note: on Heroku, the platform-provided `DATABASE_URL` is consumed automatically.
+- **Development**: With no environment variables set, the app falls back to an in-memory H2 database (`jdbc:h2:mem:testdb`, user `sa`, empty password). The H2 web console is enabled at `/h2-console` (disabled when the `production` profile is active).
+- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. `DATABASE_URL` is passed straight to `spring.datasource.url`, so it must be a JDBC URL of the form `jdbc:postgresql://host:port/db`; the `postgres://user:pass@host/db` form that hosting platforms typically inject is not accepted. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool.
 
 ### Environment Variables
 
@@ -152,18 +169,19 @@ All of the following are optional; defaults shown are from `src/main/resources/a
 | `DATABASE_USERNAME` | `sa` | Datasource username. |
 | `DATABASE_PASSWORD` | (empty) | Datasource password. |
 | `HIBERNATE_DDL_AUTO` | `update` | Hibernate DDL mode (`update`, `validate`, etc.). |
-| `SERVER_URL` | the deployed Heroku URL | Base server URL; used as the default for the QR-code verification base URL. |
+| `SERVER_URL` | `https://certificate-service-997e5d9f565a.herokuapp.com` | Base server URL; used as the default for the QR-code verification base URL. The default is the retired Heroku host, so set this explicitly (e.g. `https://certificate-service.kousenit.com`) in any deployment. |
 | `CERTIFICATE_VERIFICATION_BASE_URL` | value of `SERVER_URL` | Absolute base URL embedded in generated QR-code verification links. |
 | `CERTIFICATE_KEYSTORE` | `${user.home}/.cert_keystore.p12` | Path to the PKCS#12 signing keystore (auto-created if absent). |
+| `CERTIFICATE_KEYSTORE_B64` | (none) | Base64-encoded PKCS#12 keystore. Read only by the Railway start command in `railway.json`, which decodes it to `/tmp/keystore.p12`; not used by the application itself. |
 | `CERTIFICATE_STORAGE_PATH` | `${user.home}/certificate-service/certificates` | Directory where generated certificates are stored. |
 | `CERT_PWD` | `changeit` | Password for the signing keystore. |
-| `SPRING_PROFILES_ACTIVE` | (none) | Set to `production` to activate the production profile. |
+| `SPRING_PROFILES_ACTIVE` | (none) | Set to `production` to activate the production profile, or `fonttest` to run the font-loading check (see Testing). |
 
 ### Steps
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/yourusername/certificate-service.git
+   git clone https://github.com/kousen/certificate-service.git
    cd certificate-service
    ```
 
@@ -212,10 +230,21 @@ This project uses both traditional unit tests and property-based testing:
    ```bash
    ./gradlew test --tests "*IntegrationTest"
    ```
+   `AnalyticsIntegrationTest` starts a PostgreSQL container with Testcontainers and requires Docker. Without Docker it is skipped silently (`disabledWithoutDocker = true`); `CertificateServiceIntegrationTest` runs against H2 and needs no Docker.
+
+4. Check font loading without starting the web server
+   ```bash
+   SPRING_PROFILES_ACTIVE=fonttest ./gradlew bootRun
+   ```
+   Runs `FontTester`, prints the result, and exits.
 
 Property-based testing systematically tests properties of the application with many random inputs, helping to discover edge cases that traditional unit tests might miss.
 
-4. Generate a certificate (example using curl)
+`./gradlew test` also produces a JaCoCo coverage report at `build/jacocoHtml/index.html`. Run `./gradlew jacocoTestCoverageVerification` to enforce the configured minimums (60% overall, 70% line coverage per class in `com.kousen.cert.service`).
+
+### Try It Out
+
+1. Generate a certificate (example using curl)
    ```bash
    curl -X POST http://localhost:8080/api/certificates \
         -H "Content-Type: application/json" \
@@ -223,31 +252,40 @@ Property-based testing systematically tests properties of the application with m
         -o ada.pdf
    ```
 
-5. Open the generated PDF
+2. Open the generated PDF
    ```bash
    open ada.pdf
    ```
 
-6. View analytics dashboard
+3. View analytics dashboard
    ```
    http://localhost:8080/admin/dashboard
    ```
 
 ## Deployment
 
-### Heroku Deployment
+### Railway Deployment
 
-The application is configured for easy Heroku deployment with PostgreSQL:
+The application is deployed on Railway. Deployment is driven by `railway.json`:
 
-1. **Add PostgreSQL**: `heroku addons:create heroku-postgresql:essential-0`
-2. **Set Environment Variables**:
-   ```bash
-   heroku config:set SPRING_PROFILES_ACTIVE=production
-   heroku config:set HIBERNATE_DDL_AUTO=validate
-   ```
-3. **Deploy**: Standard git push to Heroku
+- **Build**: Railway runs the Gradle build. `settings.gradle.kts` applies the foojay toolchain resolver, so JDK 25 is provisioned automatically on the build machine.
+- **Start command**: decodes `CERTIFICATE_KEYSTORE_B64` into `/tmp/keystore.p12`, then runs `build/libs/app.jar` on `$PORT`.
+- **Health check**: `/actuator/health`.
 
-The application automatically detects the Heroku PostgreSQL `DATABASE_URL` and switches from H2 to persistent storage.
+Set these variables in the Railway service:
+
+| Variable | Value |
+| --- | --- |
+| `CERTIFICATE_KEYSTORE_B64` | `base64 < your_keystore.p12` (single line) |
+| `CERTIFICATE_KEYSTORE` | `/tmp/keystore.p12` (where the start command writes the decoded keystore) |
+| `CERT_PWD` | password of that keystore |
+| `DATABASE_URL` | `jdbc:postgresql://host:port/db` for the Railway PostgreSQL service. Set this manually; the platform-injected `postgres://` URL is not accepted. |
+| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | PostgreSQL credentials |
+| `SERVER_URL` | public URL of the service, e.g. `https://certificate-service.kousenit.com` |
+| `SPRING_PROFILES_ACTIVE` | `production` |
+| `HIBERNATE_DDL_AUTO` | `update` for the first deployment, then `validate` |
+
+`Procfile`, `system.properties`, and `heroku-deploy.sh` are left over from the earlier Heroku deployment and are not used by Railway.
 
 ## Notes on Digital Signatures
 
