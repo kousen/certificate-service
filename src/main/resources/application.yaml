@@ -21,7 +21,7 @@ spring:
       enabled: true
       path: /h2-console
 server:
-  url: ${SERVER_URL:https://certificate-service-997e5d9f565a.herokuapp.com}
+  url: ${SERVER_URL:https://certificate-service.kousenit.com}
 admin:
   # When admin.password is set (e.g. via ADMIN_PASSWORD), the analytics
   # dashboard and stored-certificate endpoints require HTTP basic auth

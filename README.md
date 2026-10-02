@@ -193,7 +193,7 @@ All of the following are optional; defaults shown are from `src/main/resources/a
 | `DATABASE_USERNAME` | `sa` | Datasource username. |
 | `DATABASE_PASSWORD` | (empty) | Datasource password. |
 | `HIBERNATE_DDL_AUTO` | `update` | Hibernate DDL mode (`update`, `validate`, etc.). |
-| `SERVER_URL` | `https://certificate-service-997e5d9f565a.herokuapp.com` | Base server URL; used as the default for the QR-code verification base URL. The default is the retired Heroku host, so set this explicitly (e.g. `https://certificate-service.kousenit.com`) in any deployment. |
+| `SERVER_URL` | `https://certificate-service.kousenit.com` | Base server URL; used as the default for the QR-code verification base URL. Set it to your own public URL in any other deployment. |
 | `CERTIFICATE_VERIFICATION_BASE_URL` | value of `SERVER_URL` | Absolute base URL embedded in generated QR-code verification links. |
 | `CERTIFICATE_KEYSTORE` | `${user.home}/.cert_keystore.p12` | Path to the PKCS#12 signing keystore (auto-created if absent). |
 | `CERTIFICATE_KEYSTORE_B64` | (none) | Base64-encoded PKCS#12 keystore. Read only by the Railway start command in `railway.json`, which decodes it to `/tmp/keystore.p12`; not used by the application itself. |
