@@ -13,6 +13,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Coverage gate: `./gradlew jacocoTestCoverageVerification` (60% overall, 70% line coverage per class in `com.kousen.cert.service`)
 - `AnalyticsIntegrationTest` needs Docker (Testcontainers PostgreSQL); it is skipped silently without it
 
+## Coverage Gate
+- `./gradlew build` (and `check`) run JaCoCo coverage verification and FAIL if overall line coverage drops below 80%, or if any class in `com.kousen.cert.service` drops below 70% line coverage (PdfBoxGenerator is excluded — its gap is a defensive fallback that only runs when PDFBox fails to save)
+- A build failure mentioning "Rule violated" means new code needs tests, not that the build is broken
+- Coverage is measured excluding Application, config/**, and model/** (same exclusions as the report)
+
 ## Test Resources
 - When creating tests, ensure that necessary resources (fonts, images, etc.) are also available in src/test/resources
 - Property-based tests should use controlled parameter generation for cryptographic tests to avoid ASN.1 parsing issues
@@ -33,11 +38,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 - **Main Application**: Certificate generation with PDF signing and QR codes
+- **Verification Flow**: Certificate IDs are generated in CertificateController BEFORE PDF creation and threaded through PdfService → QrCodeGenerator into the QR code URL (`&id=...`); the /verify-certificate page looks the ID up in CertificateMetadata and shows issue timestamp + SHA-256 of the issued file
+- **Signature Verification**: PdfSignatureVerifier (bean in CertificateConfig) verifies CMS signatures of uploaded PDFs via POST /api/certificates/verify; GET /api/certificates/public-key serves the signing cert as PEM
+- **Security**: SecurityConfig applies HTTP basic auth to /admin/**, /api/analytics/**, and /api/certificates/stored* ONLY when ADMIN_PASSWORD is set; with it unset (local dev, tests) everything is permitAll and CSRF is disabled. CertificateControllerTest must @Import(SecurityConfig.class) because @WebMvcTest otherwise applies Spring Security's locked-down defaults
 - **Analytics Package**: Comprehensive tracking and dashboard system under `com.kousen.cert.analytics`
 - **Database**: H2 for development, PostgreSQL for production via environment variables
 - **Async Processing**: Event tracking uses @Async on the `analyticsTaskExecutor` thread pool (AnalyticsConfig); metrics aggregation runs on @Scheduled crons in MetricsAggregationService (daily 01:00, weekly Monday 02:00, monthly on the 1st at 03:00)
 - **Web UI**: Thymeleaf templates with Bootstrap and Chart.js for analytics dashboard
-- **Deployment**: Railway, configured by `railway.json` (start command decodes `CERTIFICATE_KEYSTORE_B64` to `/tmp/keystore.p12`; health check at `/actuator/health`). `Procfile`, `system.properties`, and `heroku-deploy.sh` are Heroku leftovers and unused.
+- **Deployment**: Railway (railway.json); the signing keystore arrives base64-encoded in CERTIFICATE_KEYSTORE_B64 and is decoded to /tmp/keystore.p12 by the start command. `Procfile`, `system.properties`, and `heroku-deploy.sh` are Heroku leftovers and not used by Railway.
 
 ## Database Configuration
 - Uses environment variable overrides: DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD (see application.yaml). The JDBC driver and Hibernate dialect are auto-detected from the URL — there is no DATABASE_DRIVER property in the code.

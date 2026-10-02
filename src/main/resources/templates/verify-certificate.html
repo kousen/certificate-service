@@ -92,6 +92,31 @@
             border-radius: 3px;
             font-weight: bold;
         }
+        .invalid-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .unknown-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #95a5a6;
+            color: white;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .record-details {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .hash-value {
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
     </style>
 </head>
 <body>
@@ -116,7 +141,35 @@
         </div>
         <div class="details-item">
             <span class="details-label">Status:</span>
-            <span class="valid-badge">Valid</span>
+            <span th:if="${recordStatus == 'FOUND'}" class="valid-badge">Issuance record verified</span>
+            <span th:if="${recordStatus == 'NOT_FOUND'}" class="invalid-badge">No record of this certificate</span>
+            <span th:if="${recordStatus == 'NO_ID'}" class="unknown-badge">Unverified &mdash; no certificate ID in link</span>
+            <span th:if="${recordStatus == 'UNAVAILABLE'}" class="unknown-badge">Verification records unavailable</span>
+        </div>
+        <div class="record-details" th:if="${recordStatus == 'FOUND'}">
+            <div class="details-item">
+                <span class="details-label">Certificate ID:</span>
+                <span class="details-value hash-value" th:text="${certificateId}">id</span>
+            </div>
+            <div class="details-item">
+                <span class="details-label">Issued at:</span>
+                <span class="details-value" th:text="${issuedAt}">timestamp</span>
+            </div>
+            <div class="details-item" th:if="${fileHash != null}">
+                <span class="details-label">SHA-256:</span>
+                <span class="details-value hash-value" th:text="${fileHash}">hash</span>
+            </div>
+            <p>Compare the SHA-256 value above with a hash of your PDF file
+                (e.g. <code>shasum -a 256 certificate.pdf</code>) to confirm your copy
+                is byte-for-byte the one that was issued.</p>
+        </div>
+        <div class="record-details" th:if="${recordStatus == 'NOT_FOUND'}">
+            <p>This service has no record of issuing a certificate with the ID in this link.
+                The certificate may have been fabricated, or the records may have been reset.</p>
+        </div>
+        <div class="record-details" th:if="${recordStatus == 'NO_ID'}">
+            <p>This link does not include a certificate ID, so the details above are merely
+                echoed from the link itself and cannot be confirmed against issuance records.</p>
         </div>
     </div>
 
@@ -145,6 +198,14 @@
     </div>
 
     <div class="signature-info">
+        <h3>Verify the Signature Cryptographically</h3>
+        <p>You can also upload the PDF for a full cryptographic check of its digital
+            signature: <code>curl -F file=@certificate.pdf /api/certificates/verify</code>
+            reports whether the document is intact and was signed by this service.
+            The signing certificate itself can be downloaded from
+            <a href="/api/certificates/public-key">/api/certificates/public-key</a>
+            and imported into your PDF reader's trusted identities.</p>
+
         <h3>About the Digital Signature</h3>
         <p>Each certificate is digitally signed with a 4096-bit RSA key using SHA-512 algorithm. While the certificate is self-signed (not issued by a central Certificate Authority), the signature mathematically guarantees that the PDF has not been altered since it was signed.</p>
         

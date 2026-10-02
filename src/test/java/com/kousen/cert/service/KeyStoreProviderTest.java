@@ -69,4 +69,30 @@ class KeyStoreProviderTest {
         assertThat(cert).isNotNull();
         assertThat(cert).isInstanceOf(X509Certificate.class);
     }
+
+    @Test
+    void shouldExposeSigningCertificate() {
+        // Given
+        Path keystorePath = tempDir.resolve("cert_access_keystore.p12");
+        KeyStoreProvider provider = new KeyStoreProvider(keystorePath);
+
+        // When
+        X509Certificate certificate = provider.certificate();
+
+        // Then
+        assertThat(certificate.getSubjectX500Principal().getName()).contains("CN=Ken Kousen");
+        assertThat(certificate.getSerialNumber().signum()).isPositive();
+    }
+
+    @Test
+    void shouldFailToLoadCorruptKeystore() throws Exception {
+        // Given - garbage where a keystore should be
+        Path keystorePath = tempDir.resolve("corrupt_keystore.p12");
+        Files.writeString(keystorePath, "This is not a PKCS#12 keystore");
+
+        // When/Then
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> new KeyStoreProvider(keystorePath))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Failed to load keystore");
+    }
 }

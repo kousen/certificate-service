@@ -111,13 +111,35 @@ GET /api/certificates/signature-info
 
 Returns JSON describing the signing certificate (self-signed X.509, SHA512withRSA, 4096-bit key) and notes about reader warnings.
 
-### Certificate Verification
+### Verify a PDF's Digital Signature
+
+```
+POST /api/certificates/verify
+```
+
+Upload a PDF as multipart form data (field name `file`) to cryptographically verify its embedded signature:
+
+```bash
+curl -F file=@certificate.pdf http://localhost:8080/api/certificates/verify
+```
+
+Returns JSON reporting whether a signature is present, whether the document is intact (unmodified since signing), whether it was signed by this service's certificate, and whether the signature covers the entire file.
+
+### Download the Signing Certificate
+
+```
+GET /api/certificates/public-key
+```
+
+Returns the service's self-signed X.509 signing certificate in PEM format. Import it into your PDF reader's trusted identities to make signature warnings go away (a personal trust decision — that's the joke).
+
+### Certificate Verification Page
 
 ```
 GET /verify-certificate?name=...&book=...&date=...&id=...
 ```
 
-Displays certificate verification information and instructions for validating the digital signature. All query parameters are optional: `name`, `book`, and `date` are shown on the page; `id` (a certificate ID from the `X-Certificate-Id` header) records a verification event in analytics. The QR codes on generated certificates currently include `name`, `book`, and `date` but not `id`, so QR scans are not counted as verifications.
+Displays certificate verification information. The QR code embedded in each generated PDF links here with the certificate's unique ID; the page checks that ID against the issuance records and, when found, shows the issue timestamp and the SHA-256 hash of the issued file so you can compare it against your copy (`shasum -a 256 certificate.pdf`). Without an ID, the page makes clear that the displayed details are unverified.
 
 ### Analytics Dashboard
 
@@ -130,6 +152,8 @@ Web interface showing comprehensive analytics including:
 - Book popularity statistics
 - Performance metrics and response times
 - Recent activity logs
+
+When the `ADMIN_PASSWORD` environment variable is set, this dashboard (along with the analytics API and stored-certificate endpoints) requires HTTP basic auth; with no password configured, everything stays open for local development.
 
 ### Analytics API
 
@@ -157,7 +181,7 @@ No manual keystore or certificate setup is required: on first run the app genera
 The application uses an H2 in-memory database for local development and PostgreSQL for production. The JDBC driver and Hibernate dialect are auto-detected from the datasource URL, so no driver property needs to be set.
 
 - **Development**: With no environment variables set, the app falls back to an in-memory H2 database (`jdbc:h2:mem:testdb`, user `sa`, empty password). The H2 web console is enabled at `/h2-console` (disabled when the `production` profile is active).
-- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. `DATABASE_URL` is passed straight to `spring.datasource.url`, so it must be a JDBC URL of the form `jdbc:postgresql://host:port/db`; the `postgres://user:pass@host/db` form that hosting platforms typically inject is not accepted. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool.
+- **Production**: Set `DATABASE_URL` (and, if needed, `DATABASE_USERNAME` / `DATABASE_PASSWORD`) to point at PostgreSQL. `DATABASE_URL` is passed straight to `spring.datasource.url`, so it must be a JDBC URL of the form `jdbc:postgresql://host:port/db`; the `postgres://user:pass@host/db` form that hosting platforms inject is not accepted, so set it manually. The `application-production.yaml` profile disables the H2 console and tunes the HikariCP pool.
 
 ### Environment Variables
 
@@ -175,7 +199,9 @@ All of the following are optional; defaults shown are from `src/main/resources/a
 | `CERTIFICATE_KEYSTORE_B64` | (none) | Base64-encoded PKCS#12 keystore. Read only by the Railway start command in `railway.json`, which decodes it to `/tmp/keystore.p12`; not used by the application itself. |
 | `CERTIFICATE_STORAGE_PATH` | `${user.home}/certificate-service/certificates` | Directory where generated certificates are stored. |
 | `CERT_PWD` | `changeit` | Password for the signing keystore. |
-| `SPRING_PROFILES_ACTIVE` | (none) | Set to `production` to activate the production profile, or `fonttest` to run the font-loading check (see Testing). |
+| `ADMIN_USERNAME` | `admin` | Username for HTTP basic auth on admin endpoints. |
+| `ADMIN_PASSWORD` | (empty) | When set, `/admin/**`, `/api/analytics/**`, and `/api/certificates/stored*` require HTTP basic auth. When empty (e.g. local development), all endpoints are open. |
+| `SPRING_PROFILES_ACTIVE` | (none) | Set to `production` to activate the production profile. |
 
 ### Steps
 
@@ -213,6 +239,8 @@ See the Environment Variables table above for all settings. As an example, the s
 
 No manual keystore setup is needed. On startup, if no keystore exists at the configured path (`CERTIFICATE_KEYSTORE`, default `${user.home}/.cert_keystore.p12`), the application generates a self-signed 4096-bit RSA certificate (SHA512withRSA) and stores it as a PKCS#12 file. The keystore password is read from the `CERT_PWD` environment variable (or the `CERT_PWD` system property), defaulting to `changeit`. If a keystore already exists at that path, it is loaded with the same password instead of being regenerated.
 
+**In production (Railway)**, the container filesystem is ephemeral, so the keystore is supplied through the `CERTIFICATE_KEYSTORE_B64` environment variable: the start command in `railway.json` base64-decodes it to `/tmp/keystore.p12` before launching the app, and `CERTIFICATE_KEYSTORE` points there. This keeps the signing key stable across deploys — otherwise every redeploy would generate a new key and invalidate the signatures on previously issued certificates. To produce the value: `base64 -i ~/.cert_keystore.p12`.
+
 ### Testing
 
 This project uses both traditional unit tests and property-based testing:
@@ -232,15 +260,9 @@ This project uses both traditional unit tests and property-based testing:
    ```
    `AnalyticsIntegrationTest` starts a PostgreSQL container with Testcontainers and requires Docker. Without Docker it is skipped silently (`disabledWithoutDocker = true`); `CertificateServiceIntegrationTest` runs against H2 and needs no Docker.
 
-4. Check font loading without starting the web server
-   ```bash
-   SPRING_PROFILES_ACTIVE=fonttest ./gradlew bootRun
-   ```
-   Runs `FontTester`, prints the result, and exits.
-
 Property-based testing systematically tests properties of the application with many random inputs, helping to discover edge cases that traditional unit tests might miss.
 
-`./gradlew test` also produces a JaCoCo coverage report at `build/jacocoHtml/index.html`. Run `./gradlew jacocoTestCoverageVerification` to enforce the configured minimums (60% overall, 70% line coverage per class in `com.kousen.cert.service`).
+**Coverage gate**: `./gradlew build` (or `check`) runs JaCoCo coverage verification and fails if overall line coverage drops below 80%, or if any class in `com.kousen.cert.service` falls below 70% (except `PdfBoxGenerator`, whose remaining gap is a defensive fallback). The HTML report lands in `build/jacocoHtml/index.html`.
 
 ### Try It Out
 
@@ -266,26 +288,21 @@ Property-based testing systematically tests properties of the application with m
 
 ### Railway Deployment
 
-The application is deployed on Railway. Deployment is driven by `railway.json`:
+The application currently deploys to [Railway](https://railway.com); `railway.json` holds the deploy configuration (start command, `/actuator/health` health check, restart policy).
 
-- **Build**: Railway runs the Gradle build. `settings.gradle.kts` applies the foojay toolchain resolver, so JDK 25 is provisioned automatically on the build machine.
-- **Start command**: decodes `CERTIFICATE_KEYSTORE_B64` into `/tmp/keystore.p12`, then runs `build/libs/app.jar` on `$PORT`.
-- **Health check**: `/actuator/health`.
+1. **Add PostgreSQL**: attach a Railway PostgreSQL database; then set `DATABASE_URL` yourself as a JDBC URL (`jdbc:postgresql://host:port/db`); the `postgres://` URL Railway injects is not accepted
+2. **Set environment variables**:
+   - `SPRING_PROFILES_ACTIVE=production`
+   - `HIBERNATE_DDL_AUTO=validate` (after the first deploy has created the schema)
+   - `CERTIFICATE_KEYSTORE_B64` — your base64-encoded PKCS#12 keystore (see "Signing Keystore" above)
+   - `CERTIFICATE_KEYSTORE=/tmp/keystore.p12` and `CERT_PWD` — to match the decoded keystore
+   - `SERVER_URL` — the public URL of the deployment, so QR codes link to the right host
+   - `ADMIN_PASSWORD` — to protect the analytics dashboard and stored-certificate endpoints
+3. **Deploy**: push to the connected branch; Railway builds and runs the boot jar
 
-Set these variables in the Railway service:
+### Heroku (legacy)
 
-| Variable | Value |
-| --- | --- |
-| `CERTIFICATE_KEYSTORE_B64` | `base64 < your_keystore.p12` (single line) |
-| `CERTIFICATE_KEYSTORE` | `/tmp/keystore.p12` (where the start command writes the decoded keystore) |
-| `CERT_PWD` | password of that keystore |
-| `DATABASE_URL` | `jdbc:postgresql://host:port/db` for the Railway PostgreSQL service. Set this manually; the platform-injected `postgres://` URL is not accepted. |
-| `DATABASE_USERNAME` / `DATABASE_PASSWORD` | PostgreSQL credentials |
-| `SERVER_URL` | public URL of the service, e.g. `https://certificate-service.kousenit.com` |
-| `SPRING_PROFILES_ACTIVE` | `production` |
-| `HIBERNATE_DDL_AUTO` | `update` for the first deployment, then `validate` |
-
-`Procfile`, `system.properties`, and `heroku-deploy.sh` are left over from the earlier Heroku deployment and are not used by Railway.
+The repository retains a `Procfile` and `system.properties` from its original Heroku deployment, so a standard `git push heroku` flow with the `heroku-postgresql` add-on still works using the same environment variables.
 
 ## Notes on Digital Signatures
 

@@ -70,4 +70,24 @@ class PdfServiceTest {
             Files.deleteIfExists(pdfPath);
         }
     }
+
+    @Test
+    void shouldWrapGenerationFailuresAsIOException() throws Exception {
+        // Given - a QR generator that fails
+        QrCodeGenerator failingGenerator = mock(QrCodeGenerator.class);
+        when(failingGenerator.generateQrCodeData(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.anyInt()))
+                .thenThrow(new java.io.IOException("QR generation failed"));
+        PdfService service = new PdfService(failingGenerator, new PdfBoxGenerator());
+
+        CertificateRequest request = new CertificateRequest(
+                "Test User",
+                "Modern Java Recipes",
+                Optional.empty()
+        );
+
+        // When/Then
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.createPdf(request))
+                .isInstanceOf(java.io.IOException.class)
+                .hasMessageContaining("Failed to generate PDF");
+    }
 }

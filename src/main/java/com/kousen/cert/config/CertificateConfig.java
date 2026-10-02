@@ -1,6 +1,7 @@
 package com.kousen.cert.config;
 
 import com.kousen.cert.service.KeyStoreProvider;
+import com.kousen.cert.service.PdfSignatureVerifier;
 import com.kousen.cert.service.PdfSigner;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,11 @@ public class CertificateConfig implements WebMvcConfigurer {
     @Bean
     PdfSigner pdfSigner(KeyStoreProvider provider) {
         return new PdfSigner(provider);
+    }
+
+    @Bean
+    PdfSignatureVerifier pdfSignatureVerifier(KeyStoreProvider provider) {
+        return new PdfSignatureVerifier(provider);
     }
 
     private Path resolveKeyStorePath(String keystoreLocation) {

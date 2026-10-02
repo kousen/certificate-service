@@ -117,4 +117,62 @@ class QrCodeGeneratorTest {
         assertThat(urlContent).contains("name=Test%20User");
         assertThat(urlContent).contains("book=Test%20Book");
     }
+
+    @Test
+    void shouldIncludeCertificateIdInVerificationUrl() throws Exception {
+        // Given
+        ServerUrlConfig mockConfig = mock(ServerUrlConfig.class);
+        when(mockConfig.getUrl()).thenReturn("https://test-server.com");
+
+        QrCodeGenerator generator = new QrCodeGenerator(mockConfig);
+
+        var method = QrCodeGenerator.class.getDeclaredMethod(
+                "buildVerificationUrl", String.class, String.class, String.class);
+        method.setAccessible(true);
+
+        // When
+        String url = (String) method.invoke(generator, "Test User", "Test Book", "abc-123");
+
+        // Then
+        assertThat(url).contains("id=abc-123");
+    }
+
+    @Test
+    void shouldEncodeNonAsciiCharactersInParameters() throws Exception {
+        // Given
+        ServerUrlConfig mockConfig = mock(ServerUrlConfig.class);
+        when(mockConfig.getUrl()).thenReturn("https://test-server.com");
+
+        QrCodeGenerator generator = new QrCodeGenerator(mockConfig);
+
+        var method = QrCodeGenerator.class.getDeclaredMethod(
+                "buildVerificationUrl", String.class, String.class);
+        method.setAccessible(true);
+
+        // When
+        String url = (String) method.invoke(generator, "José Núñez + Co.", "Test Book");
+
+        // Then - percent-encoded UTF-8, no raw spaces, plus signs, or accents
+        assertThat(url).contains("name=Jos%C3%A9%20N%C3%BA%C3%B1ez%20%2B%20Co.");
+    }
+
+    @Test
+    void shouldWrapEncodingErrorsAsIOException() {
+        // Given
+        ServerUrlConfig mockConfig = mock(ServerUrlConfig.class);
+        when(mockConfig.getUrl()).thenReturn("https://test-server.com");
+
+        QrCodeGenerator generator = new QrCodeGenerator(mockConfig);
+
+        // When/Then - a negative size makes ZXing fail in both generation paths
+        org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                generator.generateQrCode("Test User", "Test Book", -1))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("Failed to generate QR code");
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() ->
+                generator.generateQrCodeData("Test User", "Test Book", -1))
+                .isInstanceOf(IOException.class)
+                .hasMessageContaining("Failed to generate QR code data");
+    }
 }
