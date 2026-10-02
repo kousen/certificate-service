@@ -45,7 +45,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Database**: H2 for development, PostgreSQL for production via environment variables
 - **Async Processing**: Event tracking uses @Async on the `analyticsTaskExecutor` thread pool (AnalyticsConfig); metrics aggregation runs on @Scheduled crons in MetricsAggregationService (daily 01:00, weekly Monday 02:00, monthly on the 1st at 03:00)
 - **Web UI**: Thymeleaf templates with Bootstrap and Chart.js for analytics dashboard
-- **Deployment**: Railway (railway.json); the signing keystore arrives base64-encoded in CERTIFICATE_KEYSTORE_B64 and is decoded to /tmp/keystore.p12 by the start command. `Procfile`, `system.properties`, and `heroku-deploy.sh` are Heroku leftovers and not used by Railway.
+- **Deployment**: Railway (railway.json); the signing keystore arrives base64-encoded in CERTIFICATE_KEYSTORE_B64 and is decoded to /tmp/keystore.p12 by the start command.
 
 ## Database Configuration
 - Uses environment variable overrides: DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD (see application.yaml). The JDBC driver and Hibernate dialect are auto-detected from the URL — there is no DATABASE_DRIVER property in the code.

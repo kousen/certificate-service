@@ -300,8 +300,6 @@ The application currently deploys to [Railway](https://railway.com); `railway.js
    - `ADMIN_PASSWORD` — to protect the analytics dashboard and stored-certificate endpoints
 3. **Deploy**: push to the connected branch; Railway builds and runs the boot jar
 
-The service originally ran on Heroku. `Procfile`, `system.properties`, and `heroku-deploy.sh` are leftovers from that deployment and are not used by Railway.
-
 ## Notes on Digital Signatures
 
 The certificates are signed with a self-signed certificate, which means that Adobe Reader and other PDF readers may display warnings about the signature's validity. This is normal and doesn't affect the integrity of the signature itself. The verification page accessible via the QR code explains how to interpret these warnings.
