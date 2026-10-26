@@ -71,7 +71,7 @@ Response: PDF certificate file (also returns `X-Certificate-Id` and `X-Certifica
 GET /api/certificates/books
 ```
 
-Returns the list of available book titles that can be used in certificate generation. The `bookTitle` in a create request must match one of these exactly. Currently allowed titles: Gradle Recipes for Android, Help Your Boss Help You, Kotlin Cookbook, Making Java Groovy, Mockito Made Clear, Modern Java Recipes.
+Returns the list of available book titles that can be used in certificate generation. The `bookTitle` in a create request must match one of these exactly. Currently allowed titles: Claude Code: Up and Running, Gradle Recipes for Android, Help Your Boss Help You, Kotlin Cookbook, Making Java Groovy, Mockito Made Clear, Modern Java Recipes.
 
 Response:
 ```json

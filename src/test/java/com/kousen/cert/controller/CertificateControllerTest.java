@@ -228,7 +228,9 @@ class CertificateControllerTest {
         mockMvc.perform(get("/api/certificates/books"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.availableBooks").isArray())
-                .andExpect(jsonPath("$.availableBooks.length()").value(6));
+                .andExpect(jsonPath("$.availableBooks.length()")
+                        .value(CertificateRequest.ALLOWED_BOOK_TITLES.size()))
+                .andExpect(jsonPath("$.availableBooks[0]").value("Claude Code: Up and Running"));
     }
     
     @Test

@@ -50,6 +50,13 @@ class BookTitleValidatorTest {
     }
     
     @Test
+    void shouldAcceptClaudeCodeUpAndRunning() {
+        // Explicit check so a missing newly-added title fails even though
+        // validBookTitles() is derived from the list itself
+        assertThat(validator.isValid("Claude Code: Up and Running", context)).isTrue();
+    }
+
+    @Test
     void shouldMatchExactTitleWithCorrectCase() {
         // Case matters
         assertThat(validator.isValid("making java groovy", context)).isFalse();
