@@ -27,6 +27,7 @@ public record CertificateRequest(
 ) {
     // List of allowed book titles
     public static final List<String> ALLOWED_BOOK_TITLES = List.of(
+            "Claude Code: Up and Running",
             "Gradle Recipes for Android",
             "Help Your Boss Help You",
             "Kotlin Cookbook",
