@@ -1,0 +1,8 @@
+{
+  "name": "certificate-service-railway-iac",
+  "private": true,
+  "description": "Only exists so the Railway CLI can evaluate .railway/railway.ts",
+  "devDependencies": {
+    "railway": "^3.16.0"
+  }
+}

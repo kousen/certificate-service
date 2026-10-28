@@ -53,3 +53,6 @@ out/
 
 # Graphify knowledge-graph output (embeds source content; do not commit)
 graphify-out/
+
+# Railway IaC SDK (npm install railway)
+node_modules/
